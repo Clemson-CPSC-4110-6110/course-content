@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free VR Assets - CPSC 4110/6110</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-primary: #12121a;
+            --bg-elevated: #1a1a26;
+            --bg-surface: #22222e;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent: #00d4aa;
+            --accent-bright: #00ffcc;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(0, 212, 170, 0.3);
+            --warning: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .page-wrapper {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 3rem 2rem 3rem 0;
+        }
+
+        /* Navigation sidebar */
+        .nav-sidebar {
+            position: relative;
+            padding: 1.5rem 0 1.5rem 1.5rem;
+        }
+
+        .nav-sidebar nav {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            width: 190px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .nav-sidebar nav.is-visible {
+            opacity: 1;
+        }
+
+        .nav-sidebar nav.is-sticky {
+            position: fixed;
+            top: 2rem;
+        }
+
+        .nav-sidebar h2 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: block;
+        }
+
+        .nav-sidebar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-sidebar li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-sidebar a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            margin-left: -2px;
+        }
+
+        .nav-sidebar a:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+        }
+
+        .nav-sidebar a.active {
+            color: var(--accent);
+            background: rgba(0, 212, 170, 0.08);
+            border-left-color: var(--accent);
+        }
+
+        .nav-spacer {
+            height: 0;
+            transition: height 0.1s ease;
+        }
+
+        /* Mobile nav toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg-deep);
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+            z-index: 1000;
+            transition: transform 0.2s ease;
+        }
+
+        .mobile-nav-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.9);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-overlay.visible {
+            opacity: 1;
+        }
+
+        .mobile-nav-content {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border);
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+
+        .mobile-nav-overlay.visible .mobile-nav-content {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-content h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: block;
+        }
+
+        .mobile-nav-content ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav-content a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            background: var(--bg-surface);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-content a:hover,
+        .mobile-nav-content a.active {
+            color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Content sections */
+        section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+
+        h2 .emoji {
+            margin-right: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Intro box */
+        .intro-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .intro-box p {
+            margin-bottom: 0;
+        }
+
+        /* Category note */
+        .category-note {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Resource cards */
+        .resource-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .resource-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .resource-card:hover {
+            border-color: var(--border-accent);
+            transform: translateX(4px);
+        }
+
+        .resource-card h4 {
+            margin: 0 0 0.4rem 0;
+        }
+
+        .resource-card h4 a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .resource-card h4 a:hover {
+            color: var(--accent-bright);
+        }
+
+        .resource-card h4 span {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .resource-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+            color: var(--text-muted);
+        }
+
+        /* Warning/Tips box */
+        .tips-box {
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-left: 4px solid var(--warning);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tips-box h3 {
+            color: var(--warning);
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+        }
+
+        .tips-box ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .tips-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tips-box li:last-child {
+            margin-bottom: 0;
+        }
+
+        .tips-box li::marker {
+            color: var(--warning);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-sidebar {
+                display: none;
+            }
+
+            .container {
+                padding: 2rem 1.5rem;
+                max-width: 100%;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-nav-overlay {
+                display: block;
+                pointer-events: none;
+            }
+
+            .mobile-nav-overlay.visible {
+                pointer-events: auto;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <aside class="nav-sidebar">
+            <div class="nav-spacer"></div>
+            <nav id="sidebar-nav">
+                <h2>On This Page</h2>
+                <ul>
+                    <li><a href="#unity-assets">Unity Assets</a></li>
+                    <li><a href="#3d-models">3D Models</a></li>
+                    <li><a href="#textures">Textures</a></li>
+                    <li><a href="#audio">Audio</a></li>
+                    <li><a href="#ui-icons">UI & Icons</a></li>
+                    <li><a href="#cultural">Cultural</a></li>
+                    <li><a href="#additional">Additional</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <span>&larr;</span>
+                <span>Back to Course Home</span>
+            </a>
+
+            <header>
+                <h1>Free VR Asset Resources</h1>
+                <p class="subtitle">CPSC 4110/6110: Virtual Reality Systems</p>
+            </header>
+
+            <main>
+                <div class="intro-box">
+                    <p><strong>Getting Started:</strong> This guide organizes free asset resources by category. Start with Unity Asset Store and one or two resources from each category based on your project needs. Always check license terms before using assets in your projects.</p>
+                </div>
+
+                <section id="unity-assets">
+                    <h2><span class="emoji">🎮</span>Unity-Specific Resources</h2>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/" target="_blank" rel="noopener">Unity Asset Store</a></h4>
+                            <p>Your first stop. Filter by "Free Assets" to find 3D models, textures, audio, scripts, and VR-specific tools. Look for "Starter Assets" packages.</p>
+                        </div>
+                    </div>
+
+                    <h3>Recommended Free Packages</h3>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014" target="_blank" rel="noopener">AllSky Free</a></h4>
+                            <p>Collection of 10 high-quality skyboxes (200+ in paid version). Essential for establishing atmosphere in VR environments.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/3d/animations/basic-motions-free-154271" target="_blank" rel="noopener">Kevin Iglesias Basic Motions FREE</a></h4>
+                            <p>Professional animation pack with common character movements. Works great with Mixamo characters for adding life to VR scenes.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><span>Nature Starter Kit 1 & 2</span></h4>
+                            <p>Trees, rocks, grass, and natural environment assets optimized for performance. Perfect for outdoor VR experiences.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676" target="_blank" rel="noopener">DOTween (HOTween v2)</a></h4>
+                            <p>Powerful tweening library for smooth animations and transitions. Essential for animating UI, objects, and camera movements in VR with minimal code.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/tools/gui/graphy-ultimate-stats-monitor-debugger-105778" target="_blank" rel="noopener">Graphy - Ultimate Stats Monitor</a></h4>
+                            <p>Real-time FPS counter, memory usage, and performance metrics overlay. Critical for VR optimization—maintaining frame rate is essential for comfort.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/tools/utilities/lean-pool-35666" target="_blank" rel="noopener">Lean Pool</a></h4>
+                            <p>Object pooling system for better VR performance. Reuses objects instead of constantly creating/destroying them, reducing frame stutters.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488" target="_blank" rel="noopener">Quick Outline</a></h4>
+                            <p>Simple object outlining shader for highlighting interactive objects. Great for visual feedback when players look at or interact with VR objects.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://assetstore.unity.com/packages/vfx/particles/particle-pack-127325" target="_blank" rel="noopener">Unity Particle Pack</a></h4>
+                            <p>Free particle effects system for VR environments.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="3d-models">
+                    <h2><span class="emoji">🎨</span>3D Models & Characters</h2>
+                    <p class="category-note">Low-poly assets perform better in VR</p>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://kenney.nl" target="_blank" rel="noopener">Kenney.nl</a></h4>
+                            <p>Extensive poly-art kits and modular pieces. Public domain license. Excellent starting point for stylized VR projects.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://quaternius.com/" target="_blank" rel="noopener">Quaternius</a></h4>
+                            <p>Curated low-poly asset packs with characters, environments, and props. Optimized for VR performance.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://poly.pizza/" target="_blank" rel="noopener">Poly Pizza</a></h4>
+                            <p>Searchable collection of individual low-poly models. Great for prototyping VR scenes quickly.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a></h4>
+                            <p>Rigged characters with animations. Requires free Adobe account. Essential for adding animated characters to VR.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://opengameart.org" target="_blank" rel="noopener">OpenGameArt.org</a></h4>
+                            <p>Community-driven eclectic mix of game assets. Varied licenses and styles.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="textures">
+                    <h2><span class="emoji">🖼️</span>Textures & Materials</h2>
+                    <p class="category-note">PBR materials work best for realistic VR lighting</p>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a></h4>
+                            <p>High-quality PBR textures, HDRIs, and realistic models. All CC0 license. Excellent for realistic VR environments.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://ambientcg.com" target="_blank" rel="noopener">AmbientCG</a></h4>
+                            <p>CC0 scanned, tileable textures and materials. Strong collection for architectural and environmental work.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="audio">
+                    <h2><span class="emoji">🔊</span>Audio & Sound Effects</h2>
+                    <p class="category-note">Spatial audio is critical for VR immersion!</p>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://freesound.org/" target="_blank" rel="noopener">Freesound.org</a></h4>
+                            <p>Community library of sound effects. Check individual licenses.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://sound-effects.bbcrewind.co.uk/" target="_blank" rel="noopener">BBC Sound Effects</a></h4>
+                            <p>16,000+ professional sound effects, free for educational use.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://sonniss.com/gameaudiogdc" target="_blank" rel="noopener">Sonniss GDC Bundles</a></h4>
+                            <p>Annual free game audio bundle releases with professional quality sounds.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://www.zapsplat.com/" target="_blank" rel="noopener">Zapsplat</a></h4>
+                            <p>Large sound effects library with free tier.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ui-icons">
+                    <h2><span class="emoji">🎯</span>UI & Icons</h2>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://game-icons.net/" target="_blank" rel="noopener">Game Icons</a></h4>
+                            <p>SVG icons perfect for VR UI elements and menus.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="cultural">
+                    <h2><span class="emoji">🏛️</span>Cultural & Educational</h2>
+                    <p class="category-note">Unique content for educational VR experiences</p>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://www.si.edu/openaccess" target="_blank" rel="noopener">Smithsonian Open Access</a></h4>
+                            <p>Millions of images and 3D scans from museum collections. Public domain.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://sketchfab.com/britishmuseum" target="_blank" rel="noopener">British Museum (Sketchfab)</a></h4>
+                            <p>High-quality 3D scans of artifacts and sculptures.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://www.getty.edu/art/collection/" target="_blank" rel="noopener">Getty Museum Open Content</a></h4>
+                            <p>Art and cultural objects available for download.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://www.nhm.ac.uk/discover/data.html" target="_blank" rel="noopener">Natural History Museum London</a></h4>
+                            <p>Animal and fossil 3D scans for scientific VR projects.</p>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4><a href="https://scantheworld.com/" target="_blank" rel="noopener">Scan the World</a></h4>
+                            <p>Crowdsourced collection of sculpture scans from around the world.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="additional">
+                    <h2><span class="emoji">🛠️</span>Additional Resources</h2>
+
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h4><a href="https://www.thingiverse.com/" target="_blank" rel="noopener">Thingiverse</a></h4>
+                            <p>3D printing models that often work well in VR environments.</p>
+                        </div>
+                    </div>
+
+                    <div class="tips-box">
+                        <h3>💡 Pro Tips</h3>
+                        <ul>
+                            <li><strong>Performance First:</strong> VR requires higher framerates. Use low-poly models when possible and test on your target hardware.</li>
+                            <li><strong>License Check:</strong> Always verify license terms (CC0, CC-BY, etc.) before using assets in your project.</li>
+                            <li><strong>Audio Matters:</strong> Don't neglect spatial audio—it's essential for presence and immersion in VR.</li>
+                            <li><strong>Start Small:</strong> Don't download everything at once. Pick 2-3 resources per category based on your project style.</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+
+            <footer>
+                <p>Happy building! 🚀</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Mobile navigation -->
+    <button class="mobile-nav-toggle" aria-label="Open navigation menu">☰</button>
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <h2>Jump to Section</h2>
+            <ul>
+                <li><a href="#unity-assets">Unity Assets</a></li>
+                <li><a href="#3d-models">3D Models</a></li>
+                <li><a href="#textures">Textures</a></li>
+                <li><a href="#audio">Audio</a></li>
+                <li><a href="#ui-icons">UI & Icons</a></li>
+                <li><a href="#cultural">Cultural</a></li>
+                <li><a href="#additional">Additional</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sticky navigation that starts aligned with first section
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const navSpacer = document.querySelector('.nav-spacer');
+        const firstSection = document.getElementById('unity-assets');
+        const navSidebar = document.querySelector('.nav-sidebar');
+
+        let navOriginalTop = 0;
+        let spacerHeight = 0;
+
+        function calculateNavPosition() {
+            if (!firstSection || !navSidebar || !sidebarNav) return;
+
+            const sectionTop = firstSection.getBoundingClientRect().top + window.scrollY;
+            const sidebarTop = navSidebar.getBoundingClientRect().top + window.scrollY;
+
+            spacerHeight = sectionTop - sidebarTop;
+            navSpacer.style.height = Math.max(0, spacerHeight) + 'px';
+
+            navOriginalTop = sectionTop - 32;
+
+            // Show the nav after positioning
+            sidebarNav.classList.add('is-visible');
+        }
+
+        function handleStickyNav() {
+            if (!sidebarNav || window.innerWidth <= 900) return;
+
+            if (window.scrollY >= navOriginalTop) {
+                sidebarNav.classList.add('is-sticky');
+            } else {
+                sidebarNav.classList.remove('is-sticky');
+            }
+        }
+
+        // Scroll spy for navigation highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-sidebar a, .mobile-nav-content a');
+
+        function updateActiveNav() {
+            const scrollPos = window.scrollY + 100;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+
+                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Initialize and handle scroll
+        window.addEventListener('load', calculateNavPosition);
+        window.addEventListener('resize', calculateNavPosition);
+        window.addEventListener('scroll', () => {
+            handleStickyNav();
+            updateActiveNav();
+        });
+
+        calculateNavPosition();
+        handleStickyNav();
+        updateActiveNav();
+
+        // Mobile navigation toggle
+        const mobileToggle = document.querySelector('.mobile-nav-toggle');
+        const mobileOverlay = document.querySelector('.mobile-nav-overlay');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-content a');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileOverlay.classList.toggle('visible');
+            mobileToggle.textContent = mobileOverlay.classList.contains('visible') ? '✕' : '☰';
+        });
+
+        mobileOverlay.addEventListener('click', (e) => {
+            if (e.target === mobileOverlay) {
+                mobileOverlay.classList.remove('visible');
+                mobileToggle.textContent = '☰';
+            }
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileOverlay.classList.remove('visible');
+                mobileToggle.textContent = '☰';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

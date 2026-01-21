@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unity Programming Model - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* Compact code blocks for slides */
+        .reveal pre code {
+            max-height: 420px;
+            font-size: 0.55em;
+            line-height: 1.0;
+        }
+        .reveal pre {
+            width: 100%;
+            margin: 0.5em 0;
+        }
+        /* Smaller code for side-by-side */
+        .small-code pre code {
+            font-size: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>Unity Programming Model</h1>
+    <h3>A New Way to Think About Code</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- Today's Goal -->
+<section>
+    <section class="section-slide">
+        <h2>Today's Goal</h2>
+    </section>
+
+    <section>
+        <h2>Unity's Programming Paradigm</h2>
+        <p>You know object-oriented programming.</p>
+        <p class="fragment">Unity uses OOP... but organizes it <strong>very differently</strong>.</p>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p><strong>Key Question:</strong> How do we think about building interactive 3D applications?</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>What Still Applies</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4>Fundamentals</h4>
+                <p class="small">Variables, functions, loops</p>
+            </div>
+            <div class="card fragment">
+                <h4>OOP Principles</h4>
+                <p class="small">Encapsulation, polymorphism</p>
+            </div>
+            <div class="card fragment">
+                <h4>Debugging</h4>
+                <p class="small">Same techniques work</p>
+            </div>
+            <div class="card fragment">
+                <h4>Algorithms</h4>
+                <p class="small">Problem solving transfers</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- Part I: Component-Based Architecture -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Components</h2>
+        <p>Moving Beyond Traditional OOP</p>
+    </section>
+
+    <section>
+        <h2>The Inheritance Problem</h2>
+        <pre><code class="plaintext">GameObject
+  └── Vehicle
+      ├── Car
+      │   └── RaceCar
+      │       └── OffRoadRaceCar ❌
+      └── Truck
+          └── OffRoadTruck</code></pre>
+        <p class="fragment muted">Where does "Armored Off-Road Race Car" go?</p>
+    </section>
+
+    <section>
+        <h2>Problems with Inheritance</h2>
+        <div class="columns columns-2" style="gap: var(--space-md);">
+            <div class="card fragment">
+                <h4>Rigid Hierarchies</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Code Duplication</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Diamond Problem</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Hard to Reuse</h4>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Unity Way</h2>
+        <h3>Composition Over Inheritance</h3>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <p>Instead of <strong>"IS-A"</strong>...</p>
+            </div>
+            <div>
+                <p>Use <strong>"HAS-A"</strong>!</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Component-Based Design</h2>
+        <pre><code class="plaintext">GameObject: "Off-Road Race Car"
+  ├── CarComponent
+  ├── SuspensionComponent
+  ├── RacingComponent
+  └── ArmorComponent</code></pre>
+        <pre class="fragment"><code class="plaintext">GameObject: "Delivery Truck"
+  ├── CarComponent      ← same component!
+  ├── CargoComponent
+  └── DurabilityComponent</code></pre>
+    </section>
+
+    <section>
+        <h2>Mental Model Shift</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Traditional OOP</h4>
+                <p>"A race car <strong>IS-A</strong> vehicle"</p>
+            </div>
+            <div class="card">
+                <h4>Unity</h4>
+                <p>"A race car <strong>HAS-A</strong> engine, steering, suspension"</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Benefits of Components</h2>
+        <ul>
+            <li class="fragment"><strong>Mix and Match</strong> functionality</li>
+            <li class="fragment"><strong>No diamond problem</strong></li>
+            <li class="fragment"><strong>Runtime changes</strong> &mdash; add/remove dynamically</li>
+            <li class="fragment"><strong>Reusability</strong> across GameObjects</li>
+            <li class="fragment"><strong>Designer-friendly</strong> configuration</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Scene Hierarchy</h2>
+        <pre><code class="plaintext">Hierarchy Window:
+├── Main Camera
+├── Directional Light
+├── Plane (ground)
+└── Sphere
+    ├── Transform
+    ├── Mesh Filter
+    ├── Mesh Renderer
+    ├── Sphere Collider
+    └── YourScript</code></pre>
+        <p class="fragment"><strong>Every GameObject = Container for Components</strong></p>
+    </section>
+
+    <section>
+        <h2>Creating a Component</h2>
+        <pre><code class="csharp">using UnityEngine;
+public class DemoScript : MonoBehaviour {
+    public string myName;  // Shows in Inspector
+    void Start() {
+        Debug.Log("Hello from " + myName);
+    }
+    void Update() {
+        // Runs every frame
+    }
+}</code></pre>
+        <p class="fragment">All scripts inherit from <code>MonoBehaviour</code></p>
+    </section>
+</section>
+
+<!-- Part II: Event-Driven Architecture -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Event-Driven</h2>
+        <p>Unity Owns the Main Loop</p>
+    </section>
+
+    <section>
+        <h2>Traditional Programming</h2>
+        <pre><code class="csharp">static void Main(string[] args) {
+    InitializeGame();
+    while (gameRunning) {
+        ProcessInput();
+        UpdateGame();
+        RenderGraphics();
+    }
+    Cleanup();
+}</code></pre>
+        <p class="fragment"><strong>You</strong> write the main loop</p>
+    </section>
+
+    <section>
+        <h2>Unity Programming</h2>
+        <h4>"Don't Call Us, We'll Call You"</h4>
+        <pre><code class="csharp">public class PlayerController : MonoBehaviour {
+    void Start() { }           // Called once
+    void Update() { }          // Called every frame
+    void OnCollisionEnter() { } // Called on collision
+}</code></pre>
+        <p class="fragment"><strong>Unity</strong> owns the loop. <strong>You</strong> respond to events.</p>
+    </section>
+
+    <section>
+        <h2>Mental Model Shift</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Traditional</h4>
+                <p>"I'm the <strong>conductor</strong>"</p>
+                <p class="small muted">You control timing</p>
+            </div>
+            <div class="card">
+                <h4>Unity</h4>
+                <p>"I'm a <strong>musician</strong> waiting for cues"</p>
+                <p class="small muted">You respond to events</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common Lifecycle Events</h2>
+        <pre><code class="csharp">void Awake()        // First, even if disabled
+void Start()        // Before first frame
+void Update()       // Every frame
+void FixedUpdate()  // Fixed intervals (physics)
+void LateUpdate()   // After all Updates
+
+void OnCollisionEnter(Collision c) // Hit something
+void OnTriggerEnter(Collider c)    // Entered zone
+void OnDestroy()                    // Being destroyed</code></pre>
+    </section>
+
+    <section>
+        <h2>Example: Collision</h2>
+        <pre><code class="csharp">public class DemoScript : MonoBehaviour {
+    public string myName;
+
+    void OnCollisionEnter(Collision collision) {
+        Debug.Log(myName + " hit " + collision.gameObject.name);
+    }
+}</code></pre>
+        <div class="box fragment">
+            <p>You don't call this &mdash; Unity's physics does!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Agent-Based Thinking</h2>
+        <pre><code class="plaintext">Scene:
+├── Player (responding to input)
+├── Enemy1 (AI logic)
+├── Enemy2 (AI logic)
+├── PickupItem (checking collection)
+└── ScoreManager (tracking state)</code></pre>
+        <p class="fragment">All executing "simultaneously" each frame</p>
+    </section>
+</section>
+
+<!-- Part III: Inspector-Driven Development -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: Inspector</h2>
+        <p>Visual Configuration</p>
+    </section>
+
+    <section>
+        <h2>Traditional Approach</h2>
+        <pre><code class="csharp">Player player = new Player(
+    "John", 100, new Weapon("Sword", 25)
+);</code></pre>
+        <div class="box danger fragment">
+            <ul class="small">
+                <li>Hard-coded values</li>
+                <li>Requires recompile to change</li>
+                <li>Designers can't tweak</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Unity Approach</h2>
+        <pre><code class="csharp">public class Player : MonoBehaviour {
+    public string playerName;
+    public int health;
+    public float moveSpeed;
+    public GameObject weapon;
+}</code></pre>
+        <div class="box success fragment">
+            <p>Set values in Inspector &mdash; no code changes!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Automatic UI Generation</h2>
+        <pre><code class="csharp">public int health = 100;      // Number field
+public float speed = 5.0f;    // Slider
+public string name = "Hero";  // Text field
+public GameObject weapon;     // Drag-drop slot
+public bool invincible;       // Checkbox</code></pre>
+        <p class="fragment muted">No GUI code written!</p>
+    </section>
+
+    <section>
+        <h2>Controlling Visibility</h2>
+        <pre><code class="csharp">public int visible;           // In Inspector
+
+[HideInInspector]
+public int hiddenPublic;      // Hidden
+
+[SerializeField]
+private int visiblePrivate;   // Private but visible
+
+private int normalPrivate;    // Not visible</code></pre>
+        <p class="fragment"><strong>Best Practice:</strong> Use <code>[SerializeField]</code></p>
+    </section>
+
+    <section>
+        <h2>Why This Matters</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4>Programmers</h4>
+                <p class="small">Define what CAN change</p>
+            </div>
+            <div class="card fragment">
+                <h4>Designers</h4>
+                <p class="small">Tweak without code</p>
+            </div>
+            <div class="card fragment">
+                <h4>Iteration</h4>
+                <p class="small">Test values instantly</p>
+            </div>
+            <div class="card fragment">
+                <h4>Per-Instance</h4>
+                <p class="small">Same script, different values</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- Part IV: Transform Hierarchies -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Transforms</h2>
+        <p>Parent-Child Relationships</p>
+    </section>
+
+    <section>
+        <h2>Spatial Organization</h2>
+        <pre><code class="plaintext">Car (GameObject)
+├── Body
+├── FrontLeftWheel
+├── FrontRightWheel
+├── RearLeftWheel
+└── RearRightWheel</code></pre>
+        <ul class="fragment">
+            <li><strong>Move Car</strong> &rarr; All wheels move</li>
+            <li><strong>Move Wheel</strong> &rarr; Car stays put</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Parent-Child Rules</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Parent Changes</h4>
+                <p class="small">Children move proportionally</p>
+            </div>
+            <div class="card">
+                <h4>Child Changes</h4>
+                <p class="small">Parent unaffected</p>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">Like your arm &mdash; move shoulder, whole arm moves</p>
+    </section>
+
+    <section>
+        <h2>Accessing Hierarchy</h2>
+        <pre><code class="csharp">// Get parent
+Transform parent = transform.parent;
+
+// Get parent's GameObject
+GameObject parentObj = transform.parent.gameObject;
+
+// Get child by index
+Transform first = transform.GetChild(0);
+
+// Get child by name
+Transform wheel = transform.Find("FrontLeftWheel");</code></pre>
+    </section>
+
+    <section>
+        <h2>Why Use Hierarchies?</h2>
+        <ul>
+            <li class="fragment"><strong>Logical grouping</strong> of related objects</li>
+            <li class="fragment"><strong>Automatic movement</strong> as one unit</li>
+            <li class="fragment"><strong>Relative positioning</strong> to parent</li>
+            <li class="fragment"><strong>Enable/disable</strong> entire groups</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Part V: Component Communication -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: Communication</h2>
+        <p>Making Components Work Together</p>
+    </section>
+
+    <section>
+        <h2>Two Approaches</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Direct References</h4>
+                <p class="small">Drag-and-drop in Inspector</p>
+            </div>
+            <div class="card">
+                <h4>Unity Events</h4>
+                <p class="small">Flexible, decoupled</p>
+                <span class="badge success">Recommended</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Direct References</h2>
+        <pre><code class="csharp">public class Car : MonoBehaviour {
+    public WheelScript[] wheels;  // Set in Inspector
+
+    void OnCollisionEnter(Collision c) {
+        foreach (var wheel in wheels)
+            Destroy(wheel.gameObject);
+    }
+}</code></pre>
+        <p class="fragment muted">Simple, but tightly coupled</p>
+    </section>
+
+    <section>
+        <h2>Unity Events</h2>
+        <pre><code class="csharp">using UnityEngine.Events;
+
+public class Car : MonoBehaviour {
+    public UnityEvent onCollision;
+
+    void OnCollisionEnter(Collision c) {
+        onCollision.Invoke();  // Don't care who listens
+    }
+}</code></pre>
+        <p class="fragment">Configure listeners in Inspector!</p>
+    </section>
+
+    <section>
+        <h2>Why Events Are Better</h2>
+        <ul>
+            <li class="fragment"><strong>Decoupling</strong> &mdash; Car doesn't know about wheels</li>
+            <li class="fragment"><strong>Multiple responses</strong> &mdash; One event, many actions</li>
+            <li class="fragment"><strong>Designer-friendly</strong> &mdash; No code needed to wire up</li>
+            <li class="fragment"><strong>Flexible</strong> &mdash; Add/remove listeners easily</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Part VI: Coroutines -->
+<section>
+    <section class="section-slide">
+        <h2>Part VI: Coroutines</h2>
+        <p>Time-Based Execution</p>
+    </section>
+
+    <section>
+        <h2>The Problem</h2>
+        <pre><code class="csharp">void OnCollisionEnter() {
+    Sleep(3000);  // ❌ Freezes entire game!
+    Explode();
+}</code></pre>
+        <p class="fragment">How do we wait without freezing?</p>
+        <p class="fragment"><strong>Solution:</strong> Coroutines</p>
+    </section>
+
+    <section>
+        <h2>What Are Coroutines?</h2>
+        <ul>
+            <li class="fragment">Execute code over multiple frames</li>
+            <li class="fragment">Can pause and resume</li>
+            <li class="fragment">Don't block the game loop</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p>A function that can "pause itself"</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Coroutine Syntax</h2>
+        <pre><code class="csharp">IEnumerator ExplodeAfterDelay() {
+    Debug.Log("Fuse lit!");
+    yield return new WaitForSeconds(3.0f);
+    Debug.Log("BOOM!");
+    Destroy(gameObject);
+}
+
+void OnCollisionEnter() {
+    StartCoroutine(ExplodeAfterDelay());
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Yield Options</h2>
+        <pre><code class="csharp">yield return null;                    // Next frame
+yield return new WaitForSeconds(2f);  // Wait 2 sec
+yield return new WaitForEndOfFrame(); // End of frame
+
+// Wait for condition
+yield return new WaitUntil(() => health <= 0);
+yield return new WaitWhile(() => isLoading);</code></pre>
+    </section>
+
+    <section>
+        <h2>When to Use Coroutines</h2>
+        <div class="columns">
+            <div class="card">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> Good For</h4>
+                <ul class="small">
+                    <li>Delays</li>
+                    <li>Sequences</li>
+                    <li>Cooldowns</li>
+                    <li>Respawning</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4><i class="fa-solid fa-xmark" style="color: var(--danger);"></i> Not For</h4>
+                <ul class="small">
+                    <li>Every-frame logic</li>
+                    <li>Heavy computation</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- Part VII: Assets & Packages -->
+<section>
+    <section class="section-slide">
+        <h2>Part VII: Assets</h2>
+        <p>Don't Reinvent the Wheel</p>
+    </section>
+
+    <section>
+        <h2>Unity Asset Store</h2>
+        <p>Window &rarr; Asset Store</p>
+        <div class="columns columns-3" style="gap: var(--space-sm);">
+            <div class="card fragment">
+                <h4>3D Models</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Scripts</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Audio</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Textures</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Templates</h4>
+            </div>
+            <div class="card fragment">
+                <h4>Tools</h4>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Package Manager</h2>
+        <p>Window &rarr; Package Manager</p>
+        <div class="columns columns-3">
+            <div class="card">
+                <h4>In Project</h4>
+                <p class="small">Installed packages</p>
+            </div>
+            <div class="card">
+                <h4>Unity Registry</h4>
+                <p class="small">Official packages</p>
+            </div>
+            <div class="card">
+                <h4>My Assets</h4>
+                <p class="small">Store downloads</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Important VR Packages</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>XR Interaction Toolkit</h4>
+                <ul class="small">
+                    <li>Controller input</li>
+                    <li>Hand tracking</li>
+                    <li>Teleportation</li>
+                    <li>Grabbing</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>XR Plugin Management</h4>
+                <p class="small">Quest, SteamVR config</p>
+                <h4 style="margin-top: var(--space-md);">ProBuilder</h4>
+                <p class="small">In-editor 3D modeling</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- Summary -->
+<section>
+    <section class="section-slide">
+        <h2>Six Major Shifts</h2>
+    </section>
+
+    <section>
+        <h2>The Paradigm Shifts</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Shift</th><th>Old</th><th>New</th></tr>
+            <tr class="fragment"><td>1. Architecture</td><td>IS-A inheritance</td><td>HAS-A components</td></tr>
+            <tr class="fragment"><td>2. Control</td><td>You own main()</td><td>Unity calls you</td></tr>
+            <tr class="fragment"><td>3. Config</td><td>Hard-coded</td><td>Inspector GUI</td></tr>
+            <tr class="fragment"><td>4. Spatial</td><td>Manual coords</td><td>Parent-child</td></tr>
+            <tr class="fragment"><td>5. Communication</td><td>Direct calls</td><td>Events</td></tr>
+            <tr class="fragment"><td>6. Time</td><td>Threading</td><td>Coroutines</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Tips for Success</h2>
+        <ol>
+            <li class="fragment"><strong>Think in Components</strong></li>
+            <li class="fragment"><strong>Use the Inspector</strong></li>
+            <li class="fragment"><strong>Embrace Events</strong></li>
+            <li class="fragment"><strong>Organize with Hierarchies</strong></li>
+            <li class="fragment"><strong>Keep Console Visible</strong></li>
+            <li class="fragment"><strong>Use the Asset Store</strong></li>
+        </ol>
+    </section>
+</section>
+
+<!-- Next Steps -->
+<section>
+    <section>
+        <h2>Coming Up Next</h2>
+        <ul>
+            <li class="fragment">VR-specific Unity features</li>
+            <li class="fragment">XR Interaction Toolkit</li>
+            <li class="fragment">ProBuilder for environments</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Resources</h2>
+        <div class="columns columns-2">
+            <div class="card">
+                <h4>Unity Learn</h4>
+                <p class="muted small">learn.unity.com</p>
+            </div>
+            <div class="card">
+                <h4>Documentation</h4>
+                <p class="muted small">docs.unity3d.com</p>
+            </div>
+            <div class="card">
+                <h4>Asset Store</h4>
+                <p class="muted small">assetstore.unity.com</p>
+            </div>
+            <div class="card">
+                <h4>Recording</h4>
+                <p class="muted small">Posted to Canvas</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>What Questions Do You Have?</h2>
+        <p style="margin-top: var(--space-lg);">At least 3 questions must be asked before we can end class.</p>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>

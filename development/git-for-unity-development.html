@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git for Unity Development - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>Git for Unity Development</h1>
+    <h3>Part 1: Core Workflow</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- Introduction Section -->
+<section>
+    <section class="section-slide">
+        <h2>Introduction</h2>
+    </section>
+
+    <section>
+        <h2>Why Git for Unity is Different</h2>
+        <p>Unity projects bring unique challenges compared to typical programming projects:</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Binary Files</h4>
+                <p class="small">Textures, audio clips, 3D models &mdash; Git wasn't originally designed for these</p>
+            </div>
+            <div class="card fragment">
+                <h4>File Size</h4>
+                <p class="small">Assets can be tens or hundreds of megabytes. GitHub has file size limits.</p>
+            </div>
+        </div>
+        <div class="fragment box success" style="margin-top: var(--space-lg);">
+            <p>Starter projects are already configured to handle both challenges!</p>
+        </div>
+    </section>
+</section>
+
+<!-- Accepting and Cloning Section -->
+<section>
+    <section class="section-slide">
+        <h2>Accepting &amp; Cloning Assignments</h2>
+    </section>
+
+    <section>
+        <h2>GitHub Classroom Workflow</h2>
+        <ol>
+            <li class="fragment">Click the GitHub Classroom link from Canvas</li>
+            <li class="fragment">Select your name from the roster (first time only)</li>
+            <li class="fragment">Accept the assignment</li>
+            <li class="fragment">GitHub creates your personal copy of the repository</li>
+        </ol>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p><strong>Group Projects:</strong> Join an existing team or create a new one &mdash; the whole team shares a single repository</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Cloning with GitHub Desktop</h2>
+        <ol>
+            <li class="fragment">On GitHub, click the green <strong>Code</strong> button</li>
+            <li class="fragment">Select <strong>Open with GitHub Desktop</strong></li>
+            <li class="fragment">Choose where to save the project</li>
+            <li class="fragment">Click <strong>Clone</strong></li>
+        </ol>
+        <div class="fragment box warning" style="margin-top: var(--space-lg);">
+            <h4>Windows Users</h4>
+            <p class="small">Put your project folder directly on <code>C:\</code> drive. Unity creates deeply nested folders that can cause path length issues.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Command Line Alternative</h2>
+        <pre><code>git clone https://github.com/...</code></pre>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Copy the HTTPS URL from the Code button</li>
+            <li class="fragment">Use SSH URL only if you've set up SSH keys</li>
+            <li class="fragment">GitHub Desktop is perfectly fine for this course</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Project Configuration Section -->
+<section>
+    <section class="section-slide">
+        <h2>Understanding Project Configuration</h2>
+    </section>
+
+    <section>
+        <h2>The .gitignore File</h2>
+        <p>Tells Git which files and folders to <strong>ignore</strong> (not track or upload)</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <h4>Key Exclusions</h4>
+                <ul class="small">
+                    <li class="fragment"><code>Library/</code> &mdash; Cached data, regenerated automatically</li>
+                    <li class="fragment"><code>Temp/</code> &amp; <code>Logs/</code> &mdash; Temporary runtime files</li>
+                    <li class="fragment"><code>Build/</code> &mdash; Compiled application output</li>
+                    <li class="fragment"><code>.vs/</code> &amp; <code>.idea/</code> &mdash; IDE settings</li>
+                </ul>
+            </div>
+            <div class="fragment">
+                <div class="box danger">
+                    <h4>Don't modify!</h4>
+                    <p class="small">Don't delete this file or remove entries unless you really know what you're doing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Library Folder</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p>The most important thing to exclude</p>
+        </div>
+        <ul>
+            <li class="fragment">Stores cached data, compiled scripts, processed assets</li>
+            <li class="fragment">Can easily be <strong>several gigabytes</strong></li>
+            <li class="fragment">Unity <strong>regenerates it automatically</strong> when you open the project</li>
+            <li class="fragment">No reason to upload &mdash; wastes space and time</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The .gitattributes File</h2>
+        <p>Configures how Git handles different file types</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Git LFS</h4>
+                <p class="small">Configures Large File Storage for binary files (textures, audio, 3D models)</p>
+            </div>
+            <div class="card fragment">
+                <h4>Line Endings</h4>
+                <p class="small">Normalizes line endings so files work across Windows and Mac</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Why Git LFS?</h2>
+        <ul>
+            <li class="fragment">Regular Git stores <strong>complete history</strong> of every file</li>
+            <li class="fragment">Text files: Git stores just the differences (efficient)</li>
+            <li class="fragment">Binary files: Git stores complete copies (expensive!)</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <h4>Git LFS Solution</h4>
+            <p class="small">Large binary files stored separately on GitHub's servers. Your repository contains small pointer files. Everything "just works" &mdash; add, commit, push, pull as normal.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>The .meta Files</h2>
+        <p>Every asset and folder has a corresponding <code>.meta</code> file</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Store import settings and unique identifiers</li>
+            <li class="fragment">Unity uses these to track assets and their relationships</li>
+            <li class="fragment">Deleting a .meta file can break script-to-GameObject connections</li>
+        </ul>
+        <div class="fragment box danger" style="margin-top: var(--space-lg);">
+            <p><strong>Never add .meta files to .gitignore!</strong></p>
+            <p class="small">They must be in version control</p>
+        </div>
+    </section>
+</section>
+
+<!-- Daily Workflow Section -->
+<section>
+    <section class="section-slide">
+        <h2>The Daily Workflow</h2>
+    </section>
+
+    <section>
+        <h2>Workflow Overview</h2>
+        <ol>
+            <li class="fragment"><strong>Pull</strong> &mdash; Get latest changes</li>
+            <li class="fragment"><strong>Work</strong> &mdash; Make changes in Unity</li>
+            <li class="fragment"><strong>Review</strong> &mdash; Check changed files</li>
+            <li class="fragment"><strong>Commit</strong> &mdash; Save locally with message</li>
+            <li class="fragment"><strong>Push</strong> &mdash; Upload to GitHub</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Step 1: Pull First</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p>The <strong>first thing</strong> you should do when sitting down to work</p>
+        </div>
+        <ul>
+            <li class="fragment">In GitHub Desktop: Click <strong>Fetch origin</strong></li>
+            <li class="fragment">If changes exist, click <strong>Pull</strong></li>
+            <li class="fragment">Especially important for group projects</li>
+        </ul>
+        <div class="fragment box warning" style="margin-top: var(--space-lg);">
+            <p>Skipping this step can cause merge conflicts later!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 2: Make Changes</h2>
+        <p>Work on your Unity project normally:</p>
+        <ul style="margin-top: var(--space-md);">
+            <li>Edit scenes</li>
+            <li>Write code</li>
+            <li>Import assets</li>
+            <li>Adjust settings</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">Nothing special here &mdash; just do your work!</p>
+    </section>
+
+    <section>
+        <h2>Step 3: Review Changes</h2>
+        <p>In GitHub Desktop, check the <strong>Changes</strong> tab</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="fragment">
+                <div class="box success">
+                    <h4>Normal</h4>
+                    <ul class="small">
+                        <li>Scene files you edited</li>
+                        <li>Scripts you modified</li>
+                        <li>Associated .meta files</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fragment">
+                <div class="box danger">
+                    <h4>Warning Signs</h4>
+                    <ul class="small">
+                        <li>Hundreds of unexpected files</li>
+                        <li>Hundreds of MB of changes</li>
+                        <li>Files that should be ignored</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="fragment highlight" style="margin-top: var(--space-lg);">If something looks wrong, ask before committing!</p>
+    </section>
+
+    <section>
+        <h2>Step 4: Write Commit Messages</h2>
+        <p>A short description of <strong>what</strong> you changed and <strong>why</strong></p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="fragment">
+                <div class="box success">
+                    <h4>Good Messages</h4>
+                    <ul class="small">
+                        <li>"Added player movement script with jump functionality"</li>
+                        <li>"Fixed collision detection bug in enemy AI"</li>
+                        <li>"Updated main menu UI layout"</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fragment">
+                <div class="box danger">
+                    <h4>Bad Messages</h4>
+                    <ul class="small">
+                        <li>"Updated stuff"</li>
+                        <li>"Changes"</li>
+                        <li>"asdf"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 5: Push to GitHub</h2>
+        <ul>
+            <li class="fragment">Committing saves changes <strong>locally</strong></li>
+            <li class="fragment">Pushing uploads them to <strong>GitHub</strong></li>
+            <li class="fragment">Click <strong>Push origin</strong> in GitHub Desktop</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-xl);">
+            <h4>Push Frequently!</h4>
+            <ul class="small">
+                <li>At least at the end of every work session</li>
+                <li>Ideally after every logical chunk of work</li>
+                <li>Small, frequent pushes are easier to manage</li>
+            </ul>
+        </div>
+    </section>
+</section>
+
+<!-- Storage Section -->
+<section>
+    <section class="section-slide">
+        <h2>Being a Good Steward of Storage</h2>
+    </section>
+
+    <section>
+        <h2>Why Storage Matters</h2>
+        <ul>
+            <li class="fragment">Our class shares a storage pool on GitHub</li>
+            <li class="fragment">Git LFS has limits on storage space and bandwidth</li>
+            <li class="fragment">Bandwidth is used every time someone clones or pulls</li>
+            <li class="fragment">Being wasteful can block you or teammates from pushing</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>What NOT to Commit</h2>
+        <div class="columns columns-3" style="gap: var(--space-md);">
+            <div class="card fragment">
+                <h4>Build Outputs</h4>
+                <p class="small">Often hundreds of MB. Can be regenerated from source. Use file sharing if needed.</p>
+            </div>
+            <div class="card fragment">
+                <h4>Large Asset Store Packages</h4>
+                <p class="small">Document which packages you use in a README instead. Each person downloads them.</p>
+            </div>
+            <div class="card fragment">
+                <h4>WIP Large Assets</h4>
+                <p class="small">Keep iterating textures/audio local until finalized. Every version takes space.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>What TO Commit</h2>
+        <p>Everything that actually makes up your project:</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <ul>
+                    <li class="fragment">Scripts</li>
+                    <li class="fragment">Scenes</li>
+                    <li class="fragment">Prefabs</li>
+                    <li class="fragment">Final assets</li>
+                </ul>
+            </div>
+            <div>
+                <ul>
+                    <li class="fragment">ProjectSettings folder</li>
+                    <li class="fragment">Package manifest</li>
+                    <li class="fragment">All .meta files</li>
+                </ul>
+            </div>
+        </div>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p><strong>Rule of thumb:</strong> If someone cloned your repo, could they open the project and have it work?</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Quick Sanity Check</h2>
+        <p>Before every commit, ask yourself:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Did I only edit a script? I should see that script and maybe its .meta file.</li>
+            <li class="fragment">Am I seeing hundreds of MB of changes? <strong>Pause and investigate.</strong></li>
+            <li class="fragment">Is the .gitignore working correctly?</li>
+            <li class="fragment">Am I about to commit a build folder?</li>
+        </ul>
+        <p class="fragment highlight" style="margin-top: var(--space-lg);">When in doubt, ask!</p>
+    </section>
+</section>
+
+<!-- Conclusion Section -->
+<section>
+    <section class="section-slide">
+        <h2>Summary</h2>
+    </section>
+
+    <section>
+        <h2>What We Covered</h2>
+        <ul>
+            <li class="fragment">Accept assignments through GitHub Classroom</li>
+            <li class="fragment">Clone using GitHub Desktop</li>
+            <li class="fragment"><code>.gitignore</code> excludes regenerated files (Library folder)</li>
+            <li class="fragment"><code>.gitattributes</code> configures Git LFS for large binary assets</li>
+            <li class="fragment">Daily workflow: <strong>Pull &rarr; Work &rarr; Review &rarr; Commit &rarr; Push</strong></li>
+            <li class="fragment">Be mindful of storage &mdash; don't commit builds or large packages</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Coming Up Next</h2>
+        <div class="box" style="margin-top: var(--space-lg);">
+            <h3>Team Collaboration</h3>
+            <ul>
+                <li>Branching</li>
+                <li>Merging</li>
+                <li>Handling conflicts</li>
+            </ul>
+        </div>
+        <p class="muted" style="margin-top: var(--space-xl);">Especially important for group projects!</p>
+    </section>
+</section>
+
+<!-- Command Reference -->
+<section>
+    <section class="section-slide">
+        <h2>Command Reference</h2>
+    </section>
+
+    <section>
+        <h2>Git Commands</h2>
+        <table>
+            <tr><th>Action</th><th>Command</th></tr>
+            <tr><td>Clone repository</td><td><code>git clone &lt;url&gt;</code></td></tr>
+            <tr><td>Fetch changes</td><td><code>git fetch</code></td></tr>
+            <tr><td>Pull changes</td><td><code>git pull</code></td></tr>
+            <tr><td>Stage all changes</td><td><code>git add .</code></td></tr>
+            <tr><td>Commit changes</td><td><code>git commit -m "message"</code></td></tr>
+            <tr><td>Push to GitHub</td><td><code>git push</code></td></tr>
+            <tr><td>View status</td><td><code>git status</code></td></tr>
+        </table>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>

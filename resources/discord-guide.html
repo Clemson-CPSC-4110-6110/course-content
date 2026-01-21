@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Guide - CPSC 4110/6110</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-primary: #12121a;
+            --bg-elevated: #1a1a26;
+            --bg-surface: #22222e;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent: #00d4aa;
+            --accent-bright: #00ffcc;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(0, 212, 170, 0.3);
+            --discord-blue: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .page-wrapper {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 3rem 2rem 3rem 0;
+        }
+
+        /* Navigation sidebar */
+        .nav-sidebar {
+            position: relative;
+            padding: 1.5rem 0 1.5rem 1.5rem;
+        }
+
+        .nav-sidebar nav {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            width: 190px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .nav-sidebar nav.is-visible {
+            opacity: 1;
+        }
+
+        .nav-sidebar nav.is-sticky {
+            position: fixed;
+            top: 2rem;
+        }
+
+        .nav-sidebar h2 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: block;
+        }
+
+        /* Spacer to match header height */
+        .nav-spacer {
+            height: 0;
+            transition: height 0.1s ease;
+        }
+
+        .nav-sidebar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-sidebar li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-sidebar a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            margin-left: -2px;
+        }
+
+        .nav-sidebar a:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+        }
+
+        .nav-sidebar a.active {
+            color: var(--accent);
+            background: rgba(0, 212, 170, 0.08);
+            border-left-color: var(--accent);
+        }
+
+        /* Mobile nav toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg-deep);
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+            z-index: 1000;
+            transition: transform 0.2s ease;
+        }
+
+        .mobile-nav-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Mobile nav overlay */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.9);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-overlay.visible {
+            opacity: 1;
+        }
+
+        .mobile-nav-content {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border);
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+
+        .mobile-nav-overlay.visible .mobile-nav-content {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-content h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: block;
+        }
+
+        .mobile-nav-content ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav-content a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            background: var(--bg-surface);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-content a:hover,
+        .mobile-nav-content a.active {
+            color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-sidebar {
+                display: none;
+            }
+
+            .container {
+                padding: 2rem 1.5rem;
+                max-width: 100%;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-nav-overlay {
+                display: block;
+                pointer-events: none;
+            }
+
+            .mobile-nav-overlay.visible {
+                pointer-events: auto;
+            }
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .semester {
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        /* Content sections */
+        section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.25rem;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* Highlighted box */
+        .highlight-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box.discord {
+            border-left-color: var(--discord-blue);
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Channel mentions */
+        .channel {
+            background: rgba(88, 101, 242, 0.15);
+            color: #8b9dff;
+            padding: 0.1em 0.4em;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        /* Emoji styling */
+        .emoji {
+            font-size: 1.1em;
+            margin-right: 0.25rem;
+        }
+
+        /* Cards for channel descriptions */
+        .channel-grid {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .channel-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .channel-card:hover {
+            border-color: var(--border-accent);
+        }
+
+        .channel-card h4 {
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .channel-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--discord-blue);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--bg-surface);
+        }
+
+        /* Tips section */
+        .tip {
+            display: flex;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tip-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .tip-content {
+            flex: 1;
+        }
+
+        .tip-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        footer p {
+            font-size: 1.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem 1.25rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <aside class="nav-sidebar">
+            <div class="nav-spacer"></div>
+            <nav id="sidebar-nav">
+                <h2>On This Page</h2>
+                <ul>
+                    <li><a href="#welcome">Welcome</a></li>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#channel-guide">Channel Guide</a></li>
+                    <li><a href="#getting-most">Getting the Most Out of Discord</a></li>
+                    <li><a href="#expectations">Expectations</a></li>
+                    <li><a href="#pro-tips">Pro Tips</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <span>&larr;</span>
+                <span>Back to Course Home</span>
+            </a>
+
+            <header>
+                <h1>Course Discord Guide</h1>
+                <p class="subtitle">CPSC 4110/6110: Virtual Reality Systems</p>
+                <p class="semester">Spring 2026</p>
+            </header>
+
+            <main>
+                <section id="welcome">
+                    <h2>Welcome!</h2>
+                <p>Our course Discord server is a space for you to connect with classmates, get help with technical issues, collaborate with your team, and engage with course material outside of class time.</p>
+
+                <div class="highlight-box">
+                    <p><strong>Discord is optional but highly recommended.</strong> Many students find it valuable for getting quick help from peers—often faster than waiting for office hours or email responses.</p>
+                </div>
+            </section>
+
+            <section id="getting-started">
+                <h2>Getting Started</h2>
+
+                <h3>Step 1: Create a Discord Account</h3>
+                <p>If you don't already have Discord:</p>
+                <ol>
+                    <li>Go to <a href="https://discord.com" target="_blank" style="color: var(--accent);">discord.com</a> or download the Discord app (desktop/mobile)</li>
+                    <li>Click "Register" and create an account</li>
+                    <li>Verify your email address</li>
+                </ol>
+
+                <div class="highlight-box">
+                    <p><strong>Username tip:</strong> Use something recognizable (your name or Clemson username) so classmates and the instructor can identify you.</p>
+                </div>
+
+                <h3>Step 2: Join the Server</h3>
+                <ol>
+                    <li>Click the invite link posted on Canvas (Announcements or Syllabus page)</li>
+                    <li>Accept the invitation</li>
+                    <li>Read the rules in <span class="channel">#rules</span> and react to confirm you've read them</li>
+                    <li>Introduce yourself in <span class="channel">#general</span> (name, year, one thing you're excited to build in VR)</li>
+                </ol>
+
+                <h3>Step 3: Select Your Focus Track</h3>
+                <p>Once you've decided on your specialization area, go to <span class="channel">#role-select</span> and click the appropriate reaction:</p>
+                <ul>
+                    <li><span class="emoji">🧠</span> for <strong>Human Perception</strong> track</li>
+                    <li><span class="emoji">🖥️</span> for <strong>Displays & Rendering</strong> track</li>
+                </ul>
+                <p>This will give you access to your track's dedicated discussion channels.</p>
+            </section>
+
+            <section id="channel-guide">
+                <h2>Channel Guide</h2>
+
+                <h3>Information Channels</h3>
+                <div class="channel-grid">
+                    <div class="channel-card">
+                        <h4>#announcements</h4>
+                        <p>Official course updates from the instructor. Check this regularly.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#rules</h4>
+                        <p>Server guidelines and expectations.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#syllabus-links</h4>
+                        <p>Quick links to Canvas, Unity version info, GitHub, etc.</p>
+                    </div>
+                </div>
+
+                <h3>Discussion Channels</h3>
+                <div class="channel-grid">
+                    <div class="channel-card">
+                        <h4>#general</h4>
+                        <p>Class discussion, questions about content, anything course-related.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#tech-help</h4>
+                        <p>Unity problems? Build errors? Headset issues? Post here. Your classmates may have solved the same problem.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#resources</h4>
+                        <p>Share tutorials, assets, articles, or tools you find useful.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#off-topic</h4>
+                        <p>Non-class chat. Memes welcome (keep it appropriate).</p>
+                    </div>
+                </div>
+
+                <h3>Focus Area Channels</h3>
+                <p>After selecting your track, you'll see channels for your focus area:</p>
+                <div class="channel-grid">
+                    <div class="channel-card">
+                        <h4>#perception-discussion / #displays-discussion</h4>
+                        <p>Discuss readings, share insights, ask questions about focus area material.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>Study voice channels</h4>
+                        <p>Use these to study together before the focus area exam.</p>
+                    </div>
+                </div>
+
+                <h3>Team Channels</h3>
+                <p>Our Discord bot automatically creates team channels when groups are assigned. Here's how it works:</p>
+                <div class="channel-grid">
+                    <div class="channel-card">
+                        <h4>Automatic role assignment</h4>
+                        <p>When teams are finalized, you'll receive a team role (e.g., "Team Alpha") that grants you access to your group's private channels.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>#team-[yourteam]</h4>
+                        <p>Private text channel created automatically for your project team. Only team members and instructors can see it.</p>
+                    </div>
+                    <div class="channel-card">
+                        <h4>Team voice channel</h4>
+                        <p>A dedicated voice channel for virtual meetings and remote collaboration with your team.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Note:</strong> You don't need to do anything—the bot handles channel creation and role assignment automatically once teams are posted. The instructor can see team channels to help when teams get stuck and notice if communication breaks down.</p>
+                </div>
+            </section>
+
+            <section id="getting-most">
+                <h2>Getting the Most Out of Discord</h2>
+
+                <h3>Getting Help</h3>
+                <ul>
+                    <li><strong>Search first:</strong> Use Ctrl/Cmd+F to search channels. Your error message has probably been asked about before.</li>
+                    <li><strong>Be specific:</strong> "My build is failing" isn't helpful. Include the error message, what you tried, and screenshots if possible.</li>
+                    <li><strong>Use code blocks:</strong> Wrap code or error messages in backticks (`) for single line or triple backticks (```) for multiple lines.</li>
+                    <li><strong>Pay it forward:</strong> If you solve a problem, share the solution. Help someone else when you can.</li>
+                </ul>
+
+                <h3>Team Communication</h3>
+                <ul>
+                    <li><strong>Use your team channel:</strong> Keep project discussion centralized rather than scattered across DMs.</li>
+                    <li><strong>Post async updates:</strong> Quick messages about what you worked on help the team stay aligned.</li>
+                    <li><strong>Voice for complex topics:</strong> Some things are easier to talk through than type. Jump in the voice channel.</li>
+                    <li><strong>Pin important info:</strong> Right-click → Pin Message to save key decisions or links.</li>
+                </ul>
+
+                <h3>Office Hours</h3>
+                <p>The instructor will host drop-in office hours in the "Office Hours" voice channel during scheduled times. You can:</p>
+                <ul>
+                    <li>Join the channel and wait (you'll be helped in order)</li>
+                    <li>Screen share to show your Unity project</li>
+                    <li>Listen while others get help (you might learn something)</li>
+                </ul>
+            </section>
+
+            <section id="expectations">
+                <h2>Expectations</h2>
+
+                <h3>Community Standards</h3>
+                <ul>
+                    <li>Be respectful and professional</li>
+                    <li>No harassment, discrimination, or inappropriate content</li>
+                    <li>Academic integrity applies here—don't share exam answers or code that should be individual work</li>
+                    <li>Keep discussions constructive</li>
+                </ul>
+
+                <h3>Response Times</h3>
+                <ul>
+                    <li><strong>From classmates:</strong> Often fast! The community is helpful.</li>
+                    <li><strong>From instructor/TA:</strong> We check Discord but not 24/7. For urgent grading issues, use email.</li>
+                    <li><strong>Don't expect instant answers:</strong> If it's truly urgent and no one responds, come to office hours.</li>
+                </ul>
+
+                <h3>What Belongs Where</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Use Discord for...</th>
+                            <th>Use Canvas/Email for...</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Quick questions about Unity/code</td>
+                            <td>Submitting assignments</td>
+                        </tr>
+                        <tr>
+                            <td>Sharing resources with classmates</td>
+                            <td>Grade questions or disputes</td>
+                        </tr>
+                        <tr>
+                            <td>Team coordination</td>
+                            <td>Extension/accommodation requests</td>
+                        </tr>
+                        <tr>
+                            <td>Study groups for exams</td>
+                            <td>Personal/sensitive matters</td>
+                        </tr>
+                        <tr>
+                            <td>Casual class community</td>
+                            <td>Official documentation you need recorded</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="pro-tips">
+                <h2>Pro Tips</h2>
+
+                <div class="tip">
+                    <span class="tip-icon">🔔</span>
+                    <div class="tip-content">
+                        <strong>Enable notifications for #announcements</strong>
+                        <p>Right-click channel → Notification Settings → All Messages</p>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <span class="tip-icon">🔇</span>
+                    <div class="tip-content">
+                        <strong>Mute channels you don't need</strong>
+                        <p>Right-click → Mute Channel if #off-topic gets noisy</p>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <span class="tip-icon">🧵</span>
+                    <div class="tip-content">
+                        <strong>Use threads for long discussions</strong>
+                        <p>Right-click a message → Create Thread to keep conversations organized</p>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <span class="tip-icon">💻</span>
+                    <div class="tip-content">
+                        <strong>Download the app</strong>
+                        <p>Desktop app is better than browser for notifications and screen sharing</p>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <span class="tip-icon">🌙</span>
+                    <div class="tip-content">
+                        <strong>Set your status</strong>
+                        <p>"Do Not Disturb" when you need focus time</p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.5rem;"><strong>Questions about Discord itself?</strong> Ask in <span class="channel">#general</span>—someone will help!</p>
+            </section>
+        </main>
+
+            <footer>
+                <p>See you on the server! 🎮</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Mobile navigation -->
+    <button class="mobile-nav-toggle" aria-label="Open navigation menu">☰</button>
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <h2>Jump to Section</h2>
+            <ul>
+                <li><a href="#welcome">Welcome</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#channel-guide">Channel Guide</a></li>
+                <li><a href="#getting-most">Getting the Most</a></li>
+                <li><a href="#expectations">Expectations</a></li>
+                <li><a href="#pro-tips">Pro Tips</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sticky navigation that starts aligned with Welcome section
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const navSpacer = document.querySelector('.nav-spacer');
+        const welcomeSection = document.getElementById('welcome');
+        const navSidebar = document.querySelector('.nav-sidebar');
+
+        let navOriginalTop = 0;
+        let spacerHeight = 0;
+
+        function calculateNavPosition() {
+            if (!welcomeSection || !navSidebar || !sidebarNav) return;
+
+            // Get the top of the welcome section relative to the page
+            const welcomeTop = welcomeSection.getBoundingClientRect().top + window.scrollY;
+            // Get the top of the nav sidebar container
+            const sidebarTop = navSidebar.getBoundingClientRect().top + window.scrollY;
+
+            // Calculate spacer height to align nav with welcome section
+            spacerHeight = welcomeTop - sidebarTop;
+            navSpacer.style.height = Math.max(0, spacerHeight) + 'px';
+
+            // Store the original top position where nav should become sticky
+            navOriginalTop = welcomeTop - 32; // 2rem offset when sticky
+
+            // Show the nav after positioning
+            sidebarNav.classList.add('is-visible');
+        }
+
+        function handleStickyNav() {
+            if (!sidebarNav || window.innerWidth <= 900) return;
+
+            if (window.scrollY >= navOriginalTop) {
+                sidebarNav.classList.add('is-sticky');
+            } else {
+                sidebarNav.classList.remove('is-sticky');
+            }
+        }
+
+        // Scroll spy for navigation highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-sidebar a, .mobile-nav-content a');
+
+        function updateActiveNav() {
+            const scrollPos = window.scrollY + 100;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+
+                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Initialize and handle scroll
+        window.addEventListener('load', calculateNavPosition);
+        window.addEventListener('resize', calculateNavPosition);
+        window.addEventListener('scroll', () => {
+            handleStickyNav();
+            updateActiveNav();
+        });
+
+        calculateNavPosition();
+        handleStickyNav();
+        updateActiveNav();
+
+        // Mobile navigation toggle
+        const mobileToggle = document.querySelector('.mobile-nav-toggle');
+        const mobileOverlay = document.querySelector('.mobile-nav-overlay');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-content a');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileOverlay.classList.toggle('visible');
+            mobileToggle.textContent = mobileOverlay.classList.contains('visible') ? '✕' : '☰';
+        });
+
+        mobileOverlay.addEventListener('click', (e) => {
+            if (e.target === mobileOverlay) {
+                mobileOverlay.classList.remove('visible');
+                mobileToggle.textContent = '☰';
+            }
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileOverlay.classList.remove('visible');
+                mobileToggle.textContent = '☰';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

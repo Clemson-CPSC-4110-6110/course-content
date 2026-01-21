@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLIDE_TITLE - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Slide Title Here</h1>
+    <h3>Subtitle Goes Here</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     SECTION: Example Section
+     ============================================ -->
+<section>
+    <!-- Section intro slide -->
+    <section class="section-slide">
+        <h2>Section Title</h2>
+    </section>
+
+    <!-- Regular content slide -->
+    <section>
+        <h2>Content Slide</h2>
+        <ul>
+            <li class="fragment"><strong>Key point one</strong> with explanation</li>
+            <li class="fragment"><strong>Key point two</strong> with more detail</li>
+            <li class="fragment">Supporting information here</li>
+        </ul>
+    </section>
+
+    <!-- Two-column layout -->
+    <section>
+        <h2>Two Column Layout</h2>
+        <div class="columns">
+            <div>
+                <h4>Left Column</h4>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Right Card</h4>
+                <p class="small">Card content goes here</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three-column cards -->
+    <section>
+        <h2>Card Grid</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Card One</h4>
+                <p class="small">Description</p>
+            </div>
+            <div class="card fragment">
+                <h4>Card Two</h4>
+                <p class="small">Description</p>
+            </div>
+            <div class="card fragment">
+                <h4>Card Three</h4>
+                <p class="small">Description</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Box variants -->
+    <section>
+        <h2>Callout Boxes</h2>
+        <div class="box">
+            <p><strong>Default box</strong> for general callouts</p>
+        </div>
+        <div class="box success">
+            <p><strong>Success box</strong> for positive information</p>
+        </div>
+        <div class="box warning">
+            <p><strong>Warning box</strong> for cautions</p>
+        </div>
+        <div class="box danger">
+            <p><strong>Danger box</strong> for critical warnings</p>
+        </div>
+    </section>
+
+    <!-- Table example -->
+    <section>
+        <h2>Table Example</h2>
+        <table>
+            <tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr>
+            <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+            <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+        </table>
+    </section>
+
+    <!-- Code example -->
+    <section>
+        <h2>Code Example</h2>
+        <pre><code class="language-csharp" data-line-numbers="2-4">
+void Start()
+{
+    // Highlighted lines
+    transform.position = Vector3.zero;
+}
+
+void Update()
+{
+    // Regular code
+    transform.Rotate(Vector3.up * Time.deltaTime);
+}
+        </code></pre>
+    </section>
+
+    <!-- Badges example -->
+    <section>
+        <h2>Badges</h2>
+        <p>
+            <span class="badge">Default</span>
+            <span class="badge success">Success</span>
+            <span class="badge warning">Warning</span>
+            <span class="badge danger">Danger</span>
+        </p>
+    </section>
+
+    <!-- Big number emphasis -->
+    <section>
+        <h2>Statistics</h2>
+        <p class="big-number">90%</p>
+        <p class="muted">of users prefer this approach</p>
+    </section>
+</section>
+
+<!-- ============================================
+     CLOSING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="assets/slides-init.js"></script>
+
+</body>
+</html>

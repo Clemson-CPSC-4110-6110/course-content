@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - CPSC 4110/6110</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-primary: #12121a;
+            --bg-elevated: #1a1a26;
+            --bg-surface: #22222e;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent: #00d4aa;
+            --accent-bright: #00ffcc;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(0, 212, 170, 0.3);
+            --exam: #ef4444;
+            --break: #6366f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .semester-info {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Schedule table */
+        .schedule-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-surface);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        th:first-child {
+            width: 120px;
+        }
+
+        th:nth-child(2) {
+            width: 100px;
+        }
+
+        tbody tr {
+            background: var(--bg-elevated);
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-surface);
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--bg-primary);
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: var(--bg-surface);
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .date {
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .day-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .topic {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .video-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .video-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Special rows */
+        .row-exam {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-left: 3px solid var(--exam);
+        }
+
+        .row-break {
+            background: rgba(99, 102, 241, 0.1) !important;
+            border-left: 3px solid var(--break);
+        }
+
+        .row-demo {
+            background: rgba(0, 212, 170, 0.1) !important;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tag-exam {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--exam);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .tag-break {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--break);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .tag-demo {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--accent-bright);
+            border: 1px solid var(--border-accent);
+        }
+
+        /* Module column */
+        .module {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">
+            <span>&larr;</span>
+            <span>Back to Course Home</span>
+        </a>
+
+        <header>
+            <h1>Course Schedule</h1>
+            <p class="subtitle">CPSC 4110/6110: Virtual Reality Systems</p>
+            <p class="semester-info">Spring 2026</p>
+        </header>
+
+        <div class="schedule-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Module</th>
+                        <th>Lecture Topic</th>
+                        <th>Assigned Videos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="date">Jan 8<span class="day-name">Thursday</span></td>
+                        <td class="module"></td>
+                        <td class="topic">Course Introduction</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 13<span class="day-name">Tuesday</span></td>
+                        <td class="module"></td>
+                        <td class="topic">Big Picture</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 15<span class="day-name">Thursday</span></td>
+                        <td class="module"></td>
+                        <td class="topic">Project Planning</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 20<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="development/unity-programming-model.html" class="video-link">Unity Programming Model</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 22<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Creating Environments with ProBuilder</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 27<span class="day-name">Tuesday</span></td>
+                        <td class="module">UX</td>
+                        <td class="topic">UX: Presence</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Jan 29<span class="day-name">Thursday</span></td>
+                        <td class="module">UX</td>
+                        <td class="topic">UX: Cybersickness</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 3<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Unity's Physics System</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 5<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Interaction Toolkit</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 10<span class="day-name">Tuesday</span></td>
+                        <td class="module">UX</td>
+                        <td class="topic">UX: Interaction</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 12<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Scripting custom XR Interactables</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 17<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Physical Interactions</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 19<span class="day-name">Thursday</span></td>
+                        <td class="module">UX</td>
+                        <td class="topic">UX: Locomotion</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 24<span class="day-name">Tuesday</span></td>
+                        <td class="module">UX</td>
+                        <td class="topic">UX: Interfaces</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Feb 26<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">User Interfaces</a></td>
+                    </tr>
+                    <tr class="row-exam">
+                        <td class="date">Mar 3<span class="day-name">Tuesday</span></td>
+                        <td class="module"></td>
+                        <td class="topic"><span class="tag tag-exam">Exam 1</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 5<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Scene and Data Management</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 10<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Testing and Debugging</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 12<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Performance Profiling and Optimization</a></td>
+                    </tr>
+                    <tr class="row-break">
+                        <td class="date">Mar 17<span class="day-name">Tuesday</span></td>
+                        <td class="module"></td>
+                        <td class="topic"><span class="tag tag-break">Spring Break</span></td>
+                        <td></td>
+                    </tr>
+                    <tr class="row-break">
+                        <td class="date">Mar 19<span class="day-name">Thursday</span></td>
+                        <td class="module"></td>
+                        <td class="topic"><span class="tag tag-break">Spring Break</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 24<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Peer Playtesting</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 26<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Audio and Haptics</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Mar 31<span class="day-name">Tuesday</span></td>
+                        <td class="module">Focus Area</td>
+                        <td class="topic">Focus Area 1</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 2<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Lighting</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 7<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Animations</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 9<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Peer Playtesting</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 14<span class="day-name">Tuesday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Shaders</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 16<span class="day-name">Thursday</span></td>
+                        <td class="module">Unity</td>
+                        <td class="topic">Unity</td>
+                        <td><a href="#" class="video-link">Open Lab</a></td>
+                    </tr>
+                    <tr>
+                        <td class="date">Apr 21<span class="day-name">Tuesday</span></td>
+                        <td class="module">Focus Area</td>
+                        <td class="topic">Focus Area 2</td>
+                        <td></td>
+                    </tr>
+                    <tr class="row-demo">
+                        <td class="date">Apr 23<span class="day-name">Thursday</span></td>
+                        <td class="module"></td>
+                        <td class="topic"><span class="tag tag-demo">Demo Day</span></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p>Schedule subject to change. Check Canvas for the most up-to-date information.</p>
+        </footer>
+    </div>
+</body>
+</html>

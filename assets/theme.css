@@ -1,0 +1,659 @@
+/**
+ * VR Course Slide Theme
+ * Dark theme with cyan accent for Virtual Reality Systems course
+ *
+ * Usage: <link rel="stylesheet" href="assets/theme.css">
+ */
+
+:root {
+    /* Dark palette with depth */
+    --bg-deep: #0a0a0f;
+    --bg-primary: #12121a;
+    --bg-elevated: #1a1a26;
+    --bg-surface: #22222e;
+    --bg-hover: #2a2a3a;
+
+    /* Text hierarchy */
+    --text-primary: #f0f0f5;
+    --text-secondary: #e0e0ea;
+    --text-muted: #a8a8b8;
+
+    /* Accent - cyan/teal for VR aesthetic */
+    --accent: #00d4aa;
+    --accent-bright: #00ffcc;
+    --accent-dim: #00b090;
+    --accent-glow: rgba(0, 212, 170, 0.15);
+    --accent-subtle: rgba(0, 212, 170, 0.08);
+
+    /* Semantic colors */
+    --success: #22c55e;
+    --warning: #eab308;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    /* Borders */
+    --border: rgba(255, 255, 255, 0.08);
+    --border-accent: rgba(0, 212, 170, 0.3);
+
+    /* Typography */
+    --font-display: 'Outfit', system-ui, sans-serif;
+    --font-mono: 'Space Mono', 'Consolas', monospace;
+
+    /* Spacing scale */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Reveal.js overrides */
+    --r-background-color: var(--bg-primary);
+    --r-main-font: var(--font-display);
+    --r-main-font-size: 26px;
+    --r-main-color: var(--text-primary);
+    --r-heading-font: var(--font-display);
+    --r-heading-color: var(--text-primary);
+    --r-heading-font-weight: 700;
+    --r-heading-letter-spacing: -0.03em;
+    --r-link-color: var(--accent);
+    --r-link-color-hover: var(--accent-bright);
+    --r-selection-background-color: var(--accent);
+    --r-selection-color: var(--bg-deep);
+}
+
+/* Base viewport */
+.reveal-viewport {
+    background: var(--bg-deep);
+}
+
+.reveal {
+    font-family: var(--font-display);
+    font-size: var(--r-main-font-size);
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--text-primary);
+}
+
+/* Slide layout - content left-aligned within centered slides */
+.reveal .slides section {
+    text-align: left;
+    padding: var(--space-2xl) var(--space-3xl);
+    background: var(--bg-primary);
+    box-sizing: border-box;
+    width: 100% !important;
+    overflow: hidden;
+}
+
+/* Prevent any child from exceeding slide width, with right padding for aesthetics */
+.reveal .slides section > * {
+    max-width: calc(100% - var(--space-xl));
+    box-sizing: border-box;
+}
+
+.reveal .slides section > * {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* ==================== Typography ==================== */
+
+.reveal h1 {
+    font-size: 3em;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+}
+
+.reveal h2 {
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: var(--space-xl);
+    color: var(--text-primary);
+    position: relative;
+    display: inline-block;
+}
+
+.reveal h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.reveal h3 {
+    font-size: 1.4em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.reveal h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    margin-bottom: var(--space-sm);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+}
+
+/* Body text */
+.reveal p {
+    margin-bottom: var(--space-md);
+    max-width: 50em;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Lists - generous spacing for readability */
+.reveal ul, .reveal ol {
+    display: block;
+    text-align: left;
+    margin-left: var(--space-md);
+    max-width: 48em;
+}
+
+.reveal li {
+    margin-bottom: var(--space-md);
+    line-height: 1.55;
+    color: var(--text-secondary);
+    padding-left: var(--space-sm);
+}
+
+.reveal ul > li::marker {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.reveal ol > li::marker {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.reveal li strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Emphasis */
+.reveal strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.reveal em {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ==================== Tables ==================== */
+
+.reveal table {
+    margin: var(--space-xl) 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.85em;
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    width: auto;
+    max-width: 100%;
+}
+
+.reveal th {
+    background: var(--bg-surface);
+    color: var(--accent);
+    font-weight: 600;
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    border-bottom: 2px solid var(--border-accent);
+}
+
+.reveal td {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.reveal tr:last-child td {
+    border-bottom: none;
+}
+
+.reveal tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+/* ==================== Layout Components ==================== */
+
+.reveal .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+    text-align: left;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.reveal .columns-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Cards */
+.reveal .card {
+    background: var(--bg-elevated);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+    transition: border-color 0.2s ease;
+}
+
+.reveal .card:hover {
+    border-color: var(--border-accent);
+}
+
+.reveal .card h4 {
+    margin-top: 0;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-md);
+}
+
+.reveal .card ul {
+    margin-left: var(--space-sm);
+    font-size: 0.9em;
+}
+
+.reveal .card p {
+    font-size: 0.9em;
+}
+
+/* Boxes with accent borders */
+.reveal .box {
+    background: var(--bg-elevated);
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+    margin: var(--space-lg) 0;
+}
+
+.reveal .box p {
+    margin-bottom: var(--space-sm);
+}
+
+.reveal .box p:last-child {
+    margin-bottom: 0;
+}
+
+.reveal .box.warning {
+    border-left-color: var(--warning);
+    background: rgba(234, 179, 8, 0.08);
+}
+
+.reveal .box.danger {
+    border-left-color: var(--danger);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.reveal .box.success {
+    border-left-color: var(--success);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+/* ==================== Text Utilities ==================== */
+
+.reveal .highlight {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.reveal .accent {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.reveal .muted {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+.reveal .small {
+    font-size: 0.85em;
+}
+
+.reveal .smaller {
+    font-size: 0.75em;
+}
+
+/* Badges */
+.reveal .badge {
+    display: inline-block;
+    padding: 0.25em 0.75em;
+    font-size: 0.75em;
+    font-weight: 600;
+    border-radius: 6px;
+    background: var(--accent-subtle);
+    color: var(--accent);
+    border: 1px solid var(--border-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.reveal .badge.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.reveal .badge.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.reveal .badge.warning {
+    background: rgba(234, 179, 8, 0.1);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.3);
+}
+
+/* Big numbers for emphasis */
+.reveal .big-number {
+    font-size: 4em;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+/* ==================== Media ==================== */
+
+.reveal img {
+    max-height: 380px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* ==================== UI Elements ==================== */
+
+/* Slide numbers */
+.reveal .slide-number {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+    background: transparent;
+    padding: var(--space-sm) var(--space-md);
+    right: 24px;
+    bottom: 24px;
+}
+
+/* Progress bar */
+.reveal .progress {
+    height: 3px;
+    background: var(--bg-surface);
+}
+
+.reveal .progress span {
+    background: var(--accent);
+}
+
+/* Links */
+.reveal a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.reveal a:hover {
+    border-bottom-color: var(--accent);
+}
+
+/* ==================== Code ==================== */
+
+.reveal code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--bg-surface);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--accent);
+}
+
+/* Code blocks with syntax highlighting */
+.reveal pre {
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-md);
+    margin: var(--space-lg) 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+}
+
+.reveal pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.85em;
+    line-height: 1.6;
+    color: var(--text-primary);
+    max-height: 450px;
+}
+
+/* Line numbers styling */
+.reveal pre code .hljs-ln-numbers {
+    user-select: none;
+    text-align: right;
+    color: var(--text-muted);
+    border-right: 1px solid var(--border);
+    padding-right: var(--space-md) !important;
+    margin-right: var(--space-md);
+}
+
+/* Highlighted lines */
+.reveal .hljs-ln tr.highlight-line {
+    background: var(--accent-subtle);
+}
+
+.reveal code[data-line-numbers] .hljs-ln-line.highlight-line {
+    background: rgba(0, 212, 170, 0.15);
+}
+
+/* ==================== Special Slides ==================== */
+
+/* Title slide */
+.reveal .title-slide {
+    text-align: center;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(0, 212, 170, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(0, 180, 150, 0.08) 0%, transparent 40%),
+        var(--bg-deep);
+    position: relative;
+}
+
+.reveal .title-slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, transparent 0%, transparent 49.5%, rgba(255,255,255,0.02) 49.5%, rgba(255,255,255,0.02) 50.5%, transparent 50.5%),
+        linear-gradient(0deg, transparent 0%, transparent 49.5%, rgba(255,255,255,0.02) 49.5%, rgba(255,255,255,0.02) 50.5%, transparent 50.5%);
+    background-size: 80px 80px;
+    pointer-events: none;
+}
+
+.reveal .title-slide h1 {
+    font-size: 4em;
+    font-weight: 800;
+    margin: 0 0 var(--space-md) 0;
+    letter-spacing: -0.05em;
+    color: var(--text-primary);
+    text-shadow: 0 0 80px rgba(0, 212, 170, 0.3);
+}
+
+.reveal .title-slide h3 {
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 1.5em;
+    letter-spacing: 0.15em;
+    margin: 0;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+}
+
+.reveal .title-slide .course-id {
+    color: var(--text-secondary);
+    font-size: 1.1em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin-top: var(--space-lg);
+    font-family: var(--font-mono);
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Section slide */
+.reveal .section-slide {
+    text-align: center;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background:
+        radial-gradient(ellipse at center, var(--accent-subtle) 0%, transparent 60%),
+        var(--bg-primary);
+}
+
+.reveal .section-slide h2 {
+    font-size: 2.8em;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.04em;
+}
+
+.reveal .section-slide h2::after {
+    display: none;
+}
+
+/* ==================== Animations ==================== */
+
+/* Fragment animations */
+.reveal .fragment {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal .fragment:not(.visible) {
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+.reveal .fragment.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== Plugin Styles ==================== */
+
+/* Chalkboard customization */
+.reveal .chalkboard-button {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.reveal .chalkboard-button:hover {
+    opacity: 1;
+}
+
+/* Pointer/laser styling */
+.reveal-pointer {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff3333 0%, #ff0000 50%, transparent 70%);
+    box-shadow: 0 0 20px 8px rgba(255, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+}
+
+/* Zoom styling */
+.zoomed .reveal .slides section {
+    cursor: zoom-out;
+}
+
+/* Poll container */
+.reveal .poll {
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.reveal .poll iframe {
+    background: white;
+}
+
+/* ==================== Timeline Component ==================== */
+
+.reveal .timeline {
+    position: relative;
+    padding-left: var(--space-2xl);
+}
+
+.reveal .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+    border-radius: 2px;
+}
+
+.reveal .timeline-item {
+    position: relative;
+    margin-bottom: var(--space-md);
+}
+
+.reveal .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--space-2xl) - 4px);
+    top: 0.5em;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--accent);
+}

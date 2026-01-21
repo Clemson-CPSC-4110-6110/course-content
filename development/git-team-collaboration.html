@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git for Unity Development: Team Collaboration - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* Compact code blocks for slides */
+        .reveal pre code {
+            max-height: 420px;
+            font-size: 0.55em;
+            line-height: 1.0;
+        }
+        .reveal pre {
+            width: 100%;
+            margin: 0.5em 0;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>Git for Unity Development</h1>
+    <h3>Part 2: Team Collaboration</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- Introduction Section -->
+<section>
+    <section class="section-slide">
+        <h2>Introduction</h2>
+    </section>
+
+    <section>
+        <h2>Previously...</h2>
+        <p>In Part 1, we covered:</p>
+        <ul>
+            <li class="fragment">Cloning your project from GitHub Classroom</li>
+            <li class="fragment">Understanding <code>.gitignore</code> and <code>.gitattributes</code></li>
+            <li class="fragment">The daily workflow: Pull &rarr; Work &rarr; Commit &rarr; Push</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Today: Collaboration</h2>
+        <p>Working with teammates on a group project:</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Branching</h4>
+                <p class="small">Work in parallel without conflicts</p>
+            </div>
+            <div class="card fragment">
+                <h4>Merging</h4>
+                <p class="small">Combining changes from multiple people</p>
+            </div>
+        </div>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p>Plus: Unity-specific tools for handling merge conflicts</p>
+        </div>
+    </section>
+</section>
+
+<!-- Branching Basics Section -->
+<section>
+    <section class="section-slide">
+        <h2>Branching Basics</h2>
+    </section>
+
+    <section>
+        <h2>What Are Branches?</h2>
+        <p>A branch is like a <strong>parallel timeline</strong> for your project.</p>
+        <pre><code class="plaintext">main ─────●─────●─────●─────●─────●
+                \                 /
+feature          ●─────●─────●───
+                 (your changes)</code></pre>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Make changes without affecting the main version</li>
+            <li class="fragment">Merge back when you're ready</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Why Use Branches?</h2>
+        <div class="columns columns-2" style="gap: var(--space-md);">
+            <div class="card fragment">
+                <h4>Isolation</h4>
+                <p class="small">Work on features without risking main project stability</p>
+            </div>
+            <div class="card fragment">
+                <h4>Parallel Work</h4>
+                <p class="small">Multiple people work on different things simultaneously</p>
+            </div>
+            <div class="card fragment">
+                <h4>Code Review</h4>
+                <p class="small">Review changes before they become part of main</p>
+            </div>
+            <div class="card fragment">
+                <h4>Experimentation</h4>
+                <p class="small">Try ideas you might abandon without affecting main</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Creating a Branch in GitHub Desktop</h2>
+        <ol>
+            <li class="fragment">Click the <strong>Current Branch</strong> dropdown at the top</li>
+            <li class="fragment">Type a name for your new branch</li>
+            <li class="fragment">Click <strong>Create Branch</strong></li>
+        </ol>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <h4>Branch Naming</h4>
+            <p class="small">Use descriptive, hyphenated names: <code>player-movement</code>, <code>ui-redesign</code>, <code>bug-fix-teleport</code></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>When to Use Branches</h2>
+        <div class="columns">
+            <div>
+                <div class="box success">
+                    <h4>Use a Branch</h4>
+                    <ul class="small">
+                        <li>Multi-session features</li>
+                        <li>Experimental changes</li>
+                        <li>Anything you're unsure about</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="box">
+                    <h4>Commit to Main</h4>
+                    <ul class="small">
+                        <li>Quick fixes</li>
+                        <li>Typo corrections</li>
+                        <li>Small value adjustments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">Use your judgment!</p>
+    </section>
+
+    <section>
+        <h2>Merging a Branch</h2>
+        <p>When your feature is complete:</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Option 1: Pull Request</h4>
+                <p class="small">Push branch to GitHub, create PR for team review</p>
+                <span class="badge success">Recommended for teams</span>
+            </div>
+            <div class="card fragment">
+                <h4>Option 2: Local Merge</h4>
+                <p class="small">Switch to main, Branch menu &rarr; Merge into Current Branch</p>
+            </div>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-lg);">After merging, <strong>push to GitHub</strong> to share with your team!</p>
+    </section>
+</section>
+
+<!-- Scene File Problem Section -->
+<section>
+    <section class="section-slide">
+        <h2>The Scene File Problem</h2>
+        <p>Why Unity Merges Are Tricky</p>
+    </section>
+
+    <section>
+        <h2>Unity Scenes Are Text Files</h2>
+        <p>Scenes are stored as YAML &mdash; technically human-readable:</p>
+        <pre><code class="yaml">--- !u!1 &amp;963194225
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_Component:
+  - component: {fileID: 963194228}
+  - component: {fileID: 963194227}
+  m_Name: Player</code></pre>
+        <p class="fragment muted">Every GameObject, component, and reference has a unique ID</p>
+    </section>
+
+    <section>
+        <h2>Why Merging Fails</h2>
+        <p>Git doesn't understand what the YAML content <em>means</em>.</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Two people edit the same scene</li>
+            <li class="fragment">Git sees two different text files</li>
+            <li class="fragment">It might combine lines incorrectly</li>
+            <li class="fragment">Or just give up with a conflict</li>
+        </ul>
+        <div class="fragment box danger" style="margin-top: var(--space-lg);">
+            <p>Bad merges can completely break your scene!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Prevention Is Better Than Cure</h2>
+        <p>Strategies to avoid scene conflicts:</p>
+    </section>
+
+    <section>
+        <h2>Strategy 1: Communicate</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p>"I'm going to be working on the main menu scene"</p>
+        </div>
+        <ul>
+            <li class="fragment">Check in with teammates before you start</li>
+            <li class="fragment">Use your group chat</li>
+            <li class="fragment">A quick message prevents hours of headaches</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Strategy 2: Use Prefabs</h2>
+        <p>Build GameObjects as <strong>prefabs</strong> instead of directly in scenes</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Prefab changes stored in <strong>separate files</strong></li>
+            <li class="fragment">Two people can work on different prefabs</li>
+            <li class="fragment">Both prefabs used in same scene? No conflict!</li>
+        </ul>
+        <div class="fragment box success" style="margin-top: var(--space-lg);">
+            <p>Prefabs are your best friend for team projects</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Strategy 3: Split Into Multiple Scenes</h2>
+        <p>Instead of one massive scene:</p>
+        <pre><code class="plaintext">Scenes/
+├── MainMenu.unity
+├── Level1_Environment.unity
+├── Level1_UI.unity
+└── Level1_Gameplay.unity</code></pre>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li>Unity can load scenes <strong>additively</strong></li>
+            <li>Legitimate architectural choice, not just a Git workaround</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Strategy 4: Push Frequently</h2>
+        <ul>
+            <li class="fragment">Short work sessions</li>
+            <li class="fragment">Commit and push often</li>
+            <li class="fragment">Less divergence = fewer conflicts</li>
+        </ul>
+        <div class="fragment box warning" style="margin-top: var(--space-lg);">
+            <p>The longer you wait to push, the more likely you'll have conflicts!</p>
+        </div>
+    </section>
+</section>
+
+<!-- Using UnityYAMLMerge Section -->
+<section>
+    <section class="section-slide">
+        <h2>When Conflicts Happen</h2>
+        <p>Using UnityYAMLMerge</p>
+    </section>
+
+    <section>
+        <h2>Your Project Is Already Configured</h2>
+        <p>The <code>.gitattributes</code> file includes:</p>
+        <pre><code class="plaintext">*.unity merge=unityyamlmerge
+*.prefab merge=unityyamlmerge
+*.asset merge=unityyamlmerge</code></pre>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <h4>UnityYAMLMerge</h4>
+            <p class="small">Unity's smart merge tool that <strong>understands</strong> scene file structure. It knows that two people adding different GameObjects isn't really a conflict!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>What a Conflict Looks Like</h2>
+        <ol>
+            <li class="fragment">You try to pull changes or merge a branch</li>
+            <li class="fragment">GitHub Desktop shows merge is <strong>in progress</strong> but can't complete</li>
+            <li class="fragment">You see a list of <strong>conflicted files</strong></li>
+        </ol>
+        <p class="fragment" style="margin-top: var(--space-lg);">For Unity files, we'll use <code>git mergetool</code> to invoke UnityYAMLMerge</p>
+    </section>
+
+    <section>
+        <h2>Running the Merge Tool</h2>
+        <ol>
+            <li class="fragment">
+                <strong>Open terminal</strong> from GitHub Desktop<br>
+                <span class="small muted">Repository &rarr; Open in Command Prompt/Terminal</span>
+            </li>
+            <li class="fragment">
+                <strong>Run the merge tool:</strong>
+                <pre><code>git mergetool</code></pre>
+            </li>
+            <li class="fragment">
+                UnityYAMLMerge processes each conflicted file
+            </li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Automatic Resolution</h2>
+        <p>UnityYAMLMerge can automatically resolve many conflicts:</p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> Can Merge</h4>
+                <ul class="small">
+                    <li>Different objects added to scene</li>
+                    <li>Different components modified</li>
+                    <li>Different properties changed</li>
+                </ul>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-xmark" style="color: var(--danger);"></i> Needs Help</h4>
+                <ul class="small">
+                    <li>Same property on same component</li>
+                    <li>e.g., both changed player position</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Manual Resolution</h2>
+        <p>When UnityYAMLMerge can't resolve automatically:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">A <strong>diff tool</strong> opens with three panels</li>
+            <li class="fragment">Original version in the middle</li>
+            <li class="fragment">Your version on one side, teammate's on other</li>
+            <li class="fragment">Choose which changes to keep</li>
+            <li class="fragment"><strong>Save and close</strong> when done</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Completing the Merge</h2>
+        <ol>
+            <li class="fragment">After <code>git mergetool</code> finishes, return to GitHub Desktop</li>
+            <li class="fragment">Conflicts should now be resolved</li>
+            <li class="fragment"><strong>Commit</strong> the merge (message is pre-filled)</li>
+            <li class="fragment"><strong>Push</strong> to share the merged result</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>The Escape Hatch</h2>
+        <p>If things go badly wrong:</p>
+        <pre><code>git merge --abort</code></pre>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Cancels the merge completely</li>
+            <li class="fragment">Returns to the state before you started</li>
+            <li class="fragment">Coordinate with teammate and try again</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p class="small">Sometimes the cleanest solution is for one person to manually redo their changes on top of the other person's version</p>
+        </div>
+    </section>
+</section>
+
+<!-- Troubleshooting Section -->
+<section>
+    <section class="section-slide">
+        <h2>Troubleshooting</h2>
+    </section>
+
+    <section>
+        <h2>UnityYAMLMerge Not Found</h2>
+        <p>If you get an error about the merge tool:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Make sure Unity is installed in the <strong>standard location</strong></li>
+            <li class="fragment">The configuration assumes default Unity Hub paths</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <h4>Standard Paths</h4>
+            <p class="small"><strong>Windows:</strong> <code>C:\Program Files\Unity\Hub\Editor\&lt;version&gt;\...</code></p>
+            <p class="small"><strong>Mac:</strong> <code>/Applications/Unity/Hub/Editor/&lt;version&gt;/...</code></p>
+        </div>
+        <p class="fragment muted">Contact instructor if you need help configuring a non-standard path</p>
+    </section>
+
+    <section>
+        <h2>Scene Broken After Merge</h2>
+        <p>Even with smart merging, scenes can sometimes break:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Open the scene in Unity, check Console for errors</li>
+            <li class="fragment">Unity can sometimes repair minor issues automatically</li>
+            <li class="fragment">If badly broken: <code>git merge --abort</code> and coordinate</li>
+        </ul>
+        <div class="fragment box warning" style="margin-top: var(--space-lg);">
+            <p>Fixing a broken merge can cost more time than preventing it would have!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Conflicts in Meta Files</h2>
+        <p><code>.meta</code> file conflicts are rare but can happen:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment">Two people added assets with conflicting GUIDs</li>
+            <li class="fragment">Can often accept one version or the other</li>
+            <li class="fragment"><strong>Be careful</strong> &mdash; meta files contain reference information</li>
+            <li class="fragment">Wrong version can break script-to-GameObject connections</li>
+        </ul>
+        <p class="fragment highlight" style="margin-top: var(--space-lg);">When in doubt, ask for help!</p>
+    </section>
+</section>
+
+<!-- Best Practices Section -->
+<section>
+    <section class="section-slide">
+        <h2>Best Practices Recap</h2>
+    </section>
+
+    <section>
+        <h2>Six Rules for Team Success</h2>
+        <ol>
+            <li class="fragment"><strong>Pull before you start working</strong><br><span class="small muted">Minimize divergence from teammates</span></li>
+            <li class="fragment"><strong>Commit often, push frequently</strong><br><span class="small muted">Small commits are easier to merge</span></li>
+            <li class="fragment"><strong>Communicate about scenes</strong><br><span class="small muted">A quick message prevents conflicts</span></li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Six Rules for Team Success</h2>
+        <ol start="4">
+            <li class="fragment"><strong>Use prefabs liberally</strong><br><span class="small muted">Separate files = easier merging</span></li>
+            <li class="fragment"><strong>Use <code>git mergetool</code> for conflicts</strong><br><span class="small muted">UnityYAMLMerge understands scene files</span></li>
+            <li class="fragment"><strong>When in doubt, talk it out</strong><br><span class="small muted">Sometimes manual redo is the cleanest solution</span></li>
+        </ol>
+    </section>
+</section>
+
+<!-- Conclusion Section -->
+<section>
+    <section class="section-slide">
+        <h2>Summary</h2>
+    </section>
+
+    <section>
+        <h2>What We Covered</h2>
+        <ul>
+            <li class="fragment"><strong>Branches</strong> let you work on features in isolation</li>
+            <li class="fragment"><strong>Scene files</strong> are tricky because Git doesn't understand YAML structure</li>
+            <li class="fragment"><strong>Prevention</strong> through communication and prefabs</li>
+            <li class="fragment"><strong>UnityYAMLMerge</strong> can handle many conflicts automatically</li>
+            <li class="fragment"><strong>Communication</strong> is your most powerful tool</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>It's Normal to Have Issues</h2>
+        <div class="box" style="margin-top: var(--space-lg);">
+            <p>Version control has a learning curve.</p>
+            <p>You <em>will</em> run into issues at some point.</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-xl);">When it happens, <strong>don't panic</strong> &mdash; reach out for help, and we'll get it sorted out.</p>
+    </section>
+
+    <section class="section-slide">
+        <h2>What Questions Do You Have?</h2>
+        <p style="margin-top: var(--space-lg);">At least 3 questions must be asked before we can end class.</p>
+    </section>
+</section>
+
+<!-- Command Reference Section -->
+<section>
+    <section class="section-slide">
+        <h2>Command Reference</h2>
+    </section>
+
+    <section>
+        <h2>Branch Commands</h2>
+        <table>
+            <tr><th>Action</th><th>Command</th></tr>
+            <tr><td>List branches</td><td><code>git branch</code></td></tr>
+            <tr><td>Create new branch</td><td><code>git checkout -b &lt;name&gt;</code></td></tr>
+            <tr><td>Switch to branch</td><td><code>git checkout &lt;name&gt;</code></td></tr>
+            <tr><td>Push new branch</td><td><code>git push -u origin &lt;name&gt;</code></td></tr>
+            <tr><td>Delete local branch</td><td><code>git branch -d &lt;name&gt;</code></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Merge Commands</h2>
+        <table>
+            <tr><th>Action</th><th>Command</th></tr>
+            <tr><td>Merge branch into current</td><td><code>git merge &lt;branch&gt;</code></td></tr>
+            <tr><td>Run Unity merge tool</td><td><code>git mergetool</code></td></tr>
+            <tr><td>Abort failed merge</td><td><code>git merge --abort</code></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Merge Conflict Quick Steps</h2>
+        <ol>
+            <li>Open terminal from GitHub Desktop</li>
+            <li>Run: <code>git mergetool</code></li>
+            <li>If diff tool opens, choose changes and save</li>
+            <li>Return to GitHub Desktop and commit the merge</li>
+            <li>Push to share with teammates</li>
+        </ol>
+        <div class="box" style="margin-top: var(--space-lg);">
+            <p><strong>Escape hatch:</strong> <code>git merge --abort</code></p>
+        </div>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>

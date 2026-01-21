@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Introduction - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>Virtual Reality Systems</h1>
+    <h3>Course Introduction</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<section>
+    <h2>Quick Poll</h2>
+    <div class="poll"
+         data-poll-id="33333333-3333-3333-3333-333333333333"
+         data-poll-url="http://localhost:5173">
+    </div>
+</section>
+
+<!-- What is VR Section -->
+<section>
+    <section class="section-slide">
+        <h2>What is Virtual Reality?</h2>
+    </section>
+
+    <section>
+        <h2>What is Virtual Reality?</h2>
+        <ul>
+            <li class="fragment"><strong>Virtual Reality (VR)</strong> replaces the real world with artificially created sensory input</li>
+            <li class="fragment"><strong>Augmented Reality (AR)</strong> augments the real world with artificially created sensory input</li>
+            <li class="fragment">Current technology works best for visual and auditory information</li>
+            <li class="fragment">Research extends to: touch, taste, smell, and vestibular sense</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>VR Beyond Humans</h2>
+        <p>VR isn't just for humans - researchers have created VR systems for mice, flies, and other organisms to study behavior and perception.</p>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Mouse VR Headset</h4>
+                <p class="muted">github.com/sn-lab/mouseVRheadset</p>
+            </div>
+            <div class="card">
+                <h4>FreemoVR</h4>
+                <p class="muted">strawlab.org/freemovr-press/</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Defining VR</h2>
+        <p><strong>Five important components:</strong></p>
+        <ol>
+            <li class="fragment"><strong>Organism</strong> &mdash; Immersive VR only happens if a creature perceives it</li>
+            <li class="fragment"><strong>Targeted behavior</strong> &mdash; Organism experiences something as designed</li>
+            <li class="fragment"><strong>Artificial sensory stimulation</strong> &mdash; Experience created through artificial sensory information</li>
+            <li class="fragment"><strong>Awareness</strong> &mdash; The organism is "fooled" into feeling present</li>
+            <li class="fragment"><strong>Interaction</strong> &mdash; The user not only perceives but also acts</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Discussion</h2>
+        <div class="box" style="font-size: 1.2em;">
+            <p><strong>What are the most important considerations when creating a VR application?</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Human-Centered Computing and VR</h2>
+        <ul>
+            <li class="fragment"><strong>Human Centered Computing (HCC)</strong> recognizes the intersection between technology, environment, and person</li>
+            <li class="fragment">Every system you design is intended to be used by a person in a context</li>
+            <li class="fragment">We can design better systems when we remember this</li>
+            <li class="fragment">HCC perspective is <em>especially</em> important for VR &mdash; the person-system coupling is much tighter</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Course Structure Section -->
+<section>
+    <section class="section-slide">
+        <h2>Course Structure</h2>
+    </section>
+
+    <section>
+        <h2>What to Expect</h2>
+        <p><strong>Course divided into three modules:</strong></p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <ol>
+                    <li class="fragment"><span class="badge">Module 1</span> User Experience</li>
+                    <li class="fragment"><span class="badge">Module 2</span> Sensing and Perceiving</li>
+                    <li class="fragment"><span class="badge">Module 3</span> Tracking and Rendering</li>
+                </ol>
+            </div>
+            <div class="fragment">
+                <div class="box">
+                    <p class="small">Videos may be assigned to watch before class, especially when introducing programming concepts</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Development</h2>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li><strong>Unity 6 Game Engine</strong> for building VR experiences</li>
+                    <li><strong>Meta Quest 3s</strong> loaned for the semester</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Tools</h4>
+                <ul class="small">
+                    <li>Unity 6</li>
+                    <li>Meta Quest 3</li>
+                    <li>C# Programming</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Assignments Overview</h2>
+        <div class="columns columns-3" style="gap: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Activities</h4>
+                <ul>
+                    <li>In-class work</li>
+                    <li>Exit tickets</li>
+                </ul>
+            </div>
+            <div class="card fragment">
+                <h4>Individual Projects</h4>
+                <ul>
+                    <li>3 Unity assignments</li>
+                    <li>Build baseline skills</li>
+                </ul>
+            </div>
+            <div class="card fragment">
+                <h4>Group Project</h4>
+                <ul>
+                    <li>Semester-long</li>
+                    <li>Teams of 4</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Individual Development Projects</h2>
+        <p><strong>Three Unity Development Activities:</strong></p>
+        <ul>
+            <li class="fragment">Ensure everyone develops a baseline skill set with Unity</li>
+            <li class="fragment">You can specialize within the group project</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <h4>Potential Assignments</h4>
+            <ul class="small">
+                <li>Build and deploy basic application to Meta Quest</li>
+                <li>Hand tracking and physics interactions</li>
+                <li>Optimization</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Semester-Long Group Project</h2>
+        <ul>
+            <li class="fragment">Course centers on a semester-long group project</li>
+            <li class="fragment">Teams of <strong>4 students</strong></li>
+            <li class="fragment">Each group proposes a project to develop in Unity</li>
+            <li class="fragment">Development divided into <strong>3 sprints</strong></li>
+            <li class="fragment">Meet with instructor after each sprint for feedback</li>
+            <li class="fragment">Final demos + user feedback collection</li>
+            <li class="fragment">Final report reflecting on development</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Group Project Timeline</h2>
+        <table>
+            <tr><th>Date</th><th>Milestone</th></tr>
+            <tr><td>8/28</td><td>Groups assigned</td></tr>
+            <tr><td>9/5</td><td>Meet to discuss project ideas</td></tr>
+            <tr><td>9/14</td><td>Project proposal due</td></tr>
+            <tr><td>10/3</td><td>Sprint 1 Meeting</td></tr>
+            <tr><td>10/24</td><td>Sprint 2 Meeting</td></tr>
+            <tr><td>11/21</td><td>Sprint 3 Meeting</td></tr>
+            <tr><td>~12/4</td><td>Final Demos</td></tr>
+            <tr><td>12/10</td><td>Final Report</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Sprints</h2>
+        <p><strong>Each sprint has four assignments:</strong></p>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <ol>
+                    <li class="fragment"><strong>Sprint Backlog</strong><br><span class="muted">What are you going to do?</span></li>
+                    <li class="fragment"><strong>Review Meeting</strong><br><span class="muted">Show progress to instructor</span></li>
+                </ol>
+            </div>
+            <div>
+                <ol start="3">
+                    <li class="fragment"><strong>Sprint Increment</strong><br><span class="muted">Submit latest version</span></li>
+                    <li class="fragment"><strong>Team Retrospective</strong><br><span class="muted">Reflect on team performance</span></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Exams</h2>
+        <p><strong>Three in-class exams, one for each module:</strong></p>
+        <table style="margin-top: var(--space-lg);">
+            <tr><th>Module</th><th>Exam Date</th></tr>
+            <tr><td>User Experience</td><td>10/2</td></tr>
+            <tr><td>Sensing and Perceiving</td><td>11/6</td></tr>
+            <tr><td>Tracking and Displays</td><td>12/10 <span class="muted">(final slot)</span></td></tr>
+        </table>
+        <p class="fragment highlight" style="margin-top: var(--space-lg);">Plan on being here on those dates!</p>
+    </section>
+</section>
+
+<!-- Learning Section -->
+<section>
+    <section class="section-slide">
+        <h2>Learning</h2>
+    </section>
+
+    <section>
+        <h2>Discussion</h2>
+        <div class="box">
+            <p><strong>What is something you are good at doing?</strong></p>
+            <p class="muted">This doesn't have to be school or CS related. No zero-effort responses.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Discussion</h2>
+        <div class="box">
+            <p><strong>How did you get good at the thing you are good at doing?</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>How Do We Learn?</h2>
+        <ul>
+            <li class="fragment">We learn by <strong>effortfully applying ourselves</strong> to difficult things</li>
+            <li class="fragment">Significant learning occurs through <strong>failure, refinement, and repetition</strong></li>
+            <li class="fragment">Excellence requires striving past your current ability</li>
+            <li class="fragment">Setbacks provide information needed to achieve mastery</li>
+        </ul>
+        <div class="fragment box warning" style="margin-top: var(--space-lg);">
+            <p><strong>When learning is easy, it is often superficial and quickly forgotten</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Science of Successful Learning</h2>
+        <div class="columns">
+            <div>
+                <h4>Key Principles</h4>
+                <ul>
+                    <li class="fragment">Easy learning isn't durable</li>
+                    <li class="fragment">Regular retrieval strengthens memories</li>
+                    <li class="fragment">Interleaving problems is more effective</li>
+                </ul>
+            </div>
+            <div class="fragment">
+                <h4>Effective Strategies</h4>
+                <ul class="small">
+                    <li><strong>Elaboration</strong> &mdash; Finding additional meaning</li>
+                    <li><strong>Generation</strong> &mdash; Attempt before receiving solutions</li>
+                    <li><strong>Reflection</strong> &mdash; Connect to other concepts</li>
+                    <li><strong>Calibration</strong> &mdash; Objectively evaluate knowledge</li>
+                    <li><strong>Mnemonics</strong> &mdash; Mental structures for retrieval</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Bloom's Taxonomy of Learning</h2>
+        <table>
+            <tr><th>Level</th><th>Description</th></tr>
+            <tr><td><span class="badge">Create</span></td><td>Produce new or original work</td></tr>
+            <tr><td><span class="badge">Evaluate</span></td><td>Justify a decision or course of action</td></tr>
+            <tr><td><span class="badge">Analyze</span></td><td>Draw connections among ideas</td></tr>
+            <tr><td><span class="badge">Apply</span></td><td>Use information in new situations</td></tr>
+            <tr><td><span class="badge">Understand</span></td><td>Explain ideas or concepts</td></tr>
+            <tr><td><span class="badge">Remember</span></td><td>Recall facts and basic concepts</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Physical Writing vs Typing</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p><strong>Research shows physically writing notes leads to more durable memories</strong></p>
+        </div>
+        <ul>
+            <li class="fragment">Can't copy verbatim when writing &mdash; requires synthesis</li>
+            <li class="fragment">Writing requires intricate motor skills, engages more brain regions</li>
+            <li class="fragment">Motor and vision regions synchronize with memory regions</li>
+            <li class="fragment">Similar benefits for paper or tablet with pen</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>How Assignments Support Learning</h2>
+        <table>
+            <tr><th>Assignment Type</th><th>Learning Benefits</th></tr>
+            <tr><td>Group Project</td><td>Active learning, elaboration, spaced practice</td></tr>
+            <tr><td>Individual Projects</td><td>Active learning, spaced repetition, feedback</td></tr>
+            <tr><td>Exams</td><td>Retrieval practice, interleaved practice</td></tr>
+            <tr><td>Activities</td><td>Low-stakes practice, immediate reflection</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Feedback Loop</h2>
+        <ul>
+            <li class="fragment">Learning comes from <strong>feedback and repetition</strong></li>
+            <li class="fragment">Most assignments can be resubmitted after feedback</li>
+            <li class="fragment">Lowers stakes while preserving benefits of hard problems</li>
+        </ul>
+        <div class="fragment box success" style="margin-top: var(--space-xl);">
+            <p><strong>Built into the course structure!</strong></p>
+        </div>
+    </section>
+</section>
+
+<!-- Specification Grading Section -->
+<section>
+    <section class="section-slide">
+        <h2>Specification Grading</h2>
+    </section>
+
+    <section>
+        <h2>What is Specification Grading?</h2>
+        <ul>
+            <li class="fragment">Grading system focused on <strong>clear, specific criteria</strong></li>
+            <li class="fragment">Assignments graded as <span class="badge success">Satisfactory</span> or <span class="badge danger">Unsatisfactory</span></li>
+            <li class="fragment">Projects and exams divided into <strong>bundles</strong></li>
+            <li class="fragment">Each bundle must be fully completed to earn points</li>
+            <li class="fragment"><strong>No partial credit</strong> within a bundle</li>
+            <li class="fragment">Unsatisfactory work can be resubmitted after feedback</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Why Specification Grading?</h2>
+        <div class="columns columns-3" style="gap: var(--space-md);">
+            <div class="card fragment">
+                <h4>Clarity</h4>
+                <p class="small">You know exactly what is expected</p>
+            </div>
+            <div class="card fragment">
+                <h4>Real-World</h4>
+                <p class="small">Mimics industry standards</p>
+            </div>
+            <div class="card fragment">
+                <h4>Fairness</h4>
+                <p class="small">Consistent grading for all</p>
+            </div>
+        </div>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div class="card fragment">
+                <h4>Mastery</h4>
+                <p class="small">Encourages thorough understanding</p>
+            </div>
+            <div class="card fragment">
+                <h4>Learning</h4>
+                <p class="small">Supports effective strategies</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Learning Benefits</h2>
+        <ul>
+            <li class="fragment"><strong>Mastery learning</strong> &mdash; Strong foundational understanding</li>
+            <li class="fragment"><strong>Growth Mindset</strong> &mdash; Abilities develop through effort</li>
+            <li class="fragment"><strong>Clear Expectations</strong> &mdash; Focus efforts effectively</li>
+            <li class="fragment"><strong>Effective Feedback</strong> &mdash; Correct misconceptions quickly</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Real-World Preparation</h2>
+        <div class="box">
+            <ul>
+                <li>Mimics industry project requirements</li>
+                <li>Develops attention to detail</li>
+                <li>Builds habits of meeting all specifications</li>
+                <li>Prepares for pass/fail nature of real-world tasks</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Bottom Line</h2>
+        <p>Specification grading is designed to:</p>
+        <ul>
+            <li class="fragment">Maximize learning through clear goals and feedback</li>
+            <li class="fragment">Prepare you for real-world challenges</li>
+            <li class="fragment">Provide clear paths to success</li>
+            <li class="fragment">Reward mastery and consistent effort</li>
+        </ul>
+        <div class="fragment box" style="margin-top: var(--space-xl);">
+            <p class="accent"><strong>It's not just about grades &mdash; it's about becoming a skilled developer</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Assignments Breakdown</h2>
+        <table>
+            <tr><th>Type</th><th>Count</th><th>Points Each</th><th>Total</th></tr>
+            <tr><td>Group Project Stages</td><td>5</td><td>2</td><td>10</td></tr>
+            <tr><td>Individual Projects</td><td>3</td><td>2</td><td>6</td></tr>
+            <tr><td>Exams</td><td>3</td><td>3</td><td>9</td></tr>
+            <tr><td>Activities/Exit Tickets</td><td>&mdash;</td><td>&mdash;</td><td>2</td></tr>
+            <tr style="background: var(--accent-subtle);"><td colspan="3"><strong>Total Available</strong></td><td><strong>27</strong></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Grading Scale</h2>
+        <p class="big-number">27</p>
+        <p class="muted" style="margin-top: -0.5em; margin-bottom: var(--space-lg);">points available</p>
+        <table>
+            <tr><th>Grade</th><th>Points Required</th></tr>
+            <tr><td><span class="badge danger">D</span></td><td>16 points</td></tr>
+            <tr><td><span class="badge warning">C</span></td><td>19 points</td></tr>
+            <tr><td><span class="badge">B</span></td><td>22 points</td></tr>
+            <tr><td><span class="badge success">A</span></td><td>25 points</td></tr>
+        </table>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Flexibility in which assignments you complete!</p>
+    </section>
+
+    <section>
+        <h2>Resubmissions</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p><strong>Pass/fail grading is NOT intended to be punitive</strong></p>
+        </div>
+        <ul>
+            <li class="fragment">Individual/Group (non-meeting): <strong>24-hour</strong> late window</li>
+            <li class="fragment">Group Project phases: Resubmit within <strong>5 days</strong></li>
+            <li class="fragment">Individual Projects: Resubmit within <strong>3 days</strong></li>
+            <li class="fragment">Exam 1 & 2: Retake during final exam</li>
+            <li class="fragment">May drop <strong>3</strong> exit tickets/activities</li>
+        </ul>
+    </section>
+</section>
+
+<!-- AI and Policies Section -->
+<section>
+    <section>
+        <h2>Generative AI in the Classroom</h2>
+        <ul>
+            <li class="fragment">These are valuable tools <strong>when used rightly</strong></li>
+            <li class="fragment">Widespread adoption in professional environments</li>
+            <li class="fragment">Employers look for effective AI users</li>
+        </ul>
+        <div class="fragment box success" style="margin-top: var(--space-lg);">
+            <h4>Good Uses</h4>
+            <ul class="small">
+                <li>Help overcome difficulties and answer questions</li>
+                <li>Get feedback on code you've written</li>
+                <li>Explain error messages</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Generative AI: Warnings</h2>
+        <div class="box danger">
+            <h4>Important!</h4>
+            <ul>
+                <li class="fragment">LLMs often <strong>hallucinate</strong> and get information wrong</li>
+                <li class="fragment">They may suggest techniques we don't cover in class</li>
+                <li class="fragment">Using uncovered techniques will likely <strong>not meet specs</strong></li>
+            </ul>
+        </div>
+        <p class="fragment highlight" style="margin-top: var(--space-lg);">If you use GenAI, you must document it with your submission!</p>
+    </section>
+
+    <section>
+        <h2>Honor Code</h2>
+        <ul>
+            <li class="fragment">Discussion between classmates is <strong>encouraged</strong></li>
+            <li class="fragment">All non-group assignments must be <strong>your own work</strong></li>
+            <li class="fragment">You may use assets (models, textures, sounds) and libraries</li>
+            <li class="fragment">You must have <strong>legal access</strong> to them</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Accommodations</h2>
+        <p>If you need an accommodation due to a disability or injury, please let me know as soon as possible.</p>
+        <div class="box" style="margin-top: var(--space-xl);">
+            <h4>Student Accessibility Services</h4>
+            <p>Call: 864-656-6848</p>
+            <p>Email: studentaccess@lists.clemson.edu</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mental Health Resources</h2>
+        <div class="box" style="margin-bottom: var(--space-lg);">
+            <p class="big-number" style="font-size: 2.5em;">3 in 5</p>
+            <p>students meet criteria for mental health problems during college</p>
+        </div>
+        <ul>
+            <li class="fragment">These are real problems, often with biological causes</li>
+            <li class="fragment"><strong>Seeking help is a sign of strength</strong>, not weakness</li>
+            <li class="fragment">Clemson provides free counseling and resources</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Closing -->
+<section>
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+
+    <section>
+        <h2>End of Class Exercise</h2>
+        <div class="box">
+            <p>You've been hired by <strong>Microsquawk VR</strong> to make VR HMDs for pigeons. You're the lead designer, engineer, and programmer.</p>
+        </div>
+        <div class="columns" style="margin-top: var(--space-lg);">
+            <div>
+                <h4>Consider:</h4>
+                <ul class="small">
+                    <li>What is important to think about?</li>
+                    <li>How would you create this device?</li>
+                    <li>Software considerations?</li>
+                </ul>
+            </div>
+            <div>
+                <ul class="small">
+                    <li>Interface/interaction design?</li>
+                    <li>Hardware restrictions?</li>
+                    <li>Pigeon physiology factors?</li>
+                </ul>
+            </div>
+        </div>
+        <p class="muted" style="margin-top: var(--space-lg);"><em>Submit on Canvas, due tomorrow by midnight</em></p>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="assets/slides-init.js"></script>
+
+</body>
+</html>
