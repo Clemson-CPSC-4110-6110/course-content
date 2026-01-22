@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Big Picture - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides img {
+            max-height: 450px;
+            border-radius: 8px;
+        }
+        .reveal .slides .full-image img {
+            max-height: 550px;
+        }
+        .quote-slide {
+            text-align: center;
+        }
+        .quote-slide blockquote {
+            font-size: 1.2em;
+            font-style: italic;
+            border-left: 4px solid var(--accent);
+            padding-left: var(--space-md);
+            margin: var(--space-lg) auto;
+            max-width: 80%;
+            text-align: left;
+        }
+        .quote-slide .attribution {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-top: var(--space-md);
+        }
+        .timeline {
+            font-size: 0.85em;
+        }
+        .timeline li {
+            margin-bottom: 0.3em;
+        }
+        .image-row {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            align-items: center;
+        }
+        .image-row img {
+            max-height: 300px;
+        }
+        .fov-comparison {
+            display: flex;
+            gap: var(--space-lg);
+            justify-content: center;
+            align-items: center;
+        }
+        .fov-comparison img {
+            max-width: 45%;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>The Big Picture</h1>
+    <h3>Introduction to Virtual Reality</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- Part I: Defining VR -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Defining VR</h2>
+        <p>What Makes Something "Virtual Reality"?</p>
+    </section>
+
+    <section>
+        <h2>Four Key Components</h2>
+        <p class="muted">From LaValle's VR textbook</p>
+        <ul>
+            <li class="fragment"><strong>Organism</strong> &mdash; VR only exists if someone perceives it</li>
+            <li class="fragment"><strong>Targeted Behavior</strong> &mdash; Designed experience</li>
+            <li class="fragment"><strong>Artificial Sensory Stimulation</strong> &mdash; Synthetic sensory input</li>
+            <li class="fragment"><strong>Awareness</strong> &mdash; Feeling present in the virtual world</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Fifth Component</h2>
+        <ul>
+            <li><strong>Organism</strong> &mdash; VR only exists if someone perceives it</li>
+            <li><strong>Targeted Behavior</strong> &mdash; Designed experience</li>
+            <li><strong>Artificial Sensory Stimulation</strong> &mdash; Synthetic sensory input</li>
+            <li><strong>Awareness</strong> &mdash; Feeling present in the virtual world</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Interactivity</strong> &mdash; The user not only perceives but also <em>acts</em></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Another Name for VR</h2>
+        <h3 class="fragment" style="color: var(--accent);">Perception Engineering</h3>
+    </section>
+
+    <section class="quote-slide">
+        <blockquote>
+            "The real power of VR is not necessarily to produce a faithful reproduction of 'reality', but rather that it offers the possibility to step outside of the normal bounds of reality and realize goals in a totally new and unexpected way."
+        </blockquote>
+        <p class="attribution">&mdash; Mel Slater, "Enhancing our Lives with Virtual Reality"</p>
+    </section>
+</section>
+
+<!-- Part II: Perceiving the World -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Perception</h2>
+        <p>How We Experience Reality</p>
+    </section>
+
+    <section>
+        <h2>Perceiving the Real World</h2>
+        <img src="../assets/user-experience/the-big-picture/image34.png" alt="Natural perception diagram showing world to sense organs to brain">
+        <p class="muted small">The brain receives natural stimulation from the physical world</p>
+    </section>
+
+    <section>
+        <h2>The Perception-Action Loop</h2>
+        <img src="../assets/user-experience/the-big-picture/image33.png" alt="VR perception diagram showing virtual world generator to display to sense organs to brain">
+        <p class="fragment muted">Roger Sperry: Perception and action are the fundamental logic of the nervous system</p>
+    </section>
+
+    <section>
+        <h2>Perceiving the Virtual World</h2>
+        <div class="columns">
+            <div>
+                <h4>The VR Loop</h4>
+                <ol class="small">
+                    <li>Virtual World Generator creates content</li>
+                    <li>Display presents to sense organs</li>
+                    <li>Brain processes stimulation</li>
+                    <li>User acts via body</li>
+                    <li>Sensors capture input</li>
+                    <li>Loop continues...</li>
+                </ol>
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image33.png" alt="VR system diagram" style="max-height: 350px;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Real World Underneath</h2>
+        <p>The physical world influences everything in the VR loop:</p>
+        <ul>
+            <li class="fragment">Physical comfort affects experience</li>
+            <li class="fragment">Real-world sounds can break immersion</li>
+            <li class="fragment">Body position matters</li>
+            <li class="fragment">Safety concerns persist</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Part III: Human Perception -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: Human Perception</h2>
+        <p>Why It Matters for VR</p>
+    </section>
+
+    <section>
+        <h2>A Philosophical Question</h2>
+        <p style="font-size: 1.3em; font-style: italic;">If a HMD is on in the forest and no one sees it, is it really VR?</p>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">VR only has meaning if an organism perceives it</p>
+    </section>
+
+    <section>
+        <h2>What Is Perception?</h2>
+        <div class="box">
+            <p>The process by which we gain knowledge of the world around us through our senses</p>
+        </div>
+        <div class="fragment" style="margin-top: var(--space-lg);">
+            <p>But also influenced by:</p>
+            <ul>
+                <li>Learning and memory</li>
+                <li>Expectations</li>
+                <li>Attention</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Perception Is Limited</h2>
+        <ul>
+            <li class="fragment">We don't perceive everything around us</li>
+            <li class="fragment">What we perceive is constrained by our senses</li>
+            <li class="fragment">Our senses have peculiarities we can exploit</li>
+        </ul>
+    </section>
+
+    <section class="full-image">
+        <h2>Optical Illusions</h2>
+        <img src="../assets/user-experience/the-big-picture/image29.jpg" alt="Optical illusion showing apparent motion">
+        <p class="muted small">Your brain perceives motion that isn't there</p>
+    </section>
+
+    <section>
+        <h2>Inattentional Blindness</h2>
+        <p>We miss things right in front of us when focused elsewhere</p>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>Famous example: The invisible gorilla experiment</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Cross-Modal Illusions</h2>
+        <p>Visual-auditory interactions can create phantom sounds</p>
+        <p class="muted fragment">"vEAR" &mdash; Visually-Evoked Auditory Response</p>
+    </section>
+</section>
+
+<!-- Part IV: Perception in VR Design -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Designing for Perception</h2>
+        <p>Constraints and Opportunities</p>
+    </section>
+
+    <section>
+        <h2>Two Design Goals</h2>
+        <div class="columns">
+            <div class="card">
+                <h4><i class="fa-solid fa-shield" style="color: var(--warning);"></i> Prevent Bad Experiences</h4>
+                <p class="small">Account for perceptual limitations</p>
+            </div>
+            <div class="card">
+                <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--success);"></i> Create Better Experiences</h4>
+                <p class="small">Leverage perceptual peculiarities</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Preventing Bad Experiences</h2>
+        <div class="box danger">
+            <h4>VR Sickness</h4>
+            <p>Caused by conflict between sensory systems</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-md);"><strong>Solution:</strong> Minimize sensory conflict</p>
+    </section>
+
+    <section>
+        <h2>Leveraging Perception</h2>
+        <ul>
+            <li class="fragment"><strong>Basic:</strong> Only need enough pixels for ~20/20 vision</li>
+            <li class="fragment"><strong>Better:</strong> Foveated rendering &mdash; exploit the fovea</li>
+            <li class="fragment"><strong>Best:</strong> Redirected walking, change blindness, impossible spaces</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">All build on peculiarities of our perceptual systems</p>
+    </section>
+</section>
+
+<!-- Part V: History of VR -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: History of VR</h2>
+        <p>From Dreams to Reality</p>
+    </section>
+
+    <section>
+        <h2>The Gartner Hype Cycle</h2>
+        <img src="../assets/user-experience/the-big-picture/image5.png" alt="Gartner Hype Cycle diagram" style="max-height: 400px;">
+        <p class="muted small">Technology adoption follows predictable patterns</p>
+    </section>
+
+    <section class="section-slide">
+        <h2>Early History</h2>
+        <p>1800s &ndash; 1980s</p>
+    </section>
+
+    <section>
+        <h2>Early Milestones</h2>
+        <div class="columns">
+            <div class="timeline">
+                <ul>
+                    <li><strong>1838:</strong> First 3D Displays</li>
+                    <li><strong>1929:</strong> Link Flight Simulator</li>
+                    <li><strong>1946:</strong> First computer (ENIAC)</li>
+                    <li><strong>1956:</strong> Sensorama</li>
+                    <li><strong>1960:</strong> Heilig's HMD</li>
+                    <li><strong>1968:</strong> Sword of Damocles</li>
+                </ul>
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image18.jpg" alt="Early flight simulator" style="max-height: 300px;">
+                <p class="muted small">Early flight simulation</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Sword of Damocles (1968)</h2>
+        <p>Ivan Sutherland's pioneering HMD</p>
+        <ul>
+            <li class="fragment">First modern VR device</li>
+            <li class="fragment">Head tracking</li>
+            <li class="fragment">Stereoscopic 3D</li>
+            <li class="fragment">Live computer graphics</li>
+        </ul>
+    </section>
+
+    <section class="section-slide">
+        <h2>Peak of Inflated Expectations</h2>
+        <p>1980s &ndash; 1990s</p>
+    </section>
+
+    <section>
+        <h2>The VR Boom</h2>
+        <div class="columns">
+            <div class="timeline">
+                <ul>
+                    <li><strong>1985:</strong> VPL Founded (coined "VR")</li>
+                    <li><strong>1986:</strong> Super Cockpit</li>
+                    <li><strong>1987:</strong> Scientific American article</li>
+                    <li><strong>1992:</strong> CAVE system</li>
+                    <li><strong>1995:</strong> IEEE VR conference</li>
+                    <li><strong>1995:</strong> Virtual Boy</li>
+                </ul>
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image17.png" alt="Jaron Lanier" style="max-height: 280px;">
+                <p class="muted small">Jaron Lanier, VPL founder</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The CAVE (1992)</h2>
+        <img src="../assets/user-experience/the-big-picture/image15.png" alt="CAVE automatic virtual environment" style="max-height: 400px;">
+        <p class="muted small">Cave Automatic Virtual Environment &mdash; room-scale projection VR</p>
+    </section>
+
+    <section>
+        <h2>Virtual Boy (1995)</h2>
+        <div class="columns">
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image22.jpg" alt="Nintendo Virtual Boy" style="max-height: 350px;">
+            </div>
+            <div>
+                <p>First consumer "VR" device</p>
+                <ul class="small">
+                    <li>Monochrome red display</li>
+                    <li>No head tracking</li>
+                    <li>Commercial failure</li>
+                    <li>But important milestone</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>Trough of Disillusionment</h2>
+        <p>1990s &ndash; 2010s</p>
+    </section>
+
+    <section>
+        <h2>VR in 2010: The Problem</h2>
+        <table style="font-size: 0.7em;">
+            <tr><th>Model</th><th>FOV</th><th>Price</th><th>$/Degree</th></tr>
+            <tr><td>SX100</td><td>100&deg;</td><td>$65,000</td><td>$650</td></tr>
+            <tr><td>xSight</td><td>123&deg;</td><td>$39,000</td><td>$317</td></tr>
+            <tr><td>Wide 5</td><td>150&deg;</td><td>$45,000</td><td>$300</td></tr>
+            <tr><td>Z800</td><td>40&deg;</td><td>$1,800</td><td>$45</td></tr>
+            <tr><td>HMZ-T1</td><td>45&deg;</td><td>$800</td><td>$18</td></tr>
+        </table>
+        <p class="fragment muted">Good VR was prohibitively expensive</p>
+    </section>
+
+    <section>
+        <h2>Field of View Matters</h2>
+        <div class="fov-comparison">
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image23.png" alt="45 degree FOV">
+                <p class="muted small">45&deg; FOV</p>
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image26.png" alt="150 degree FOV">
+                <p class="muted small">150&deg; FOV</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>The Renaissance</h2>
+        <p>2010s &ndash; Present</p>
+    </section>
+
+    <section>
+        <h2>The Smartphone Revolution</h2>
+        <div class="columns">
+            <div class="timeline">
+                <ul>
+                    <li><strong>2011:</strong> LEEP Smartphone Display</li>
+                    <li><strong>2012:</strong> FOV2GO prototype</li>
+                    <li><strong>2012:</strong> Oculus Kickstarter</li>
+                    <li><strong>2014:</strong> Google Cardboard</li>
+                    <li><strong>2015:</strong> Samsung Gear VR</li>
+                    <li><strong>2016:</strong> Consumer VR arrives!</li>
+                </ul>
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image20.png" alt="DIY smartphone VR" style="max-height: 250px;">
+                <p class="muted small">Cheap smartphone displays enabled affordable VR</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Oculus Kickstarter (2012)</h2>
+        <img src="../assets/user-experience/the-big-picture/image27.png" alt="Oculus Kickstarter page" style="max-height: 380px;">
+        <p class="muted small">Raised $1 million in three days &mdash; VR for the masses</p>
+    </section>
+
+    <section>
+        <h2>Google Cardboard (2014)</h2>
+        <div class="columns">
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image25.png" alt="Google Cardboard" style="max-height: 320px;">
+            </div>
+            <div>
+                <img src="../assets/user-experience/the-big-picture/image30.png" alt="Cardboard assembly" style="max-height: 320px;">
+            </div>
+        </div>
+        <p class="muted small">Democratizing VR with cardboard and smartphones</p>
+    </section>
+
+    <section>
+        <h2>2016: Consumer VR Arrives</h2>
+        <div class="image-row">
+            <img src="../assets/user-experience/the-big-picture/image32.png" alt="Oculus Rift CV1" style="max-height: 280px;">
+        </div>
+        <p>Oculus Rift CV1 &bull; HTC Vive &bull; PlayStation VR &bull; Daydream</p>
+        <p class="muted small">The first high-quality consumer VR devices</p>
+    </section>
+
+    <section>
+        <h2>VR Today: The Transformation</h2>
+        <table style="font-size: 0.7em;">
+            <tr><th>Model</th><th>FOV</th><th>Price</th><th>$/Degree</th></tr>
+            <tr class="muted"><td>SX100 (2010)</td><td>100&deg;</td><td>$65,000</td><td>$650</td></tr>
+            <tr class="muted"><td>Wide 5 (2010)</td><td>150&deg;</td><td>$45,000</td><td>$300</td></tr>
+            <tr style="color: var(--accent);"><td><strong>Quest 2 (2020)</strong></td><td><strong>104&deg;</strong></td><td><strong>$400</strong></td><td><strong>~$4</strong></td></tr>
+        </table>
+        <p class="fragment" style="margin-top: var(--space-md);">100x improvement in price/performance!</p>
+    </section>
+
+    <section class="section-slide">
+        <h2>Plateau of Productivity?</h2>
+        <p>Where are we headed?</p>
+    </section>
+</section>
+
+<!-- Closing -->
+<section>
+    <section>
+        <h2>Key Takeaways</h2>
+        <ol>
+            <li class="fragment">VR is <strong>perception engineering</strong></li>
+            <li class="fragment">Human perception <strong>constrains and enables</strong> VR design</li>
+            <li class="fragment">The technology has finally caught up with the <strong>vision</strong></li>
+            <li class="fragment">Understanding perception is key to creating <strong>good VR</strong></li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Coming Up</h2>
+        <ul>
+            <li>Deep dive into human visual perception</li>
+            <li>Understanding presence and immersion</li>
+            <li>VR sickness: causes and solutions</li>
+        </ul>
+    </section>
+
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
