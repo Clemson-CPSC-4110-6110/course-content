@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaction - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides img {
+            max-height: 450px;
+            border-radius: 8px;
+        }
+        .reveal .slides .full-image img {
+            max-height: 550px;
+        }
+        .quote-slide {
+            text-align: center;
+        }
+        .quote-slide blockquote {
+            font-size: 1.1em;
+            font-style: italic;
+            border-left: 4px solid var(--accent);
+            padding-left: var(--space-md);
+            margin: var(--space-lg) auto;
+            max-width: 85%;
+            text-align: left;
+        }
+        .quote-slide .attribution {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-top: var(--space-md);
+        }
+        .definition-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: 8px;
+            margin: var(--space-md) auto;
+            max-width: 90%;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+        .two-column img {
+            max-height: 350px;
+        }
+        .image-row {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            align-items: center;
+        }
+        .image-row img {
+            max-height: 280px;
+        }
+        /* Design triangle visualization */
+        .triangle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: var(--space-lg) 0;
+        }
+        .triangle-diagram {
+            position: relative;
+            width: 400px;
+            height: 360px;
+        }
+        .triangle-diagram .vertex {
+            position: absolute;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-elevated);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            color: var(--accent);
+        }
+        .triangle-diagram .vertex-top {
+            top: 0; left: 50%; transform: translateX(-50%);
+        }
+        .triangle-diagram .vertex-left {
+            bottom: 0; left: 0;
+        }
+        .triangle-diagram .vertex-right {
+            bottom: 0; right: 0;
+        }
+        .triangle-diagram svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        /* Comparison matrix table */
+        .comparison-table {
+            font-size: 0.6em;
+            margin: var(--space-sm) 0;
+            width: 100%;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: var(--space-xs) var(--space-sm);
+            text-align: center;
+        }
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .rating-high { color: var(--success); }
+        .rating-med { color: var(--warning); }
+        .rating-low { color: var(--danger); }
+        /* DoF visualization */
+        .dof-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+        .dof-item {
+            background: var(--bg-elevated);
+            padding: var(--space-md);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .dof-item .dof-number {
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .dof-item .dof-label {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Interaction</h1>
+    <h3>Designing How Users Act in XR</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     PART I: FRAMING THE PROBLEM
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Framing the Problem</h2>
+        <p>Interaction Design Is a Design Problem, Not a Simulation Problem</p>
+    </section>
+
+    <section class="section-slide">
+        <h2>What are all of the ways you can interact within VR?</h2>
+    </section>
+
+    <section>
+        <h2>Universal Simulation Principle</h2>
+        <div class="box">
+            <p>Any interaction mechanism from the real world can be simulated in VR</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-lg);"><strong>But should we always do this?</strong></p>
+        <p class="fragment muted">Consider: Simulating a full physical keyboard in VR vs. using voice input or a virtual keyboard with controller pointing</p>
+    </section>
+
+    <section>
+        <h2>Why Realism Isn't Always Better</h2>
+        <ul>
+            <li class="fragment"><strong>Many real-world actions are necessary, not ideal</strong> &mdash; they're constrained by physics, not optimized for the task</li>
+            <li class="fragment"><strong>Real actions can be inefficient</strong> &mdash; turning a physical dial vs. typing a precise value</li>
+            <li class="fragment"><strong>Real actions can be expensive</strong> &mdash; walking across a warehouse floor vs. teleporting</li>
+            <li class="fragment"><strong>Real interactions may not map to VR hardware</strong> &mdash; controllers lack the fidelity of human fingers</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Interaction Design Triangle</h2>
+        <p class="muted small">A framework for evaluating every interaction design tradeoff</p>
+        <div class="columns">
+            <div>
+                <div class="triangle-container">
+                    <div class="triangle-diagram">
+                        <svg viewBox="0 0 400 360">
+                            <polygon points="200,40 50,320 350,320" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.4"/>
+                        </svg>
+                        <div class="vertex vertex-top"><i class="fa-solid fa-bullseye"></i> Effectiveness</div>
+                        <div class="vertex vertex-left"><i class="fa-solid fa-graduation-cap"></i> Learnability</div>
+                        <div class="vertex vertex-right"><i class="fa-solid fa-heart"></i> Comfort</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li><strong>Effectiveness</strong> &mdash; Speed, accuracy, range of achievable goals</li>
+                    <li><strong>Learnability</strong> &mdash; How quickly can a new user perform the interaction?</li>
+                    <li><strong>Comfort</strong> &mdash; Physical ease during extended use</li>
+                </ul>
+                <p class="muted small fragment" style="margin-top: var(--space-md);">We'll use this triangle throughout the lecture to evaluate every technique we encounter</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Ergonomic Interaction Zones</h2>
+        <p>The comfortable interaction volume isn't a sphere &mdash; it's a <strong>truncated cone</strong> in front of the torso, biased downward</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <div class="columns columns-3" style="gap: var(--space-sm);">
+                    <div class="card" style="padding: var(--space-md);">
+                        <h4 style="font-size: 0.75em;">Primary</h4>
+                        <p class="small">Chest to waist, within arm's length</p>
+                        <p class="small muted">Frequent, precise actions</p>
+                    </div>
+                    <div class="card" style="padding: var(--space-md);">
+                        <h4 style="font-size: 0.75em;">Secondary</h4>
+                        <p class="small">Extended reach, shoulder height or below knee</p>
+                        <p class="small muted">Occasional actions</p>
+                    </div>
+                    <div class="card" style="padding: var(--space-md);">
+                        <h4 style="font-size: 0.75em;">Peripheral</h4>
+                        <p class="small">Behind head, above reach, at floor level</p>
+                        <p class="small muted">Avoid or use indirect input</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Design implications:</strong></p>
+                    <ul class="small">
+                        <li>Place menus and frequent UI at chest-to-waist height</li>
+                        <li>Anchor world-space UI to wrist or palm, not floating at eye level</li>
+                        <li>If an object must be above shoulder height, use ray-based selection instead of direct grab</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">Meta's design guidelines codify these zones &mdash; your Quest guardian boundary defines the horizontal limits</p>
+    </section>
+
+    <section>
+        <h2>Gorilla Arm</h2>
+        <p>Avoid techniques that require continuously holding arms up or out</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul class="small">
+                    <li>Arms fatigue rapidly when held at or above shoulder height or extended away from the body</li>
+                    <li>Sustained interaction becomes painful within minutes</li>
+                    <li class="fragment">A classic failure on the <strong class="accent">comfort</strong> axis of the design triangle</li>
+                </ul>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 3em; margin: 0;">&#129421;</p>
+                <p class="muted small">Requires "gorilla arms" to use comfortably</p>
+            </div>
+        </div>
+        <div class="box warning fragment" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Design principle:</strong> Keep frequent interactions at waist or lap level when possible</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART II: THE MOTOR SYSTEM
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: How Humans Interact</h2>
+        <p>The Motor System Foundation</p>
+    </section>
+
+    <section>
+        <h2>Why Motor Science Matters for XR</h2>
+        <div class="box">
+            <p>To design good interactions, we need to understand how humans execute actions</p>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Motor control explains why some techniques feel natural and others feel broken</p>
+    </section>
+
+    <section>
+        <h2>What Are Motor Programs?</h2>
+        <div class="definition-box">
+            <p>A <strong>motor program</strong> is a pre-structured set of motor commands that can be executed as a unit, without requiring conscious attention to each individual movement</p>
+        </div>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Stored in the brain</strong> &mdash; motor cortex, cerebellum, and basal ganglia work together to encode movement sequences</li>
+                    <li class="fragment"><strong>Built through repetition</strong> &mdash; thousands of attempts refine timing, force, and coordination</li>
+                    <li class="fragment"><strong>Hierarchical</strong> &mdash; complex skills are built by chaining simpler motor programs together</li>
+                </ul>
+            </div>
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Parameterized</strong> &mdash; the same program can vary speed, scale, and force (you can sign your name large on a whiteboard or small on paper)</li>
+                    <li class="fragment"><strong>Resilient</strong> &mdash; once deeply learned, they persist for years (riding a bicycle)</li>
+                    <li class="fragment"><strong>Transferable</strong> &mdash; partially &mdash; skills in one context can accelerate learning in similar contexts</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Building Motor Programs Over a Lifetime</h2>
+        <div class="columns">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Cognitive stage</strong> &mdash; conscious, slow, error-prone. Thinking about every step. ("How do I hold chopsticks?")</li>
+                    <li class="fragment"><strong>Associative stage</strong> &mdash; fewer errors, movements become smoother, less conscious effort needed</li>
+                    <li class="fragment"><strong>Autonomous stage</strong> &mdash; the skill is automatic. Attention is freed for other tasks. (Typing while thinking about what to write)</li>
+                </ul>
+            </div>
+            <div>
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Examples across life:</strong></p>
+                    <ul class="small">
+                        <li><strong>Infant:</strong> reaching, grasping, releasing</li>
+                        <li><strong>Child:</strong> writing, throwing, tying laces</li>
+                        <li><strong>Adult:</strong> typing, driving, using a mouse</li>
+                        <li><strong>Specialist:</strong> surgery, musical instrument, sports</li>
+                    </ul>
+                    <p class="small muted" style="margin-top: var(--space-sm);">Every VR user arrives with decades of motor programs &mdash; your design can leverage or conflict with them</p>
+                </div>
+            </div>
+        </div>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Try it:</strong> Mime signing your name with your dominant hand. Now try with your non-dominant hand. The difference is motor programs &mdash; one hand has thousands of hours of practice, the other doesn't.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Open-Loop vs. Closed-Loop Control</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Open-Loop</h4>
+                <p class="small">Execute the entire motion without correction</p>
+                <p class="small muted">Fast but inaccurate &mdash; e.g., throwing a dart</p>
+            </div>
+            <div class="card">
+                <h4>Closed-Loop</h4>
+                <p class="small">Initiate motion, refine using sensory feedback</p>
+                <p class="small muted">Slower but precise &mdash; e.g., threading a needle</p>
+            </div>
+        </div>
+        <div class="box warning fragment" style="margin-top: var(--space-lg);">
+            <p class="small"><strong>XR challenge:</strong> VR often breaks the feedback loop &mdash; no haptics, latency in visual feedback, missing proprioceptive cues. This degrades motor performance.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fitts' Law</h2>
+        <p>The foundational model of aimed movement &mdash; predicts how long it takes to select a target</p>
+        <div class="definition-box">
+            <p><strong>MT = a + b &times; log<sub>2</sub>(D / W + 1)</strong></p>
+        </div>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li><strong>MT</strong> &mdash; Movement time (seconds)</li>
+                    <li><strong>D</strong> &mdash; Distance from start to target center</li>
+                    <li><strong>W</strong> &mdash; Width (size) of the target</li>
+                </ul>
+            </div>
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li><strong>a</strong> &mdash; Intercept: the baseline reaction/start time, independent of difficulty</li>
+                    <li><strong>b</strong> &mdash; Slope: how sensitive the device/limb is to difficulty increases</li>
+                </ul>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);"><strong>a</strong> and <strong>b</strong> are empirically measured constants &mdash; they differ by input device, user population, and context</p>
+    </section>
+
+    <section>
+        <h2>Fitts' Law: The Index of Difficulty</h2>
+        <p>The log term is called the <strong>Index of Difficulty (ID)</strong>, measured in bits:</p>
+        <div class="definition-box">
+            <p><strong>ID = log<sub>2</sub>(D / W + 1)</strong></p>
+        </div>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Higher ID</strong> = harder task (small, distant target)</li>
+                    <li class="fragment"><strong>Lower ID</strong> = easier task (large, nearby target)</li>
+                    <li class="fragment">Doubling target size reduces ID by 1 bit</li>
+                    <li class="fragment">Halving distance also reduces ID by ~1 bit</li>
+                </ul>
+            </div>
+            <div>
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Example:</strong></p>
+                    <p class="small">Target 20cm away, 2cm wide:<br>
+                    ID = log<sub>2</sub>(20/2 + 1) = <strong>3.46 bits</strong></p>
+                    <p class="small" style="margin-top: var(--space-sm);">Same target doubled to 4cm wide:<br>
+                    ID = log<sub>2</sub>(20/4 + 1) = <strong>2.58 bits</strong></p>
+                    <p class="small muted" style="margin-top: var(--space-sm);">Doubling size reduced difficulty by ~25%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fitts' Law: What a and b Tell Us</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>a (Intercept)</h4>
+                <p class="small">The time it takes to <em>start</em> moving &mdash; reaction time, cognitive processing</p>
+                <p class="small muted">A device with high <strong>a</strong> is slow to initiate (e.g., gaze dwell selection has a high intercept because of the dwell timer)</p>
+            </div>
+            <div class="card">
+                <h4>b (Slope)</h4>
+                <p class="small">How much each additional bit of difficulty costs in time</p>
+                <p class="small muted">A device with high <strong>b</strong> degrades rapidly as tasks get harder (e.g., head-based pointing has a steep slope because head movements are imprecise)</p>
+            </div>
+        </div>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p class="small"><strong>Throughput</strong> (1/b, in bits/sec) is the standard metric for comparing input devices &mdash; higher is better. A mouse has ~4 bits/s; VR controller raycasting is typically ~2&ndash;3 bits/s.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fitts' Law in XR</h2>
+        <p>Why Fitts' Law matters more in VR than on a desktop:</p>
+        <ul>
+            <li class="fragment"><strong>Pointing precision is much worse</strong> &mdash; hand tremor, no wrist-bracing surface, 3D angular error amplified over distance</li>
+            <li class="fragment"><strong>Targets are in 3D</strong> &mdash; depth adds difficulty that 2D Fitts' Law doesn't capture (active research area)</li>
+            <li class="fragment"><strong>No cursor acceleration</strong> &mdash; desktop mice use pointer acceleration to reduce effective D; most VR raycasts don't</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Design implication:</strong> Every selection technique we'll study works by changing the effective D or W in the user's favor &mdash; making targets effectively larger or closer</p>
+        </div>
+        <p class="fragment small" style="margin-top: var(--space-md);"><strong>Try it:</strong> <a href="http://simonwallner.at/ext/fitts/" target="_blank">Interactive Fitts' Law demo</a> &mdash; experience how target size and distance affect selection time with a mouse, then imagine how much harder it is in VR</p>
+    </section>
+
+    <section>
+        <h2>Motor Programs in VR</h2>
+        <ul>
+            <li class="fragment"><strong>Leverage existing motor programs</strong> when possible to make systems easier to use</li>
+            <li class="fragment"><strong>Design for easy learning</strong> when existing programs don't apply</li>
+            <li class="fragment">Remember: motor programs can be learned <em>and</em> unlearned</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Remapping</h2>
+        <p>Some motor programs are hard to learn because of complex <strong>remapping</strong> between action and effect</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <p class="small">When using a computer, we regularly use a motor program with complex remapping. What is it?</p>
+                <p class="fragment" style="font-size: 1.2em; margin-top: var(--space-md);"><strong class="accent">A mouse!</strong></p>
+                <ul class="small fragment">
+                    <li>Horizontal hand motion &rarr; vertical cursor motion</li>
+                    <li>Small physical motion &rarr; large screen motion</li>
+                </ul>
+            </div>
+            <div class="fragment">
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Remapping in VR can change:</strong></p>
+                    <ul class="small">
+                        <li><strong>Scale</strong> &mdash; small movements control large actions</li>
+                        <li><strong>Direction</strong> &mdash; motion mapped to different axis</li>
+                        <li><strong>Degrees of freedom</strong> &mdash; reduce DoF for precision</li>
+                        <li><strong>Modality</strong> &mdash; hand gesture triggers voice command</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Feedback and Feedforward</h2>
+        <p>Closed-loop motor control needs <strong>feedback</strong> to succeed</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div class="card">
+                <h4>Feedback</h4>
+                <ul class="small">
+                    <li>Visual highlight on hover</li>
+                    <li>Haptic pulse on selection</li>
+                    <li>Audio confirmation on action</li>
+                    <li>Controller vibration on collision</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Feedforward</h4>
+                <ul class="small">
+                    <li>Show ray direction before selection</li>
+                    <li>Preview object placement location</li>
+                    <li>Ghost hand showing snap position</li>
+                    <li>UI affordances indicating interactability</li>
+                </ul>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">This is where motor program theory meets practical XR implementation</p>
+    </section>
+
+    <section>
+        <h2>Progressive Disclosure of Interaction</h2>
+        <p>Successful VR applications teach interactions incrementally, building on motor programs established earlier</p>
+        <div class="box" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Half-Life: Alyx</strong> &mdash; the canonical example:</p>
+            <ol class="small">
+                <li class="fragment">Learn to <strong>grab</strong> objects near you</li>
+                <li class="fragment">Learn to <strong>pull</strong> distant objects using the gravity glove (builds on grab motor program)</li>
+                <li class="fragment">Learn to <strong>reload</strong> by physically inserting magazines (combines grab + placement)</li>
+                <li class="fragment">Learn to <strong>throw</strong> objects at enemies (builds on grab + release timing)</li>
+                <li class="fragment">Learn to <strong>combine</strong> interactions under pressure (all motor programs automated)</li>
+            </ol>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-md);">Each step builds on motor programs from the previous step &mdash; by the time complex interactions are needed, the foundational programs are already learned. Apply this to your student projects.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART III: INTERACTION TAXONOMY
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: The Interaction Taxonomy</h2>
+        <p>Categorizing What Users Do in XR</p>
+    </section>
+
+    <section>
+        <h2>From Motor Science to Interaction Design</h2>
+        <div class="box">
+            <p>Now that we understand the human side, let's categorize what users actually do in XR</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Three Core Interactions</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Selection</h4>
+                <p class="small">Choosing an object or target to initiate an interaction</p>
+                <p class="small muted">The most studied &mdash; and arguably the hardest &mdash; interaction problem in XR</p>
+            </div>
+            <div class="card fragment">
+                <h4>Manipulation</h4>
+                <p class="small">Modifying a selected object's properties: position, rotation, scale, or state</p>
+                <p class="small muted">Requires mapping between user actions and object changes</p>
+            </div>
+            <div class="card fragment">
+                <h4>Placement</h4>
+                <p class="small">Positioning an object at a target location with desired orientation</p>
+                <p class="small muted">The inverse of selection &mdash; aided by snap zones and basins of attraction</p>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-lg);"><strong>Note:</strong> Locomotion/navigation is sometimes considered a fourth major interaction type &mdash; we'll cover it separately</p>
+    </section>
+
+    <section>
+        <h2>Input Modalities</h2>
+        <p class="muted small">The tools users use to perform interactions</p>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li class="fragment"><strong>6DoF controllers</strong> &mdash; Quest Touch, Vive wand</li>
+                    <li class="fragment"><strong>Tracked hands</strong> &mdash; pinch, poke, grab (primary on Quest 3)</li>
+                    <li class="fragment"><strong>Gaze / eye tracking</strong> &mdash; dwell, gaze+pinch (Quest 3 Pro+)</li>
+                </ul>
+            </div>
+            <div>
+                <ul>
+                    <li class="fragment"><strong>Voice</strong> &mdash; commands, dictation</li>
+                    <li class="fragment"><strong>External controllers</strong> &mdash; gamepad, keyboard</li>
+                    <li class="fragment"><strong>Body tracking</strong> &mdash; feet, torso, full-body</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Degrees of Freedom</h2>
+        <p class="muted small">How many independent axes does each input device control?</p>
+        <div class="dof-grid">
+            <div class="dof-item fragment">
+                <div class="dof-number">6</div>
+                <div class="dof-label">DoF</div>
+                <p class="small" style="margin-top: var(--space-sm);"><strong>Controllers / Hands</strong></p>
+                <p class="small muted">Position (x,y,z) + Rotation (pitch, yaw, roll)</p>
+            </div>
+            <div class="dof-item fragment">
+                <div class="dof-number">3</div>
+                <div class="dof-label">DoF</div>
+                <p class="small" style="margin-top: var(--space-sm);"><strong>Gamepad Stick</strong></p>
+                <p class="small muted">2 axes per stick + buttons</p>
+            </div>
+            <div class="dof-item fragment">
+                <div class="dof-number">2</div>
+                <div class="dof-label">DoF</div>
+                <p class="small" style="margin-top: var(--space-sm);"><strong>Gaze Direction</strong></p>
+                <p class="small muted">Yaw + Pitch (no roll, no position)</p>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">DoF mismatches between input and task require <strong>remapping</strong> &mdash; connecting back to Part II</p>
+    </section>
+
+    <section>
+        <h2>Selection</h2>
+        <p>Selection initiates an interaction &mdash; it can also <em>be</em> the entire action (e.g., selecting an object to delete it)</p>
+        <ul>
+            <li class="fragment">Controller touches object (direct touch)</li>
+            <li class="fragment">Raycast from controller into environment</li>
+            <li class="fragment">Volume-based (cursor region captures nearby objects)</li>
+            <li class="fragment">Gaze-based selection (dwell or gaze+confirm)</li>
+            <li class="fragment">Hand tracking: pinch-to-select, poke interactions</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Manipulation</h2>
+        <p>Having selected an object, you can now modify it</p>
+        <ul>
+            <li class="fragment"><strong>Transform:</strong> adjusting position, rotation, scale</li>
+            <li class="fragment"><strong>Activate:</strong> "using" it (e.g., turning a flashlight on/off)</li>
+            <li class="fragment"><strong>Affordances:</strong> what the object lets you do (a stick extends reach, a lever amplifies force)</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p class="small">Many "using" actions require remapping (e.g., flashlight toggle mapped to trigger). Purely physics-based interactions (e.g., pushing a button) usually don't.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Affordance Design Without Physics</h2>
+        <p>In reality, affordances are communicated through material, shape, weight, and texture &mdash; <strong>none of which VR delivers well</strong></p>
+        <p class="muted small">How do you signal "this is grabbable" or "this slides but doesn't rotate"?</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Outline / glow on hover</strong> &mdash; object lights up when in range</li>
+                    <li class="fragment"><strong>Hand pose preview</strong> &mdash; virtual hand changes shape to show the grip it will use</li>
+                    <li class="fragment"><strong>Animated hints</strong> &mdash; subtle bounce, shimmer, or particle effects on first encounter</li>
+                    <li class="fragment"><strong>Color coding</strong> &mdash; interactable objects share a consistent visual language</li>
+                </ul>
+            </div>
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Constraint visualization</strong> &mdash; rails, arrows, or tracks showing allowed motion</li>
+                    <li class="fragment"><strong>Audio cues</strong> &mdash; sound on hover signals interactability</li>
+                    <li class="fragment"><strong>Tooltip labels</strong> &mdash; text showing action ("Grab", "Pull", "Turn")</li>
+                </ul>
+                <div class="box fragment" style="font-size: 0.8em; margin-top: var(--space-md);">
+                    <p><strong>XRI connection:</strong> <code>XRInteractableVisual</code> components handle hover/select state changes automatically</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Placement</h2>
+        <p class="small">The inverse of selection &mdash; putting something down precisely (e.g., spark plug into a socket, furniture into a room)</p>
+        <div class="columns" style="margin-top: var(--space-sm);">
+            <div>
+                <div class="card" style="margin-bottom: var(--space-sm); padding: var(--space-md);">
+                    <h4>Basins of Attraction</h4>
+                    <p class="smaller">Objects snap to valid placement locations when brought nearby, reducing precision requirements</p>
+                </div>
+                <div class="card" style="padding: var(--space-md);">
+                    <h4>Snap Zones</h4>
+                    <p class="smaller">In Unity XRI: <code>XRSocketInteractor</code> defines where objects can be placed and how they align</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/basin-of-attraction.png" alt="Basin of attraction: an object entering the dotted hemisphere region is pulled toward the target placement location" style="max-height: 250px;">
+                <p class="muted smaller">Object entering the basin (dotted region) snaps toward the target</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Interaction State Machine</h2>
+        <p>Every interaction follows a lifecycle &mdash; and your feedback design should match each state</p>
+        <div class="definition-box" style="margin-top: var(--space-md); text-align: center;">
+            <p style="font-size: 0.9em; letter-spacing: 0.05em;">
+                <strong>Idle</strong> &rarr;
+                <strong style="color: var(--accent);">Hover</strong> &rarr;
+                <strong style="color: var(--warning);">Select</strong> &rarr;
+                <strong style="color: var(--success);">Activate</strong> &rarr;
+                <strong>Release</strong> &rarr;
+                <strong>Idle</strong>
+            </p>
+        </div>
+        <table style="font-size: 0.7em; margin-top: var(--space-md);">
+            <tr>
+                <th>State</th>
+                <th>User Action</th>
+                <th>Feedback</th>
+                <th>XRI Event</th>
+            </tr>
+            <tr>
+                <td><strong>Idle</strong></td>
+                <td>Nothing targeted</td>
+                <td>Affordance cues (glow, animation)</td>
+                <td>&mdash;</td>
+            </tr>
+            <tr>
+                <td><strong style="color: var(--accent);">Hover</strong></td>
+                <td>Ray or hand enters range</td>
+                <td>Highlight, hand pose change, audio cue</td>
+                <td><code>hoverEntered</code></td>
+            </tr>
+            <tr>
+                <td><strong style="color: var(--warning);">Select</strong></td>
+                <td>Trigger press, pinch, or grab</td>
+                <td>Haptic pulse, visual snap, sound</td>
+                <td><code>selectEntered</code></td>
+            </tr>
+            <tr>
+                <td><strong style="color: var(--success);">Activate</strong></td>
+                <td>Secondary action while holding</td>
+                <td>State change (toggle, fire, open)</td>
+                <td><code>activated</code></td>
+            </tr>
+            <tr>
+                <td><strong>Release</strong></td>
+                <td>Let go of trigger/hand</td>
+                <td>Return to idle state, physics takes over</td>
+                <td><code>selectExited</code></td>
+            </tr>
+        </table>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">Design distinct feedback for <em>each</em> state &mdash; if hover and select look the same, users can't tell what they've done</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART IV: SELECTION TECHNIQUES DEEP DIVE
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Selection Deep Dive</h2>
+        <p>Techniques Evaluated Through the Design Triangle</p>
+    </section>
+
+    <section>
+        <h2>Evaluating Selection Techniques</h2>
+        <p>We'll use two lenses to compare every technique:</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div class="card">
+                <h4>Design Triangle</h4>
+                <p class="small">Effectiveness, learnability, and comfort tradeoffs</p>
+            </div>
+            <div class="card">
+                <h4>Fitts' Law</h4>
+                <p class="small">How does the technique change effective target distance (D) and width (W)?</p>
+            </div>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">Good selection techniques make targets effectively larger or closer</p>
+    </section>
+
+    <section>
+        <h2>Three Categories of Selection</h2>
+        <div class="columns columns-3">
+            <div class="card">
+                <h4><i class="fa-solid fa-hand"></i> Direct Touch</h4>
+                <p class="small">User's hand or controller physically contacts the object</p>
+                <p class="small muted">Natural but range-limited</p>
+            </div>
+            <div class="card">
+                <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Ray-Based</h4>
+                <p class="small">A ray extends from controller or hand to select at distance</p>
+                <p class="small muted">Good range, precision challenges</p>
+            </div>
+            <div class="card">
+                <h4><i class="fa-solid fa-circle-nodes"></i> Indirect</h4>
+                <p class="small">Volume-based, progressive refinement, or world-in-miniature approaches</p>
+                <p class="small muted">Specialized for difficult scenarios</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Direct Touch &amp; Hand Tracking</h2>
+        <p>The most natural interaction &mdash; and the primary input on Quest 3</p>
+        <ul>
+            <li class="fragment"><strong>Poke:</strong> Index finger presses UI buttons or touches objects</li>
+            <li class="fragment"><strong>Pinch:</strong> Thumb and index finger come together to grab or select</li>
+            <li class="fragment"><strong>Grab:</strong> Close hand around an object to pick it up</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Design triangle:</strong> <span class="rating-high">High learnability</span> (everyone knows how to grab things), <span class="rating-med">moderate effectiveness</span> (limited to arm's reach), <span class="rating-med">moderate comfort</span> (gorilla arm risk for overhead targets)</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Ray-Based Techniques</h2>
+        <p class="muted small">Variations on the same core concept, each optimizing for different scenarios</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><strong>Basic Raycast</strong> &mdash; first hit along the ray is selected. Simple, fast, imprecise at distance.</li>
+                    <li class="fragment"><strong>Sticky Ray</strong> &mdash; a curved ray snaps to the closest selectable object. Reduces precision needed.</li>
+                    <li class="fragment"><strong>Depth Ray</strong> &mdash; objects along the ray become transparent. A cursor slides along the ray to choose depth.</li>
+                    <li class="fragment"><strong>Assistive Raycasting</strong> &mdash; dynamically adjusts ray sensitivity based on target density and user intent.</li>
+                </ul>
+            </div>
+            <div>
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Fitts' Law insight:</strong></p>
+                    <p class="small">Basic raycasting at distance makes W (target width) tiny because small angular errors at the hand translate to large errors at the target.</p>
+                    <p class="small">Sticky Ray and Assistive Raycasting increase effective W, reducing selection time.</p>
+                </div>
+                <p class="smaller fragment" style="margin-top: var(--space-md);"><strong>Basic Raycast &mdash; Design triangle:</strong> <span class="rating-high">High learnability</span> (point and click), <span class="rating-med">moderate effectiveness</span> (imprecise at distance), <span class="rating-high">high comfort</span> (low fatigue)</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Sticky Ray in Action</h2>
+        <div class="columns">
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/sticky-ray-1.png" alt="Sticky ray snapping to nearby red cube — the dashed line shows actual pointing direction while the curved red ray bends toward the nearest target" style="max-height: 300px;">
+                <p class="muted smaller">Ray snaps to the red cube (nearest target)</p>
+            </div>
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/sticky-ray-2.png" alt="Sticky ray snapping to green sphere — pointing direction unchanged but curved ray redirects to a different nearest object" style="max-height: 300px;">
+                <p class="muted smaller">Same pointing direction, ray snaps to the green sphere (now nearest)</p>
+            </div>
+        </div>
+        <p class="smaller" style="margin-top: var(--space-sm);"><strong>p<sub>0</sub></strong> = hand origin, <strong>p<sub>1</sub></strong> = actual pointing direction, <strong>p<sub>2</sub></strong> = snapped target. The curved red ray shows where selection will actually land.</p>
+        <p class="smaller fragment" style="margin-top: var(--space-sm);"><strong>Design triangle:</strong> <span class="rating-high">High learnability</span> (same as basic ray), <span class="rating-high">high effectiveness</span> (auto-snapping compensates for imprecision), <span class="rating-high">high comfort</span> (low fatigue)</p>
+    </section>
+
+    <section>
+        <h2>Depth Ray in Action</h2>
+        <p class="small">Multiple objects along the ray &mdash; slide a cursor along the ray to choose which one to select</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/depth-ray-1.png" alt="Depth ray with cursor positioned on the middle object (yellow circle), occluding objects rendered semi-transparent" style="max-height: 280px;">
+                <p class="muted smaller">(a) Cursor selects the middle sphere &mdash; nearer objects become transparent</p>
+            </div>
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/depth-ray-2.png" alt="Depth ray with cursor moved to select the nearest cube instead" style="max-height: 280px;">
+                <p class="muted smaller">(b) Cursor moved closer &mdash; now selects the nearest cube</p>
+            </div>
+        </div>
+        <p class="smaller fragment" style="margin-top: var(--space-sm);"><strong>Design triangle:</strong> <span class="rating-med">Moderate learnability</span> (extra depth cursor to learn), <span class="rating-high">high effectiveness</span> (solves occlusion), <span class="rating-high">high comfort</span> (low fatigue)</p>
+    </section>
+
+    <section>
+        <h2>Volume-Based Techniques</h2>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <h3 style="font-size: 1em;">Bubble Cursor</h3>
+                <ul class="smaller">
+                    <li>A sphere in space, moved like a 3D pointer</li>
+                    <li>Cursor <strong>resizes dynamically</strong> to always capture the nearest object</li>
+                    <li>Occluding objects become transparent</li>
+                </ul>
+                <p class="muted smaller fragment">Effectively makes W as large as possible at all times</p>
+                <img src="../assets/user-experience/interaction/bubble-cursor.png" alt="Bubble cursor: (a) nearby targets become semi-transparent, (b) cursor approaches occluded target which becomes visible and selectable" style="max-height: 140px; margin-top: var(--space-xs);">
+                <p class="smaller fragment" style="margin-top: var(--space-xs);"><strong>Triangle:</strong> <span class="rating-med">Med. learnability</span>, <span class="rating-high">high effectiveness</span>, <span class="rating-med">med. comfort</span></p>
+            </div>
+            <div>
+                <h3 style="font-size: 1em;">SQUAD</h3>
+                <p class="small"><em>Sphere-casting refined by QUAD-menu</em></p>
+                <ul class="smaller">
+                    <li>Cast a sphere to rough-select a group of objects</li>
+                    <li>A QUAD menu appears showing candidates</li>
+                    <li>Progressively refine until one object is selected</li>
+                </ul>
+                <p class="muted smaller fragment">Trades speed for accuracy in dense environments</p>
+                <p class="smaller fragment" style="margin-top: var(--space-xs);"><strong>Triangle:</strong> <span class="rating-low">Low learnability</span>, <span class="rating-high">very high effectiveness</span>, <span class="rating-high">high comfort</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>SQUAD in Action</h2>
+        <p><a href="https://www.youtube.com/watch?v=e-4SaOTxf5Y" target="_blank">Watch the SQUAD demo video <i class="fa-solid fa-arrow-up-right-from-square"></i></a></p>
+    </section>
+
+    <section>
+        <h2>Reach-Extension: Go-Go Technique</h2>
+        <div class="columns">
+            <div>
+                <ul class="small">
+                    <li class="fragment">Virtual hand matches real hand when near the body (linear region)</li>
+                    <li class="fragment">Beyond distance <strong>D</strong>, a <strong>non-linear mapping</strong> stretches the virtual arm exponentially</li>
+                    <li class="fragment">Preserves direct-touch mental model while extending reach</li>
+                </ul>
+                <div class="box fragment" style="font-size: 0.8em; margin-top: var(--space-md);">
+                    <p><strong>Design triangle:</strong> <span class="rating-med">Moderate learnability</span>, <span class="rating-med">moderate effectiveness</span>, <span class="rating-high">good comfort</span></p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <img src="../assets/user-experience/interaction/go-go-technique.png" alt="Go-Go technique transfer function: Rv (virtual reach) vs Rr (real reach), showing linear mapping up to threshold D then non-linear exponential extension" style="max-height: 280px;">
+                <p class="muted smaller"><strong>Rv</strong> = virtual reach, <strong>Rr</strong> = real reach. Linear up to <strong>D</strong>, then non-linear extension (<strong>F</strong>)</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Gaze-Based Selection</h2>
+        <p>Increasingly important with eye tracking on Quest 3 Pro and future devices</p>
+        <ul>
+            <li class="fragment"><strong>Dwell selection:</strong> Look at a target for a set duration to select it &mdash; "Midas touch" problem</li>
+            <li class="fragment"><strong>Gaze + confirm:</strong> Look at target, then pinch or press button to confirm &mdash; more reliable</li>
+            <li class="fragment"><strong>Gaze + hand:</strong> Eyes choose the target, hand performs the action &mdash; fast and natural</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Fitts' Law:</strong> Eye movements are extremely fast (saccades take ~200ms). Gaze reduces D to near zero &mdash; but gaze precision is low (~1&deg;), meaning W must be large.</p>
+        </div>
+        <p class="smaller fragment" style="margin-top: var(--space-sm);"><strong>Design triangle:</strong> <span class="rating-med">Moderate learnability</span> (gaze+confirm requires practice), <span class="rating-med">moderate effectiveness</span> (fast but imprecise), <span class="rating-high">very high comfort</span> (no arm movement at all)</p>
+    </section>
+
+    <section>
+        <h2>Bimanual Interaction</h2>
+        <div class="columns" style="margin-top: var(--space-sm);">
+            <div>
+                <div class="box" style="margin-top: 0;">
+                    <p class="small"><strong>Guiard's Kinematic Chain Model:</strong></p>
+                    <ul class="smaller" style="margin-bottom: 0;">
+                        <li><strong>Non-dominant hand</strong> &mdash; sets frame of reference, coarse, leads</li>
+                        <li><strong>Dominant hand</strong> &mdash; fine manipulation within that frame, follows</li>
+                    </ul>
+                </div>
+                <p class="smaller" style="color: var(--accent); font-weight: 600; margin-top: var(--space-md);">Real-World Parallels</p>
+                <ul class="smaller">
+                    <li>Hold paper, write with other hand</li>
+                    <li>Surgeon positions tissue, other hand cuts</li>
+                    <li>Hold ruler steady, draw along edge</li>
+                </ul>
+            </div>
+            <div>
+                <p class="smaller" style="color: var(--accent); font-weight: 600;">VR Applications</p>
+                <ul class="smaller">
+                    <li>Hold object in one hand, paint/sculpt with other</li>
+                    <li>Non-dominant hand summons palette/menu, dominant hand selects from it</li>
+                    <li>Two-handed weapon aiming (stock hand stabilizes, trigger hand fires)</li>
+                </ul>
+                <div class="box warning fragment" style="font-size: 0.8em;">
+                    <p>Violating the asymmetric model (e.g., requiring both hands to do precision work simultaneously) feels unnatural</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 style="margin-bottom: var(--space-sm);">Technique Comparison</h2>
+        <table class="comparison-table">
+            <tr>
+                <th>Technique</th>
+                <th>Accuracy</th>
+                <th>Speed</th>
+                <th>Learning Curve</th>
+                <th>Fatigue</th>
+                <th>Best Use Case</th>
+            </tr>
+            <tr>
+                <td>Direct Touch</td>
+                <td class="rating-high">High</td>
+                <td class="rating-high">Fast</td>
+                <td class="rating-high">Minimal</td>
+                <td class="rating-med">Medium</td>
+                <td>Nearby objects, UI buttons</td>
+            </tr>
+            <tr>
+                <td>Basic Raycast</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-high">Fast</td>
+                <td class="rating-high">Low</td>
+                <td class="rating-high">Low</td>
+                <td>Distant single targets</td>
+            </tr>
+            <tr>
+                <td>Sticky Ray</td>
+                <td class="rating-high">High</td>
+                <td class="rating-high">Fast</td>
+                <td class="rating-high">Low</td>
+                <td class="rating-high">Low</td>
+                <td>Distant targets, moderate clutter</td>
+            </tr>
+            <tr>
+                <td>Depth Ray</td>
+                <td class="rating-high">High</td>
+                <td class="rating-med">Moderate</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-high">Low</td>
+                <td>Crowded, occluded environments</td>
+            </tr>
+            <tr>
+                <td>Bubble Cursor</td>
+                <td class="rating-high">High</td>
+                <td class="rating-high">Fast</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-med">Medium</td>
+                <td>Sparse to moderate density</td>
+            </tr>
+            <tr>
+                <td>SQUAD</td>
+                <td class="rating-high">Very High</td>
+                <td class="rating-low">Slow</td>
+                <td class="rating-low">High</td>
+                <td class="rating-high">Low</td>
+                <td>Very dense, precision-critical</td>
+            </tr>
+            <tr>
+                <td>Go-Go</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-med">Moderate</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-high">Low</td>
+                <td>Mid-distance, natural grab feel</td>
+            </tr>
+            <tr>
+                <td>Gaze + Pinch</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-high">Very Fast</td>
+                <td class="rating-med">Medium</td>
+                <td class="rating-high">Very Low</td>
+                <td>UI, large targets, accessibility</td>
+            </tr>
+        </table>
+    </section>
+</section>
+
+<!-- ============================================
+     PART V: CASE STUDY AND ACTIVITIES
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: Putting It Together</h2>
+        <p>Case Studies and Activities</p>
+    </section>
+
+    <section>
+        <h2>Case Study: Selecting a Region in an MRI Scan</h2>
+        <p>Enable a user to find and select a small, specific portion of a very large MRI scan for later analysis</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <ul class="small">
+                    <li class="fragment"><strong>What is your selection process?</strong></li>
+                    <li class="fragment">What Fitts' Law challenges does this present?</li>
+                    <li class="fragment">Where does this fall on the design triangle?</li>
+                    <li class="fragment">Which technique(s) from our comparison matrix would you use?</li>
+                    <li class="fragment">How would you combine techniques? (e.g., coarse then fine selection)</li>
+                </ul>
+            </div>
+            <div style="text-align: center;">
+                <p class="muted small">Imagine navigating a high-resolution volumetric brain scan to select a 1mm region for analysis</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Activity: "Fix This Interaction"</h2>
+        <p>Diagnose a poorly designed VR interaction using the design triangle</p>
+        <div class="box" style="margin-top: var(--space-md);">
+            <p class="small"><strong>Instructions:</strong></p>
+            <ol class="small">
+                <li>Watch the provided video of a VR interaction</li>
+                <li>Identify what's wrong using the design triangle (effectiveness, learnability, comfort)</li>
+                <li>Connect the problem to motor science concepts (Fitts' Law, feedback, remapping)</li>
+                <li>Propose a better alternative and justify it</li>
+            </ol>
+        </div>
+        <p class="muted small fragment" style="margin-top: var(--space-md);">See Canvas for the activity details and submission</p>
+    </section>
+
+    <section>
+        <h2>Connecting to Unity XRI</h2>
+        <p class="muted small">How today's concepts map to your development work</p>
+        <div class="columns" style="margin-top: var(--space-md);">
+            <div>
+                <table style="font-size: 0.7em;">
+                    <tr><th>Concept</th><th>Unity XRI Component</th></tr>
+                    <tr><td>Direct Touch</td><td><code>XRDirectInteractor</code></td></tr>
+                    <tr><td>Raycast</td><td><code>XRRayInteractor</code></td></tr>
+                    <tr><td>Grab / Manipulation</td><td><code>XRGrabInteractable</code></td></tr>
+                    <tr><td>Placement / Snap</td><td><code>XRSocketInteractor</code></td></tr>
+                    <tr><td>Poke (Hand Tracking)</td><td><code>XRPokeInteractor</code></td></tr>
+                    <tr><td>Gaze</td><td><code>XRGazeInteractor</code></td></tr>
+                </table>
+            </div>
+            <div>
+                <div class="box" style="font-size: 0.85em;">
+                    <p><strong>Key insight:</strong> The interaction taxonomy maps directly to XRI's interactor/interactable pattern</p>
+                    <p class="small muted">Understanding <em>why</em> these components exist helps you choose and configure them correctly</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Key Takeaways</h2>
+        <ul>
+            <li class="fragment"><strong>Interaction design is a design problem</strong> &mdash; realism isn't the goal; effectiveness, learnability, and comfort are</li>
+            <li class="fragment"><strong>Motor science is the foundation</strong> &mdash; Fitts' Law, feedback loops, and remapping explain why techniques work (or don't)</li>
+            <li class="fragment"><strong>Selection, manipulation, placement</strong> are the core interaction types; selection is the hardest</li>
+            <li class="fragment"><strong>Hand tracking is primary on Quest 3</strong> &mdash; pinch, poke, and grab are essential interactions</li>
+            <li class="fragment"><strong>Choose techniques by context</strong> &mdash; use the comparison matrix, not gut feeling</li>
+            <li class="fragment"><strong>Theory maps to practice</strong> &mdash; every concept today has a Unity XRI counterpart</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Coming Up</h2>
+        <ul>
+            <li>Locomotion and navigation techniques in VR</li>
+            <li>Hands-on: implementing selection and manipulation in Unity with XR Interaction Toolkit</li>
+        </ul>
+    </section>
+
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>

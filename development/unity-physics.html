@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unity Physics - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* Compact code blocks for slides */
+        .reveal pre code {
+            max-height: 420px;
+            font-size: 0.55em;
+            line-height: 1.0;
+        }
+        .reveal pre {
+            width: 100%;
+            margin: 0.5em 0;
+        }
+        /* Smaller code for side-by-side */
+        .small-code pre code {
+            font-size: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title Slide -->
+<section class="title-slide">
+    <h1>Unity Physics</h1>
+    <h3>Making Virtual Worlds Feel Real</h3>
+    <p class="muted">CPSC 4110/6110</p>
+</section>
+
+<!-- Today's Goal -->
+<section>
+    <section class="section-slide">
+        <h2>Today's Goal</h2>
+    </section>
+
+    <section>
+        <h2>Quick Refresher</h2>
+        <p>You've watched the videos on Unity physics.</p>
+        <p class="fragment">Today we'll review key concepts and clarify common questions.</p>
+        <div class="fragment box" style="margin-top: var(--space-lg);">
+            <p><strong>Focus:</strong> Understanding how physics components work together</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>What We'll Cover</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4>Rigidbodies</h4>
+                <p class="small">Mass, gravity, forces</p>
+            </div>
+            <div class="card fragment">
+                <h4>Colliders</h4>
+                <p class="small">Shapes and properties</p>
+            </div>
+            <div class="card fragment">
+                <h4>Triggers</h4>
+                <p class="small">Detection zones</p>
+            </div>
+            <div class="card fragment">
+                <h4>Physics Events</h4>
+                <p class="small">Responding to interactions</p>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">Note: We're <strong>not</strong> covering joints yet</p>
+    </section>
+</section>
+
+<!-- Part I: Physics System Overview -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Physics Overview</h2>
+        <p>The Big Picture</p>
+    </section>
+
+    <section>
+        <h2>Unity Physics Engine</h2>
+        <ul>
+            <li class="fragment"><strong>PhysX</strong> by NVIDIA (built-in)</li>
+            <li class="fragment">Simulates realistic physics automatically</li>
+            <li class="fragment">Runs at <strong>fixed timestep</strong> (default: 50Hz)</li>
+            <li class="fragment">Separate from rendering frame rate</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Physics Loop</h2>
+        <pre><code class="plaintext">Every Physics Step (50x per second):
+1. Apply forces to Rigidbodies
+2. Update positions/rotations
+3. Check for collisions
+4. Resolve collisions
+5. Trigger collision/trigger events</code></pre>
+        <div class="box fragment">
+            <p>That's why we use <code>FixedUpdate()</code> for physics code!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Key Components</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Rigidbody</h4>
+                <p class="small">Enables physics simulation</p>
+            </div>
+            <div class="card fragment">
+                <h4>Collider</h4>
+                <p class="small">Defines shape for collisions</p>
+            </div>
+            <div class="card fragment">
+                <h4>Physics Material</h4>
+                <p class="small">Surface properties</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- Part II: Rigidbodies -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Rigidbodies</h2>
+        <p>The Physics Brain</p>
+    </section>
+
+    <section>
+        <h2>What is a Rigidbody?</h2>
+        <p>A component that enables physics simulation on a GameObject.</p>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p><strong>Rule:</strong> No Rigidbody = No physics simulation</p>
+        </div>
+        <p class="fragment muted">Objects won't fall, collide, or respond to forces without one</p>
+    </section>
+
+    <section>
+        <h2>Key Rigidbody Properties</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Property</th><th>What It Does</th></tr>
+            <tr class="fragment"><td><strong>Mass</strong></td><td>Weight in kg (affects force response)</td></tr>
+            <tr class="fragment"><td><strong>Drag</strong></td><td>Air resistance (slows linear motion)</td></tr>
+            <tr class="fragment"><td><strong>Angular Drag</strong></td><td>Rotational resistance (slows spinning)</td></tr>
+            <tr class="fragment"><td><strong>Use Gravity</strong></td><td>Enable/disable gravity pull</td></tr>
+            <tr class="fragment"><td><strong>Is Kinematic</strong></td><td>Controlled by scripts, not forces</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Rigidbody Types</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Dynamic</h4>
+                <p class="small">Default mode</p>
+                <p class="small">Affected by forces and collisions</p>
+                <span class="badge">Use for: Balls, projectiles, physics objects</span>
+            </div>
+            <div class="card">
+                <h4>Kinematic</h4>
+                <p class="small">Is Kinematic = true</p>
+                <p class="small">Script-controlled movement</p>
+                <span class="badge warning">Use for: Platforms, player controllers</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Applying Forces</h2>
+        <pre><code class="csharp">Rigidbody rb;
+
+void Start() {
+    rb = GetComponent&lt;Rigidbody&gt;();
+}
+
+void FixedUpdate() {
+    // Continuous force (like a thruster)
+    rb.AddForce(Vector3.forward * 10f);
+
+    // Impulse force (like a jump)
+    rb.AddForce(Vector3.up * 5f, ForceMode.Impulse);
+
+    // Direct velocity change
+    rb.velocity = new Vector3(0, 10, 0);
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Common ForceMode Options</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Mode</th><th>Use Case</th></tr>
+            <tr class="fragment"><td><code>ForceMode.Force</code></td><td>Continuous force (thrusters, wind)</td></tr>
+            <tr class="fragment"><td><code>ForceMode.Impulse</code></td><td>Instant impact (explosion, jump)</td></tr>
+            <tr class="fragment"><td><code>ForceMode.VelocityChange</code></td><td>Ignore mass in calculation</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Constraints</h2>
+        <p>Freeze position or rotation on specific axes:</p>
+        <pre><code class="csharp">// Freeze rotation on X and Z (no tipping over)
+rb.constraints = RigidbodyConstraints.FreezeRotationX |
+                 RigidbodyConstraints.FreezeRotationZ;
+
+// Freeze all rotation
+rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+// Freeze Y position (can't jump)
+rb.constraints = RigidbodyConstraints.FreezePositionY;</code></pre>
+    </section>
+</section>
+
+<!-- Part III: Colliders -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: Colliders</h2>
+        <p>Defining Physical Shape</p>
+    </section>
+
+    <section>
+        <h2>What is a Collider?</h2>
+        <p>A component that defines the shape for physics interactions.</p>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Without Collider</h4>
+                <p class="small">Objects pass through each other</p>
+            </div>
+            <div class="card">
+                <h4>With Collider</h4>
+                <p class="small">Physics detects and resolves collisions</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Primitive Colliders</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Box Collider</h4>
+                <p class="small">Cubes, walls, floors</p>
+                <span class="badge success">Fast</span>
+            </div>
+            <div class="card fragment">
+                <h4>Sphere Collider</h4>
+                <p class="small">Balls, round objects</p>
+                <span class="badge success">Fastest</span>
+            </div>
+            <div class="card fragment">
+                <h4>Capsule Collider</h4>
+                <p class="small">Characters, pills</p>
+                <span class="badge success">Fast</span>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-lg);"><strong>Best Practice:</strong> Use primitives when possible (better performance)</p>
+    </section>
+
+    <section>
+        <h2>Mesh Colliders</h2>
+        <div class="box warning">
+            <p><strong>Use with caution!</strong> More accurate, but expensive</p>
+        </div>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment"><strong>Mesh Collider</strong> &mdash; Matches exact mesh shape</li>
+            <li class="fragment">Much slower than primitives</li>
+            <li class="fragment">Can't collide with other mesh colliders unless "Convex"</li>
+            <li class="fragment"><strong>Best for:</strong> Static environment geometry</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Compound Colliders</h2>
+        <p>Combine multiple primitive colliders for complex shapes:</p>
+        <pre><code class="plaintext">Car (GameObject)
+├── Rigidbody
+├── Box Collider (body)
+├── WheelFL
+│   └── Sphere Collider
+├── WheelFR
+│   └── Sphere Collider
+└── ...</code></pre>
+        <p class="fragment"><strong>Better performance than one mesh collider!</strong></p>
+    </section>
+
+    <section>
+        <h2>Collider Properties</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Property</th><th>Effect</th></tr>
+            <tr class="fragment"><td><strong>Is Trigger</strong></td><td>Detects overlap, doesn't block (more later)</td></tr>
+            <tr class="fragment"><td><strong>Material</strong></td><td>Physics material (friction, bounce)</td></tr>
+            <tr class="fragment"><td><strong>Center</strong></td><td>Offset from GameObject position</td></tr>
+            <tr class="fragment"><td><strong>Size/Radius</strong></td><td>Dimensions of collider</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- Part IV: Triggers vs Collisions -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Triggers</h2>
+        <p>Detection Without Collision</p>
+    </section>
+
+    <section>
+        <h2>The Difference</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Collision</h4>
+                <p class="small">Is Trigger = <strong>false</strong></p>
+                <p class="small">Objects <strong>block</strong> each other</p>
+                <p class="small">Physics resolves overlap</p>
+                <span class="badge">Walls, floors, obstacles</span>
+            </div>
+            <div class="card">
+                <h4>Trigger</h4>
+                <p class="small">Is Trigger = <strong>true</strong></p>
+                <p class="small">Objects <strong>pass through</strong></p>
+                <p class="small">Detects overlap only</p>
+                <span class="badge warning">Detection zones, pickups</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>When to Use Triggers</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Pickup Items</h4>
+                <p class="small">Coins, power-ups</p>
+            </div>
+            <div class="card fragment">
+                <h4>Danger Zones</h4>
+                <p class="small">Lava, hazards</p>
+            </div>
+            <div class="card fragment">
+                <h4>Detection Areas</h4>
+                <p class="small">Enemy sight range</p>
+            </div>
+            <div class="card fragment">
+                <h4>Checkpoints</h4>
+                <p class="small">Level progress</p>
+            </div>
+            <div class="card fragment">
+                <h4>Doors/Portals</h4>
+                <p class="small">Scene transitions</p>
+            </div>
+            <div class="card fragment">
+                <h4>Goal Areas</h4>
+                <p class="small">Win conditions</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Trigger Requirements</h2>
+        <div class="box">
+            <p><strong>At least ONE object must have a Rigidbody</strong></p>
+        </div>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card success">
+                <h4><i class="fa-solid fa-check"></i> Works</h4>
+                <p class="small">Trigger + Rigidbody</p>
+                <p class="small">Trigger + other object has Rigidbody</p>
+            </div>
+            <div class="card danger">
+                <h4><i class="fa-solid fa-xmark"></i> Doesn't Work</h4>
+                <p class="small">Two triggers, no Rigidbodies</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Collision Matrix</h2>
+        <table style="font-size: 0.65em;">
+            <tr><th></th><th>Static Collider</th><th>Rigidbody</th><th>Kinematic Rigidbody</th><th>Trigger</th></tr>
+            <tr class="fragment">
+                <td><strong>Static Collider</strong></td>
+                <td>-</td>
+                <td>Collision</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Rigidbody</strong></td>
+                <td>Collision</td>
+                <td>Collision</td>
+                <td>Collision</td>
+                <td>Trigger</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Kinematic Rigidbody</strong></td>
+                <td>-</td>
+                <td>Collision</td>
+                <td>-</td>
+                <td>Trigger</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Trigger</strong></td>
+                <td>-</td>
+                <td>Trigger</td>
+                <td>Trigger</td>
+                <td>-</td>
+            </tr>
+        </table>
+        <p class="fragment muted small">Dash (-) means no interaction</p>
+    </section>
+</section>
+
+<!-- Part V: Physics Events -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: Physics Events</h2>
+        <p>Responding to Interactions</p>
+    </section>
+
+    <section>
+        <h2>Collision Events</h2>
+        <pre><code class="csharp">// Called when collision starts
+void OnCollisionEnter(Collision collision) {
+    Debug.Log("Hit: " + collision.gameObject.name);
+}
+
+// Called every frame while colliding
+void OnCollisionStay(Collision collision) {
+    // Continuous contact logic
+}
+
+// Called when collision ends
+void OnCollisionExit(Collision collision) {
+    Debug.Log("Stopped touching: " + collision.gameObject.name);
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Trigger Events</h2>
+        <pre><code class="csharp">// Called when entering trigger
+void OnTriggerEnter(Collider other) {
+    Debug.Log("Entered trigger: " + other.gameObject.name);
+
+    if (other.CompareTag("Player")) {
+        // Collect coin, activate checkpoint, etc.
+    }
+}
+
+// Called every frame while inside trigger
+void OnTriggerStay(Collider other) { }
+
+// Called when exiting trigger
+void OnTriggerExit(Collider other) { }</code></pre>
+    </section>
+
+    <section>
+        <h2>Collision vs Trigger Events</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Collision Events</h4>
+                <pre class="small-code"><code class="csharp">OnCollisionEnter(Collision c)
+OnCollisionStay(Collision c)
+OnCollisionExit(Collision c)</code></pre>
+                <p class="small">Parameter: <code>Collision</code></p>
+                <p class="small">Access contact points, impulse</p>
+            </div>
+            <div class="card">
+                <h4>Trigger Events</h4>
+                <pre class="small-code"><code class="csharp">OnTriggerEnter(Collider c)
+OnTriggerStay(Collider c)
+OnTriggerExit(Collider c)</code></pre>
+                <p class="small">Parameter: <code>Collider</code></p>
+                <p class="small">Access other GameObject/component</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Accessing Collision Data</h2>
+        <pre><code class="csharp">void OnCollisionEnter(Collision collision) {
+    // Get other object
+    GameObject other = collision.gameObject;
+
+    // Get collision force
+    float impactForce = collision.impulse.magnitude;
+
+    // Get contact points
+    ContactPoint contact = collision.contacts[0];
+    Vector3 hitPoint = contact.point;
+    Vector3 hitNormal = contact.normal;
+
+    // Get relative velocity
+    Vector3 relVelocity = collision.relativeVelocity;
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Common Pattern: Pickup</h2>
+        <pre><code class="csharp">public class Coin : MonoBehaviour {
+    void OnTriggerEnter(Collider other) {
+        if (other.CompareTag("Player")) {
+            // Add to score
+            GameManager.instance.AddScore(10);
+
+            // Play sound
+            AudioSource.PlayClipAtPoint(collectSound, transform.position);
+
+            // Destroy coin
+            Destroy(gameObject);
+        }
+    }
+}</code></pre>
+        <p class="fragment muted">Remember: Coin needs <code>Is Trigger = true</code> and Player needs Rigidbody!</p>
+    </section>
+</section>
+
+<!-- Part VI: Physics Materials -->
+<section>
+    <section class="section-slide">
+        <h2>Part VI: Physics Materials</h2>
+        <p>Surface Properties</p>
+    </section>
+
+    <section>
+        <h2>What are Physics Materials?</h2>
+        <p>Define how surfaces interact during collisions:</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment"><strong>Friction</strong> &mdash; How much surfaces resist sliding</li>
+            <li class="fragment"><strong>Bounciness</strong> &mdash; How much energy is retained in bounce</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">Create: Assets → Create → Physics Material</p>
+    </section>
+
+    <section>
+        <h2>Key Properties</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Property</th><th>Range</th><th>Effect</th></tr>
+            <tr class="fragment">
+                <td><strong>Dynamic Friction</strong></td>
+                <td>0-1</td>
+                <td>Friction while moving</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Static Friction</strong></td>
+                <td>0-1</td>
+                <td>Friction when at rest</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Bounciness</strong></td>
+                <td>0-1</td>
+                <td>0 = no bounce, 1 = perfect bounce</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Friction Combine</strong></td>
+                <td>Mode</td>
+                <td>How to combine with other material</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Bounce Combine</strong></td>
+                <td>Mode</td>
+                <td>How to combine bounciness</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Example Materials</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Ice</h4>
+                <p class="small">Friction: 0.05</p>
+                <p class="small">Bounce: 0.0</p>
+            </div>
+            <div class="card fragment">
+                <h4>Rubber</h4>
+                <p class="small">Friction: 0.9</p>
+                <p class="small">Bounce: 0.8</p>
+            </div>
+            <div class="card fragment">
+                <h4>Concrete</h4>
+                <p class="small">Friction: 0.6</p>
+                <p class="small">Bounce: 0.1</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Applying Physics Materials</h2>
+        <ol>
+            <li class="fragment">Create Physics Material asset</li>
+            <li class="fragment">Set friction and bounciness values</li>
+            <li class="fragment">Drag material onto Collider component</li>
+        </ol>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p>Materials are assigned to <strong>Colliders</strong>, not Rigidbodies!</p>
+        </div>
+    </section>
+</section>
+
+<!-- Part VII: Raycasting -->
+<section>
+    <section class="section-slide">
+        <h2>Part VII: Raycasting</h2>
+        <p>Line-of-Sight Detection</p>
+    </section>
+
+    <section>
+        <h2>What is Raycasting?</h2>
+        <p>Casting an invisible ray to detect what it hits.</p>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Use Cases</h4>
+                <ul class="small">
+                    <li>Check if player is grounded</li>
+                    <li>Aim/shooting mechanics</li>
+                    <li>Line-of-sight checks</li>
+                    <li>Click detection</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Advantages</h4>
+                <ul class="small">
+                    <li>Very fast</li>
+                    <li>Precise direction</li>
+                    <li>Controllable distance</li>
+                    <li>No trigger zones needed</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Basic Raycast</h2>
+        <pre><code class="csharp">void Update() {
+    // Cast ray forward from this object
+    Ray ray = new Ray(transform.position, transform.forward);
+
+    if (Physics.Raycast(ray, out RaycastHit hit, 10f)) {
+        // Hit something within 10 units
+        Debug.Log("Hit: " + hit.collider.gameObject.name);
+        Debug.Log("Distance: " + hit.distance);
+        Debug.Log("Hit point: " + hit.point);
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Simplified Syntax</h2>
+        <pre><code class="csharp">// All in one line
+if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 10f)) {
+    Debug.Log("Hit: " + hit.collider.name);
+}
+
+// Check for hit without details
+if (Physics.Raycast(transform.position, transform.forward, 10f)) {
+    Debug.Log("Something is in front!");
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Ground Check Example</h2>
+        <pre><code class="csharp">public class PlayerController : MonoBehaviour {
+    public float groundCheckDistance = 0.1f;
+
+    bool IsGrounded() {
+        // Cast ray downward from center
+        Vector3 origin = transform.position;
+
+        return Physics.Raycast(origin, Vector3.down, groundCheckDistance);
+    }
+
+    void Update() {
+        if (IsGrounded() && Input.GetButtonDown("Jump")) {
+            GetComponent&lt;Rigidbody&gt;().AddForce(Vector3.up * 5f, ForceMode.Impulse);
+        }
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Visualizing Rays</h2>
+        <pre><code class="csharp">void Update() {
+    Vector3 origin = transform.position;
+    Vector3 direction = transform.forward;
+    float distance = 10f;
+
+    // Draw ray in Scene view (only visible in editor)
+    Debug.DrawRay(origin, direction * distance, Color.red);
+
+    if (Physics.Raycast(origin, direction, distance)) {
+        Debug.DrawRay(origin, direction * distance, Color.green);
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Layer Masks</h2>
+        <p>Filter what the ray can hit:</p>
+        <pre><code class="csharp">public LayerMask groundLayer;
+
+bool IsGrounded() {
+    // Only hit objects on the ground layer
+    return Physics.Raycast(
+        transform.position,
+        Vector3.down,
+        groundCheckDistance,
+        groundLayer
+    );
+}</code></pre>
+        <p class="fragment muted">Set layer in Inspector as a dropdown</p>
+    </section>
+</section>
+
+<!-- Part VIII: Best Practices -->
+<section>
+    <section class="section-slide">
+        <h2>Best Practices</h2>
+    </section>
+
+    <section>
+        <h2>Physics Code Location</h2>
+        <div class="columns">
+            <div class="card success">
+                <h4><i class="fa-solid fa-check"></i> FixedUpdate()</h4>
+                <p class="small">Force application</p>
+                <p class="small">Rigidbody manipulation</p>
+                <p class="small">Physics calculations</p>
+            </div>
+            <div class="card">
+                <h4>Update()</h4>
+                <p class="small">Input detection</p>
+                <p class="small">Raycasting</p>
+                <p class="small">Visual updates</p>
+            </div>
+        </div>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p><strong>Why?</strong> FixedUpdate runs at same rate as physics simulation (consistent behavior)</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Performance Tips</h2>
+        <ul>
+            <li class="fragment"><strong>Use primitive colliders</strong> when possible (box, sphere, capsule)</li>
+            <li class="fragment"><strong>Avoid mesh colliders</strong> on moving objects</li>
+            <li class="fragment"><strong>Simplify collision geometry</strong> (doesn't need to match visual mesh)</li>
+            <li class="fragment"><strong>Use layers</strong> to filter what can collide</li>
+            <li class="fragment"><strong>Set objects to static</strong> if they never move</li>
+            <li class="fragment"><strong>Don't move static colliders</strong> at runtime (expensive recalculation)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Common Mistakes</h2>
+        <div class="box danger">
+            <h4>Moving Transform Directly</h4>
+            <pre class="small-code"><code class="csharp">// ❌ BAD (if using physics)
+transform.position += Vector3.forward * speed * Time.deltaTime;</code></pre>
+        </div>
+        <div class="box success fragment">
+            <h4>Use Rigidbody Instead</h4>
+            <pre class="small-code"><code class="csharp">// ✓ GOOD
+rb.velocity = transform.forward * speed;
+// OR
+rb.MovePosition(rb.position + transform.forward * speed * Time.fixedDeltaTime);</code></pre>
+        </div>
+    </section>
+
+    <section>
+        <h2>Debugging Physics</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4>Console Logging</h4>
+                <pre class="small-code"><code class="csharp">void OnCollisionEnter(Collision c) {
+    Debug.Log("Collision!");
+    Debug.Log(c.gameObject.name);
+    Debug.Log(c.impulse.magnitude);
+}</code></pre>
+            </div>
+            <div class="card fragment">
+                <h4>Visual Debugging</h4>
+                <pre class="small-code"><code class="csharp">void OnDrawGizmos() {
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(
+        transform.position,
+        detectionRadius
+    );
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Physics Settings</h2>
+        <p>Edit → Project Settings → Physics</p>
+        <ul style="margin-top: var(--space-lg);">
+            <li class="fragment"><strong>Gravity</strong> &mdash; Default: (0, -9.81, 0)</li>
+            <li class="fragment"><strong>Fixed Timestep</strong> &mdash; How often physics updates (default: 0.02s = 50Hz)</li>
+            <li class="fragment"><strong>Layer Collision Matrix</strong> &mdash; What layers can collide</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Part IX: Design Exercises -->
+<section>
+    <section class="section-slide">
+        <h2>Design Challenges</h2>
+        <p>Group Discussion Exercises</p>
+    </section>
+
+    <section>
+        <h2>Challenge 1: The Launching Pad</h2>
+        <div class="box">
+            <p><strong>Requirement:</strong> Create a zone on the ground that launches the player upward when they enter it.</p>
+        </div>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Questions to Answer</h4>
+                <ul class="small">
+                    <li>What components does the pad need?</li>
+                    <li>What components does the player need?</li>
+                    <li>Collision or trigger?</li>
+                    <li>Which event method to use?</li>
+                    <li>Where does the force get applied?</li>
+                    <li>What code runs in FixedUpdate?</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Key Concepts</h4>
+                <ul class="small">
+                    <li>Triggers</li>
+                    <li>AddForce</li>
+                    <li>FixedUpdate timing</li>
+                    <li>Rigidbody references</li>
+                    <li>OnTriggerEnter</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Challenge 2: Hazard Detection System</h2>
+        <div class="box">
+            <p><strong>Requirement:</strong> Player takes damage when touching spikes (solid), but also when walking through a damage zone (passable). Both need different responses.</p>
+        </div>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Questions to Answer</h4>
+                <ul class="small">
+                    <li>Which hazard uses collision? Trigger?</li>
+                    <li>What's different about their setups?</li>
+                    <li>Which event methods for each?</li>
+                    <li>How do you identify what hit you?</li>
+                    <li>Can you get collision force data?</li>
+                    <li>Do spikes need a Rigidbody?</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Key Concepts</h4>
+                <ul class="small">
+                    <li>OnCollisionEnter</li>
+                    <li>OnTriggerEnter</li>
+                    <li>Choosing collision vs trigger</li>
+                    <li>Reading collision data</li>
+                    <li>GameObject.CompareTag</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Challenge 3: The Speed Bump</h2>
+        <div class="box">
+            <p><strong>Requirement:</strong> An object that bounces you back only if you're moving fast enough. Otherwise, you can push through it slowly.</p>
+        </div>
+        <div class="columns fragment" style="margin-top: var(--space-lg);">
+            <div class="card">
+                <h4>Questions to Answer</h4>
+                <ul class="small">
+                    <li>Collision or trigger?</li>
+                    <li>How do you check player speed?</li>
+                    <li>Which velocity to use?</li>
+                    <li>What direction for bounce force?</li>
+                    <li>How strong should the force be?</li>
+                    <li>When to apply the force?</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Key Concepts</h4>
+                <ul class="small">
+                    <li>OnCollisionEnter</li>
+                    <li>collision.relativeVelocity</li>
+                    <li>rigidbody.velocity</li>
+                    <li>Conditional AddForce</li>
+                    <li>FixedUpdate timing</li>
+                    <li>Vector3.magnitude</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Presentation Format</h2>
+        <p>Each group should prepare to share:</p>
+        <ol style="margin-top: var(--space-lg);">
+            <li class="fragment"><strong>Component Setup</strong> &mdash; What goes on each GameObject?</li>
+            <li class="fragment"><strong>Event Choice</strong> &mdash; Which physics event(s) and why?</li>
+            <li class="fragment"><strong>Code Logic</strong> &mdash; Pseudocode or description of the approach</li>
+            <li class="fragment"><strong>Tricky Parts</strong> &mdash; What challenges did you identify?</li>
+        </ol>
+    </section>
+</section>
+
+<!-- Summary -->
+<section>
+    <section class="section-slide">
+        <h2>Quick Review</h2>
+    </section>
+
+    <section>
+        <h2>Key Takeaways</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Component</th><th>Purpose</th></tr>
+            <tr class="fragment"><td><strong>Rigidbody</strong></td><td>Enables physics simulation</td></tr>
+            <tr class="fragment"><td><strong>Collider</strong></td><td>Defines shape for collisions</td></tr>
+            <tr class="fragment"><td><strong>Trigger</strong></td><td>Detection without blocking</td></tr>
+            <tr class="fragment"><td><strong>Physics Material</strong></td><td>Surface friction/bounce</td></tr>
+            <tr class="fragment"><td><strong>Raycast</strong></td><td>Line-of-sight detection</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>The Golden Rules</h2>
+        <ol>
+            <li class="fragment">Physics needs <strong>Rigidbody</strong></li>
+            <li class="fragment">Collisions need <strong>Collider</strong></li>
+            <li class="fragment">Triggers need <strong>at least one Rigidbody</strong></li>
+            <li class="fragment">Physics code goes in <strong>FixedUpdate()</strong></li>
+            <li class="fragment">Use <strong>primitive colliders</strong> when possible</li>
+            <li class="fragment">Don't move static colliders at runtime</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Coming Up Next</h2>
+        <ul>
+            <li class="fragment">Hands-on physics exercises</li>
+            <li class="fragment">Building interactive VR mechanics</li>
+            <li class="fragment">XR Interaction Toolkit physics integration</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Closing -->
+<section>
+    <section>
+        <h2>Resources</h2>
+        <div class="columns columns-2">
+            <div class="card">
+                <h4>Unity Manual</h4>
+                <p class="muted small">docs.unity3d.com/Manual/PhysicsSection.html</p>
+            </div>
+            <div class="card">
+                <h4>Scripting Reference</h4>
+                <p class="muted small">docs.unity3d.com/ScriptReference/Physics.html</p>
+            </div>
+            <div class="card">
+                <h4>Unity Learn</h4>
+                <p class="muted small">learn.unity.com</p>
+            </div>
+            <div class="card">
+                <h4>Recording</h4>
+                <p class="muted small">Posted to Canvas</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>What Questions Do You Have?</h2>
+        <p style="margin-top: var(--space-lg);">At least 3 questions must be asked before we can end class.</p>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
