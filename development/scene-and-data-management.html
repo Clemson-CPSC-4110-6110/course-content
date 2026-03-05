@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scene &amp; Data Management - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides pre code {
+            max-height: 420px;
+            font-size: 0.75em !important;
+            line-height: 1.4 !important;
+            padding: 0.4em 0.6em !important;
+        }
+        .reveal .slides pre {
+            width: 100%;
+            margin: 0.4em 0;
+            padding: 0.6em !important;
+            line-height: 1.4 !important;
+        }
+        .reveal .slides .small-code pre code {
+            font-size: 0.65em !important;
+            line-height: 1.4 !important;
+        }
+        /* Architecture diagram styling */
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .arch-layer {
+            background: var(--bg-elevated, #1a1a26);
+            border: 2px solid var(--accent, #00d4aa);
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            text-align: center;
+            width: 80%;
+            position: relative;
+        }
+        .arch-layer.persistent {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .arch-layer.additive {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+        }
+        .arch-layer.data {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .arch-connector {
+            font-size: 1.5rem;
+            color: var(--text-muted, #6a6a7a);
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Scene &amp; Data Management</h1>
+    <h3>Organizing VR Applications</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     SECTION 1: Why Scenes Matter
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Why Scenes Matter</h2>
+        <p>Beyond a Single Scene</p>
+    </section>
+
+    <section>
+        <h2>The Scenario</h2>
+        <p>Your VR app needs:</p>
+        <ul>
+            <li class="fragment"><strong>A lobby</strong> &mdash; where the user starts</li>
+            <li class="fragment"><strong>A gameplay environment</strong> &mdash; the main experience</li>
+            <li class="fragment"><strong>A settings menu</strong> &mdash; comfort options, controls</li>
+            <li class="fragment"><strong>Multiple levels</strong> &mdash; different worlds to explore</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p><strong>How do you organize all of this?</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>What Is a Scene?</h2>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li class="fragment"><strong>A container</strong> for GameObjects</li>
+                    <li class="fragment">Think of it like a <strong>level</strong> or <strong>environment</strong></li>
+                    <li class="fragment">Saved as a <code>.unity</code> file</li>
+                    <li class="fragment">Has its own hierarchy, lighting, navigation</li>
+                </ul>
+            </div>
+            <div class="card fragment">
+                <h4>Scene Contains</h4>
+                <pre><code class="plaintext">MyScene.unity
+├── Main Camera
+├── Directional Light
+├── Terrain
+├── Player
+│   └── PlayerScript
+└── UI Canvas</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The "One Giant Scene" Problem</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-clock" style="color: var(--danger);"></i> Load Times</h4>
+                <p class="small">Everything loads at once &mdash; long startup</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-memory" style="color: var(--danger);"></i> Memory</h4>
+                <p class="small">All assets in RAM &mdash; critical in VR</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-code-branch" style="color: var(--danger);"></i> Git Conflicts</h4>
+                <p class="small">Everyone editing one scene file</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-folder-open" style="color: var(--danger);"></i> Organization</h4>
+                <p class="small">Hundreds of objects, impossible to navigate</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Why VR Makes This Worse</h2>
+        <ul>
+            <li class="fragment"><strong>90 FPS minimum</strong> &mdash; can't afford frame drops during loading</li>
+            <li class="fragment"><strong>Comfort matters</strong> &mdash; a loading freeze causes discomfort</li>
+            <li class="fragment"><strong>XR Rig must persist</strong> &mdash; losing head tracking = instant nausea</li>
+            <li class="fragment"><strong>Memory constrained</strong> &mdash; Quest has ~6 GB usable RAM</li>
+        </ul>
+        <div class="box warning fragment">
+            <p>A single frame hitch in VR is <strong>much</strong> worse than on a monitor</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Two Approaches</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Single Load</h4>
+                <p class="small">Destroy current scene, load a new one</p>
+                <p class="small muted">Simple but destructive</p>
+            </div>
+            <div class="card">
+                <h4>Additive Loading</h4>
+                <p class="small">Layer scenes on top of each other</p>
+                <span class="badge success">Recommended for VR</span>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 2: Scene Loading Basics
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Scene Loading Basics</h2>
+        <p>Loading and Unloading Scenes</p>
+    </section>
+
+    <section>
+        <h2>Build Settings</h2>
+        <p>Before you can load a scene, Unity needs to know about it.</p>
+        <pre class="fragment"><code class="plaintext">File → Build Settings → Scenes In Build
+
+  ✓ Scenes/Lobby          (index 0)
+  ✓ Scenes/Gameplay       (index 1)
+  ✓ Scenes/Settings       (index 2)</code></pre>
+        <div class="box fragment">
+            <p>Only scenes listed here can be loaded at runtime</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Simple Scene Loading</h2>
+        <pre><code class="csharp">using UnityEngine.SceneManagement;
+
+public class SceneLoader : MonoBehaviour {
+    public void LoadByName() {
+        SceneManager.LoadScene("Gameplay");
+    }
+    public void LoadByIndex() {
+        SceneManager.LoadScene(1);
+    }
+}</code></pre>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>Load by <strong>scene name</strong> or <strong>build index</strong> from Build Settings</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>What Happens on LoadScene?</h2>
+        <ol>
+            <li class="fragment"><strong>Current scene is destroyed</strong> &mdash; all GameObjects gone</li>
+            <li class="fragment"><strong>New scene loads synchronously</strong> &mdash; game freezes</li>
+            <li class="fragment"><strong>New scene's Awake/Start run</strong></li>
+        </ol>
+        <div class="box danger fragment" style="margin-top: var(--space-lg);">
+            <p><strong>Problem:</strong> Your XR Rig, your score, your game state &mdash; all destroyed!</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Synchronous Problem</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Desktop</h4>
+                <p class="small">Screen freezes for a moment</p>
+                <p class="small muted">Annoying but tolerable</p>
+            </div>
+            <div class="card">
+                <h4>VR</h4>
+                <p class="small">Head tracking stops responding</p>
+                <p class="small" style="color: var(--danger);">Nausea-inducing</p>
+            </div>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-lg);"><strong>We need a better approach for VR...</strong></p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 3: Additive Scene Loading
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: Additive Loading</h2>
+        <p>The VR-Friendly Approach</p>
+    </section>
+
+    <section>
+        <h2>Additive vs. Single</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Single (Default)</h4>
+                <pre><code class="csharp">// Destroys everything, loads fresh
+SceneManager.LoadScene("Level2");</code></pre>
+                <p class="small muted">Replace the world</p>
+            </div>
+            <div class="card">
+                <h4>Additive</h4>
+                <pre><code class="csharp">// Loads ON TOP of current scene
+SceneManager.LoadScene("Level2",
+    LoadSceneMode.Additive);</code></pre>
+                <p class="small muted">Layer scenes together</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The VR Scene Pattern</h2>
+        <pre><code class="plaintext">Core Scene (always loaded)
+  ├── XR Rig        ├── AudioManager
+  ├── GameManager    └── Event System
+─────────────────────────────────────
+Environment Scene (swappable)
+  ├── Terrain / Room   ├── Props
+  └── Lighting
+─────────────────────────────────────
+UI Scene (optional, additive)
+  ├── Menus   └── HUD Elements</code></pre>
+    </section>
+
+    <section>
+        <h2>Swapping Environments</h2>
+        <pre><code class="csharp">public class LevelManager : MonoBehaviour {
+    private string currentLevel;
+    public void LoadLevel(string levelName) {
+        if (currentLevel != null)
+            SceneManager.UnloadSceneAsync(currentLevel);
+        SceneManager.LoadSceneAsync(levelName, LoadSceneMode.Additive);
+        currentLevel = levelName;
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Async Loading</h2>
+        <p><code>LoadSceneAsync</code> loads in the background over multiple frames</p>
+        <pre class="fragment"><code class="csharp">IEnumerator LoadLevelAsync(string levelName) {
+    AsyncOperation op = SceneManager.LoadSceneAsync(
+        levelName, LoadSceneMode.Additive);
+
+    while (!op.isDone) {
+        float progress = op.progress;  // 0.0 to 1.0
+        // Update loading bar, fade screen, etc.
+        yield return null;
+    }
+    Debug.Log("Level loaded!");
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Why Async Matters for VR</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> Head Tracking</h4>
+                <p class="small">Continues during load</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> No Freeze</h4>
+                <p class="small">Loading spread across frames</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> Loading UX</h4>
+                <p class="small">Show progress, fade to black</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-check" style="color: var(--success);"></i> Comfort</h4>
+                <p class="small">User stays oriented</p>
+            </div>
+        </div>
+        <div class="box fragment" style="margin-top: var(--space-lg);">
+            <p><strong>Rule of thumb:</strong> Always use <code>LoadSceneAsync</code> in VR</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Transition Strategy</h2>
+        <ol>
+            <li class="fragment"><strong>Fade to black</strong> (or a loading environment)</li>
+            <li class="fragment"><strong>Start async load</strong> of new scene</li>
+            <li class="fragment"><strong>Unload old scene</strong> async</li>
+            <li class="fragment"><strong>Wait for both operations</strong></li>
+            <li class="fragment"><strong>Fade back in</strong></li>
+        </ol>
+        <p class="fragment muted" style="margin-top: var(--space-md);">The user never sees a "loading screen" &mdash; just a brief fade</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 4: Data Persistence Across Scenes
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Keeping Data Alive</h2>
+        <p>Persistence Across Scenes</p>
+    </section>
+
+    <section>
+        <h2>The Problem</h2>
+        <p>When a scene is unloaded, its GameObjects are <strong>destroyed</strong>.</p>
+        <div class="box danger fragment">
+            <p>Player score? <strong>Gone.</strong><br>
+            Settings? <strong>Gone.</strong><br>
+            Game state? <strong>Gone.</strong></p>
+        </div>
+        <p class="fragment">How do we keep data alive across scene transitions?</p>
+    </section>
+
+    <section>
+        <h2>Three Approaches</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>DontDestroyOnLoad</h4>
+                <p class="small">Keep a GameObject alive forever</p>
+            </div>
+            <div class="card fragment">
+                <h4>ScriptableObjects</h4>
+                <p class="small">Data assets in your Project</p>
+            </div>
+            <div class="card fragment">
+                <h4>Static Classes</h4>
+                <p class="small">Pure C# &mdash; no MonoBehaviour</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Approach 1: DontDestroyOnLoad</h2>
+        <pre><code class="csharp">public class GameManager : MonoBehaviour {
+    public static GameManager Instance;
+    public int score;
+
+    void Awake() {
+        if (Instance == null) {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        } else Destroy(gameObject);  // Only one!
+    }
+}</code></pre>
+        <p class="fragment muted">The "Singleton" pattern &mdash; one instance survives all scene loads</p>
+    </section>
+
+    <section>
+        <h2>Using the Singleton</h2>
+        <pre><code class="csharp">// From ANY script, in ANY scene:
+GameManager.Instance.score += 100;
+
+// Check current level
+if (GameManager.Instance.currentLevel == "Boss")
+    ShowWarning();</code></pre>
+        <div class="box fragment">
+            <p><strong>VR use case:</strong> Your XR Rig lives in a DontDestroyOnLoad scene &mdash; it persists as you load new environments</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Approach 2: ScriptableObjects</h2>
+        <pre><code class="csharp">[CreateAssetMenu(menuName = "Data/Player Data")]
+public class PlayerData : ScriptableObject {
+    public int score;
+    public int health;
+    public float snapTurnAngle;
+    public float vignetteIntensity;
+}</code></pre>
+        <div class="fragment">
+            <p>Create in Project: <strong>Right-click &rarr; Create &rarr; Data &rarr; Player Data</strong></p>
+        </div>
+        <p class="fragment muted">Lives in your <strong>Project</strong>, not in any scene</p>
+    </section>
+
+    <section>
+        <h2>ScriptableObjects: Shared Data</h2>
+        <div class="columns" style="gap: var(--space-sm);">
+            <div class="small-code">
+                <p class="small"><strong>Scene A:</strong></p>
+                <pre><code class="csharp">public class ScoreDisplay : MonoBehaviour {
+    public PlayerData playerData;
+    void Update() {
+        text.text = "Score: " + playerData.score;
+    }
+}</code></pre>
+            </div>
+            <div class="small-code">
+                <p class="small"><strong>Scene B:</strong></p>
+                <pre><code class="csharp">public class Enemy : MonoBehaviour {
+    public PlayerData playerData;  // Same asset!
+    void OnDestroy() {
+        playerData.score += 50;
+    }
+}</code></pre>
+            </div>
+        </div>
+        <div class="box fragment" style="margin-top: var(--space-sm);">
+            <p><strong>Both reference the same asset</strong> &mdash; changes are shared automatically</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Approach 3: Static Classes</h2>
+        <pre><code class="csharp">public static class GameState {
+    public static int score;
+    public static string playerName;
+    public static float comfortLevel;
+}</code></pre>
+        <pre class="fragment"><code class="csharp">// Use from anywhere:
+GameState.score += 100;</code></pre>
+        <div class="box warning fragment">
+            <p>Simple, but no Inspector support, hard to test, and can become a dumping ground</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Comparison</h2>
+        <table style="font-size: 0.75em;">
+            <tr>
+                <th>Feature</th>
+                <th>DontDestroy</th>
+                <th>ScriptableObject</th>
+                <th>Static</th>
+            </tr>
+            <tr class="fragment">
+                <td>Inspector editing</td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+            </tr>
+            <tr class="fragment">
+                <td>MonoBehaviour features</td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+            </tr>
+            <tr class="fragment">
+                <td>Scene independent</td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+            </tr>
+            <tr class="fragment">
+                <td>Survives Play Mode</td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+                <td><i class="fa-solid fa-check" style="color: var(--success);"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color: var(--danger);"></i></td>
+            </tr>
+            <tr class="fragment">
+                <td>Multiple instances</td>
+                <td>Singleton only</td>
+                <td>Many assets</td>
+                <td>One global</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>When to Use What</h2>
+        <div class="columns columns-3">
+            <div class="card">
+                <h4>DontDestroyOnLoad</h4>
+                <ul class="small">
+                    <li>XR Rig</li>
+                    <li>Audio Manager</li>
+                    <li>Network Manager</li>
+                </ul>
+                <p class="small muted">Needs to run code every frame</p>
+            </div>
+            <div class="card">
+                <h4>ScriptableObjects</h4>
+                <ul class="small">
+                    <li>Player stats</li>
+                    <li>Comfort settings</li>
+                    <li>Inventory data</li>
+                </ul>
+                <p class="small muted">Pure data, shared across scenes</p>
+            </div>
+            <div class="card">
+                <h4>Static Classes</h4>
+                <ul class="small">
+                    <li>Constants</li>
+                    <li>Utility functions</li>
+                    <li>Quick prototyping</li>
+                </ul>
+                <p class="small muted">Simple, no frills</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 5: ScriptableObjects Deep Dive
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: ScriptableObjects</h2>
+        <p>Data That Lives Outside Scenes</p>
+    </section>
+
+    <section>
+        <h2>What Are ScriptableObjects?</h2>
+        <ul>
+            <li class="fragment"><strong>Data containers</strong> saved as assets in your Project</li>
+            <li class="fragment">Don't attach to GameObjects</li>
+            <li class="fragment">Don't live in any scene</li>
+            <li class="fragment">Editable in the Inspector</li>
+            <li class="fragment"><strong>Persist between scenes</strong> (and between Play sessions in Editor)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Creating a ScriptableObject</h2>
+        <pre><code class="csharp">[CreateAssetMenu(menuName = "VR/Comfort Settings")]
+public class ComfortSettings : ScriptableObject {
+    [Header("Locomotion")]
+    public float snapTurnAngle = 30f;
+    public bool smoothLocomotion = false;
+    public float moveSpeed = 2f;
+    [Header("Comfort")]
+    [Range(0, 1)] public float vignetteIntensity = 0.5f;
+    public bool showFloor = true;
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Using It</h2>
+        <pre><code class="csharp">public class LocomotionController : MonoBehaviour {
+    [SerializeField] private ComfortSettings settings;
+
+    void Update() {
+        if (settings.smoothLocomotion)
+            SmoothMove(settings.moveSpeed);
+        else
+            SnapTurn(settings.snapTurnAngle);
+        vignette.intensity = settings.vignetteIntensity;
+    }
+}</code></pre>
+        <p class="fragment muted">Any script in any scene can reference the same settings asset</p>
+    </section>
+
+    <section>
+        <h2>Why This Is Powerful</h2>
+        <div class="columns columns-2">
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-link" style="color: var(--accent);"></i> Shared Reference</h4>
+                <p class="small">Settings menu and locomotion system read the same data</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-sliders" style="color: var(--accent);"></i> Designer-Friendly</h4>
+                <p class="small">Tweak values in Inspector, no code changes</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-copy" style="color: var(--accent);"></i> Multiple Presets</h4>
+                <p class="small">Create "Comfortable", "Moderate", "Intense" presets</p>
+            </div>
+            <div class="card fragment">
+                <h4><i class="fa-solid fa-shield" style="color: var(--accent);"></i> No Scene Dependency</h4>
+                <p class="small">Data survives scene transitions automatically</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>ScriptableObjects as Events</h2>
+        <p class="small">Problem: How do objects in different scenes communicate without direct references?</p>
+        <div class="columns small-code fragment" style="gap: var(--space-sm);">
+            <div>
+                <p class="small"><strong>GameEvent.cs</strong> (ScriptableObject)</p>
+                <pre><code class="csharp">[CreateAssetMenu(menuName = "Events/Game Event")]
+public class GameEvent : ScriptableObject {
+    private List&lt;GameEventListener&gt; listeners = new();
+    public void Raise() {
+        foreach (var l in listeners)
+            l.OnEventRaised();
+    }
+    public void Register(GameEventListener l)
+        => listeners.Add(l);
+    public void Unregister(GameEventListener l)
+        => listeners.Remove(l);
+}</code></pre>
+            </div>
+            <div>
+                <p class="small"><strong>GameEventListener.cs</strong> (MonoBehaviour)</p>
+                <pre><code class="csharp">public class GameEventListener : MonoBehaviour {
+    public GameEvent gameEvent;
+    public UnityEvent response;
+    void OnEnable()
+        => gameEvent.Register(this);
+    void OnDisable()
+        => gameEvent.Unregister(this);
+    public void OnEventRaised()
+        => response.Invoke();
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>How the Event Pattern Works</h2>
+        <ol>
+            <li class="fragment">Create a <strong>GameEvent asset</strong> in your Project (e.g., "OnLevelComplete")</li>
+            <li class="fragment">Any script can <strong>Raise</strong> the event: <code>onLevelComplete.Raise();</code></li>
+            <li class="fragment"><strong>GameEventListener</strong> components on GameObjects subscribe automatically</li>
+            <li class="fragment">Wire up responses in the <strong>Inspector</strong> via UnityEvent &mdash; no code needed</li>
+        </ol>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>VR example:</strong> An enemy in the Environment scene raises "OnEnemyDefeated" &mdash; the score UI in a different scene responds, with no direct reference between them</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 6: Save & Load
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VI: Saving Data</h2>
+        <p>Beyond Runtime Persistence</p>
+    </section>
+
+    <section>
+        <h2>When Do You Need Save/Load?</h2>
+        <ul>
+            <li class="fragment"><strong>User preferences</strong> &mdash; comfort settings that persist between app launches</li>
+            <li class="fragment"><strong>Progress</strong> &mdash; which levels are unlocked</li>
+            <li class="fragment"><strong>State</strong> &mdash; saving a game to resume later</li>
+        </ul>
+        <div class="box fragment">
+            <p>DontDestroyOnLoad and ScriptableObjects only persist <strong>during a session</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>PlayerPrefs</h2>
+        <p>Simple key-value storage &mdash; good for settings</p>
+        <div class="columns small-code" style="gap: var(--space-sm);">
+            <div>
+                <p class="small"><strong>Save:</strong></p>
+                <pre><code class="csharp">PlayerPrefs.SetFloat("SnapTurnAngle", 45f);
+PlayerPrefs.SetInt("SmoothLocomotion", 1);
+PlayerPrefs.SetString("PlayerName", "Alex");
+PlayerPrefs.Save();</code></pre>
+            </div>
+            <div>
+                <p class="small"><strong>Load:</strong></p>
+                <pre><code class="csharp">float angle = PlayerPrefs.GetFloat("SnapTurnAngle", 30f);
+int smooth  = PlayerPrefs.GetInt("SmoothLocomotion", 0);
+string name = PlayerPrefs.GetString("PlayerName", "Player");</code></pre>
+            </div>
+        </div>
+        <div class="box warning fragment" style="margin-top: var(--space-sm);">
+            <p>Don't store game state here &mdash; just simple preferences</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>JSON Serialization</h2>
+        <div class="columns small-code" style="gap: var(--space-sm);">
+            <div>
+                <p class="small"><strong>Data class:</strong></p>
+                <pre><code class="csharp">[System.Serializable]
+public class SaveData {
+    public int score;
+    public string currentLevel;
+    public float[] playerPosition;
+}</code></pre>
+            </div>
+            <div>
+                <p class="small"><strong>Save &amp; Load:</strong></p>
+                <pre><code class="csharp">// Save
+var data = new SaveData { score = 500 };
+string json = JsonUtility.ToJson(data);
+File.WriteAllText(path, json);
+// Load
+string json = File.ReadAllText(path);
+var save = JsonUtility.FromJson&lt;SaveData&gt;(json);</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Save/Load Summary</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Method</th><th>Best For</th><th>Complexity</th></tr>
+            <tr class="fragment">
+                <td>PlayerPrefs</td>
+                <td>Settings, preferences</td>
+                <td><span class="badge success">Simple</span></td>
+            </tr>
+            <tr class="fragment">
+                <td>JsonUtility</td>
+                <td>Game state, progress</td>
+                <td><span class="badge warning">Moderate</span></td>
+            </tr>
+            <tr class="fragment">
+                <td>Binary / SQLite</td>
+                <td>Large datasets, security</td>
+                <td><span class="badge danger">Advanced</span></td>
+            </tr>
+        </table>
+        <p class="fragment muted" style="margin-top: var(--space-md);">For this course, PlayerPrefs and JSON cover most needs</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 7: Putting It Together
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VII: VR Architecture</h2>
+        <p>Putting It All Together</p>
+    </section>
+
+    <section>
+        <h2>Recommended VR Project Structure</h2>
+        <div class="arch-diagram">
+            <div class="arch-layer persistent fragment">
+                <strong style="color: #f59e0b;">Persistent Core Scene</strong><br>
+                <span class="small">XR Rig &bull; GameManager &bull; AudioManager &bull; EventSystem</span>
+            </div>
+            <div class="arch-connector fragment">&darr; additive load / unload &darr;</div>
+            <div class="arch-layer additive fragment">
+                <strong style="color: #6366f1;">Environment Scenes</strong> (swappable)<br>
+                <span class="small">Lobby &bull; Level 1 &bull; Level 2 &bull; ...</span>
+            </div>
+            <div class="arch-connector fragment">&darr; references &darr;</div>
+            <div class="arch-layer data fragment">
+                <strong style="color: #10b981;">ScriptableObject Assets</strong><br>
+                <span class="small">ComfortSettings &bull; PlayerData &bull; GameEvents</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>How It Fits Together</h2>
+        <ol>
+            <li class="fragment"><strong>App starts</strong> &rarr; Core scene loads (XR Rig, managers)</li>
+            <li class="fragment"><strong>Core scene</strong> additively loads <strong>Lobby</strong></li>
+            <li class="fragment">User picks a level &rarr; <strong>fade out</strong></li>
+            <li class="fragment"><strong>Unload</strong> Lobby async, <strong>load</strong> Level 1 async</li>
+            <li class="fragment"><strong>Fade in</strong> &mdash; XR Rig never moved</li>
+            <li class="fragment">ScriptableObjects hold data throughout</li>
+            <li class="fragment">On quit &rarr; <strong>save</strong> preferences with PlayerPrefs</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>File Organization</h2>
+        <div class="columns small-code" style="gap: var(--space-sm);">
+            <div>
+                <pre><code class="plaintext">Assets/
+├── Scenes/
+│   ├── Core.unity       ← Persistent
+│   ├── Lobby.unity      ← Additive
+│   ├── Level_01.unity   ← Additive
+│   └── Level_02.unity   ← Additive</code></pre>
+            </div>
+            <div>
+                <pre><code class="plaintext">├── Data/
+│   ├── ComfortSettings.asset
+│   ├── PlayerData.asset
+│   └── Events/
+├── Scripts/
+│   ├── Managers/
+│   └── Data/</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Tips for Success</h2>
+        <ul>
+            <li class="fragment"><strong>Always use async loading</strong> in VR &mdash; never freeze the frame</li>
+            <li class="fragment"><strong>Keep your XR Rig in one persistent scene</strong></li>
+            <li class="fragment"><strong>Use ScriptableObjects</strong> for shared data &mdash; not static globals</li>
+            <li class="fragment"><strong>Fade to black</strong> during transitions &mdash; respect user comfort</li>
+            <li class="fragment"><strong>Test on device</strong> &mdash; loading performance differs from Editor</li>
+            <li class="fragment"><strong>Keep scenes focused</strong> &mdash; one responsibility per scene</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     SUMMARY
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Key Takeaways</h2>
+    </section>
+
+    <section>
+        <h2>What We Covered</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Concept</th><th>Key Idea</th></tr>
+            <tr class="fragment"><td>Scenes</td><td>Containers for GameObjects &mdash; use multiple</td></tr>
+            <tr class="fragment"><td>Additive Loading</td><td>Layer scenes; keep XR Rig persistent</td></tr>
+            <tr class="fragment"><td>Async Loading</td><td>Never freeze the frame in VR</td></tr>
+            <tr class="fragment"><td>DontDestroyOnLoad</td><td>Keep managers alive across scenes</td></tr>
+            <tr class="fragment"><td>ScriptableObjects</td><td>Scene-independent data containers</td></tr>
+            <tr class="fragment"><td>PlayerPrefs / JSON</td><td>Save data between sessions</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- ============================================
+     CLOSING
+     ============================================ -->
+<section>
+    <section>
+        <h2>Resources</h2>
+        <div class="columns columns-2">
+            <div class="card">
+                <h4>Unity Docs</h4>
+                <p class="muted small">SceneManager API</p>
+            </div>
+            <div class="card">
+                <h4>Unity Learn</h4>
+                <p class="muted small">Scene Management tutorials</p>
+            </div>
+            <div class="card">
+                <h4>Unite Talk</h4>
+                <p class="muted small">"ScriptableObjects for Fun and Profit"</p>
+            </div>
+            <div class="card">
+                <h4>Recording</h4>
+                <p class="muted small">Posted to Canvas</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-slide">
+        <h2>What Questions Do You Have?</h2>
+        <p style="margin-top: var(--space-lg);">At least 3 questions must be asked before we can end class.</p>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
