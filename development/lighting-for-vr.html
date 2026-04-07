@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighting for VR - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides pre code {
+            max-height: 420px;
+            font-size: 0.75em !important;
+            line-height: 1.4 !important;
+            padding: 0.4em 0.6em !important;
+        }
+        .reveal .slides pre {
+            width: 100%;
+            margin: 0.4em 0;
+            padding: 0.6em !important;
+            line-height: 1.4 !important;
+        }
+        .pipeline-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .pipeline-timeline .stage {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            text-align: center;
+            font-size: 0.8em;
+            min-width: 120px;
+        }
+        .pipeline-timeline .stage.recommended {
+            border-color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+        }
+        .pipeline-timeline .stage.deprecated {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .pipeline-timeline .arrow {
+            color: var(--text-muted);
+            font-size: 1.2em;
+        }
+        .cost-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0.4rem 0;
+        }
+        .cost-bar .label {
+            min-width: 100px;
+            font-weight: 600;
+            text-align: right;
+        }
+        .cost-bar .bar {
+            height: 24px;
+            border-radius: 4px;
+            background: var(--accent);
+            transition: width 0.5s;
+        }
+        .cost-bar .bar.medium { background: #eab308; }
+        .cost-bar .bar.high { background: #ef4444; }
+        .brick-diagram {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            max-width: 400px;
+            margin: 1rem auto;
+        }
+        .brick-diagram .brick {
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: var(--text-muted);
+        }
+        .brick-diagram .brick.dense {
+            background: rgba(0, 212, 170, 0.2);
+            border-color: var(--accent);
+        }
+        .brick-diagram .brick.sparse {
+            background: rgba(0, 212, 170, 0.05);
+        }
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        .workflow-steps .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.8em;
+        }
+        .workflow-steps .step-num {
+            background: var(--accent);
+            color: var(--bg-deep);
+            border-radius: 50%;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .comparison-row .side {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .comparison-row .side.old {
+            border-color: #ef4444;
+        }
+        .comparison-row .side.new {
+            border-color: var(--accent);
+        }
+        .comparison-row .side h4 {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Lighting for VR</h1>
+    <h3>Unity 6 &amp; Adaptive Probe Volumes</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     PART I: WHY LIGHTING IS DIFFERENT IN VR
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Why Lighting Is Different in VR</h2>
+        <p>Constraints That Shape Every Decision</p>
+    </section>
+
+    <section>
+        <h2>The Fundamental Problem</h2>
+        <p>VR renders the scene <strong>twice per frame</strong> &mdash; once for each eye</p>
+        <div class="box warning fragment" style="margin-top: var(--space-md);">
+            <p>Every light, shadow, and post-processing effect costs <strong>double</strong> compared to flat-screen rendering</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Frame Budgets Are Non-Negotiable</h2>
+        <p class="muted">Dropped frames cause motion sickness &mdash; not just annoyance</p>
+        <table style="margin-top: var(--space-md);">
+            <tr><th>Platform</th><th>Target FPS</th><th>Frame Budget</th></tr>
+            <tr><td>Meta Quest 2</td><td>72 Hz</td><td>13.9 ms</td></tr>
+            <tr><td>Meta Quest 3</td><td>72&ndash;90 Hz</td><td>11.1&ndash;13.9 ms</td></tr>
+            <tr><td>PCVR (Index, Vive)</td><td>90 Hz</td><td>11.1 ms</td></tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Frame <em>time</em> is a better measure than frame <em>rate</em> &mdash; it captures consistency</p>
+    </section>
+
+    <section>
+        <h2>Lighting and Presence</h2>
+        <ul>
+            <li class="fragment">Global illumination, ambient occlusion, and shadow quality directly influence how "real" an environment feels</li>
+            <li class="fragment">Flickering shadows or inconsistent illumination between eyes causes discomfort</li>
+            <li class="fragment">Too-dark environments break immersion (common when relying on direct light only)</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>The challenge: achieve <strong>high visual quality</strong> within <strong>extreme performance constraints</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Performance Budgets (Quest)</h2>
+        <div class="columns">
+            <div>
+                <h4 style="color: var(--accent);">Draw Calls</h4>
+                <table style="font-size: 0.8em;">
+                    <tr><th></th><th>Quest 2</th><th>Quest 3</th></tr>
+                    <tr><td>Light</td><td>400&ndash;600</td><td>600+</td></tr>
+                    <tr><td>Medium</td><td>200&ndash;300</td><td>300&ndash;400</td></tr>
+                    <tr><td>Busy</td><td>80&ndash;200</td><td>150&ndash;250</td></tr>
+                </table>
+            </div>
+            <div>
+                <h4 style="color: var(--accent);">Triangles</h4>
+                <table style="font-size: 0.8em;">
+                    <tr><th>Quest 2</th><th>Quest 3</th></tr>
+                    <tr><td>750k&ndash;1M</td><td>1M&ndash;1.5M</td></tr>
+                </table>
+                <p class="muted small" style="margin-top: var(--space-sm);">Every real-time light adds draw calls on top of these budgets</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART II: RENDERING PIPELINE
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Rendering Pipeline</h2>
+        <p>Choosing the Right Foundation in Unity 6</p>
+    </section>
+
+    <section>
+        <h2>Unity 6 Pipeline Strategy</h2>
+        <div class="pipeline-timeline fragment">
+            <div class="stage deprecated">
+                <strong>Built-in RP</strong><br>
+                <span class="small muted">Deprecated in 6.5</span>
+            </div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage">
+                <strong>HDRP</strong><br>
+                <span class="small muted">Maintenance mode</span>
+            </div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage recommended">
+                <strong>URP</strong><br>
+                <span class="small" style="color: var(--accent);">Active development</span>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-lg);">URP is the recommended pipeline for VR/XR, mobile, and most new projects</p>
+    </section>
+
+    <section>
+        <h2>Why Forward Rendering for VR?</h2>
+        <ul>
+            <li class="fragment"><strong>MSAA support</strong> &mdash; hardware anti-aliasing critical for VR clarity</li>
+            <li class="fragment"><strong>Lower memory</strong> &mdash; no G-buffer for both eyes</li>
+            <li class="fragment"><strong>Single-Pass Instanced</strong> &mdash; compatible with forward rendering</li>
+            <li class="fragment"><strong>Mobile-friendly</strong> &mdash; lower bandwidth, works well on Quest GPUs</li>
+        </ul>
+        <div class="box danger fragment" style="margin-top: var(--space-md);">
+            <p>Deferred rendering does <strong>not</strong> support MSAA and has poor single-pass instanced support &mdash; avoid for VR</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Single-Pass Instanced Rendering</h2>
+        <p>The most performant stereo rendering method</p>
+        <div class="comparison-row fragment">
+            <div class="side old">
+                <h4 style="color: #ef4444;">Multi-Pass</h4>
+                <ul class="small">
+                    <li>Renders scene once per eye</li>
+                    <li>CPU culls objects twice</li>
+                    <li>~2x draw calls</li>
+                </ul>
+            </div>
+            <div class="side new">
+                <h4 style="color: var(--accent);">Single-Pass Instanced</h4>
+                <ul class="small">
+                    <li>GPU instancing renders both eyes in parallel</li>
+                    <li>One instanced draw call (count of 2)</li>
+                    <li>~1x draw calls</li>
+                </ul>
+            </div>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">On Quest, this becomes <strong>Multi-View</strong> &mdash; the graphics driver handles eye multiplexing automatically</p>
+    </section>
+
+    <section>
+        <h2>Anti-Aliasing in VR</h2>
+        <table>
+            <tr><th>Method</th><th>VR Suitability</th><th>Notes</th></tr>
+            <tr>
+                <td><strong style="color: var(--accent);">MSAA 4x</strong></td>
+                <td><span class="badge success">Recommended</span></td>
+                <td>Hardware AA, no temporal artifacts</td>
+            </tr>
+            <tr>
+                <td>FXAA</td>
+                <td><span class="badge">Acceptable</span></td>
+                <td>Lightweight supplement to MSAA</td>
+            </tr>
+            <tr>
+                <td>TAA</td>
+                <td><span class="badge danger">Avoid</span></td>
+                <td>Causes blur with constant head movement</td>
+            </tr>
+            <tr>
+                <td>SMAA</td>
+                <td><span class="badge danger">Avoid</span></td>
+                <td>Does not support VR</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Unity 6.3 Improvements</h2>
+        <ul>
+            <li class="fragment"><strong>OpenCL GPU Lightmapper</strong> is now the default baking backend (faster bakes)</li>
+            <li class="fragment"><strong>xAtlas</strong> lightmap packing &mdash; up to 27% memory savings</li>
+            <li class="fragment"><strong>Render Graph Viewer</strong> connects to XR device builds for live profiling</li>
+            <li class="fragment">URP and HDRP now share the same underlying compiler and API</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     PART III: LIGHT TYPES & MODES
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: Light Types &amp; Modes</h2>
+        <p>Understanding Your Tools</p>
+    </section>
+
+    <section>
+        <h2>Light Types in Unity URP</h2>
+        <table>
+            <tr><th>Type</th><th>Behavior</th><th>Real-time</th><th>Baked</th></tr>
+            <tr>
+                <td><strong>Directional</strong></td>
+                <td>Parallel rays (sun)</td>
+                <td><span class="badge success">Yes</span></td>
+                <td><span class="badge success">Yes</span></td>
+            </tr>
+            <tr>
+                <td><strong>Point</strong></td>
+                <td>Emits in all directions</td>
+                <td><span class="badge success">Yes</span></td>
+                <td><span class="badge success">Yes</span></td>
+            </tr>
+            <tr>
+                <td><strong>Spot</strong></td>
+                <td>Cone-shaped emission</td>
+                <td><span class="badge success">Yes</span></td>
+                <td><span class="badge success">Yes</span></td>
+            </tr>
+            <tr>
+                <td><strong>Area</strong></td>
+                <td>Emits from a surface</td>
+                <td><span class="badge warning">Bake only</span></td>
+                <td><span class="badge success">Yes</span></td>
+            </tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Area lights produce soft, realistic shadows but are bake-only in URP</p>
+    </section>
+
+    <section>
+        <h2>Real-time Light Cost in VR</h2>
+        <p class="muted small">Cheapest to most expensive</p>
+        <div style="margin-top: var(--space-md);">
+            <div class="cost-bar fragment">
+                <span class="label">Directional</span>
+                <div class="bar" style="width: 25%;"></div>
+                <span class="small muted">Uniform, no falloff</span>
+            </div>
+            <div class="cost-bar fragment">
+                <span class="label">Spot</span>
+                <div class="bar medium" style="width: 50%;"></div>
+                <span class="small muted">Culls outside cone</span>
+            </div>
+            <div class="cost-bar fragment">
+                <span class="label">Point</span>
+                <div class="bar high" style="width: 90%;"></div>
+                <span class="small muted">All directions; cubemap shadows = 6 faces</span>
+            </div>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-md);">Remember: every cost is doubled in VR (stereo rendering)</p>
+    </section>
+
+    <section>
+        <h2>The Three Light Modes</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4 style="color: var(--accent);">Baked</h4>
+                <p class="small">Pre-calculated, stored in lightmaps</p>
+                <p class="small muted">Zero runtime cost</p>
+                <p class="small muted">Cannot change dynamically</p>
+            </div>
+            <div class="card fragment">
+                <h4 style="color: #eab308;">Mixed</h4>
+                <p class="small">Baked indirect + real-time direct &amp; shadows</p>
+                <p class="small muted">Good balance</p>
+                <p class="small muted">Moderate GPU cost</p>
+            </div>
+            <div class="card fragment">
+                <h4 style="color: #ef4444;">Realtime</h4>
+                <p class="small">Calculated every frame</p>
+                <p class="small muted">Fully dynamic</p>
+                <p class="small muted">Most expensive</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mixed Lighting Sub-Modes</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Mode</th><th>Cost</th><th>Best For</th></tr>
+            <tr>
+                <td><strong>Subtractive</strong></td>
+                <td><span class="badge success">Lowest</span></td>
+                <td>Quest &mdash; one directional with real-time shadows</td>
+            </tr>
+            <tr>
+                <td><strong>Shadowmask</strong></td>
+                <td><span class="badge warning">Medium</span></td>
+                <td>Up to 4 overlapping baked shadows; better quality</td>
+            </tr>
+            <tr>
+                <td><strong>Baked Indirect</strong></td>
+                <td><span class="badge danger">Highest</span></td>
+                <td>Bakes indirect only; all direct lighting is real-time</td>
+            </tr>
+        </table>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Rule of thumb:</strong> Bake everything you can. Use Mixed only for key shadow-casting lights. Use Realtime as a last resort.</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART IV: LIGHT BAKING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Light Baking</h2>
+        <p>Pre-Computing Light for Free Runtime Performance</p>
+    </section>
+
+    <section>
+        <h2>Why Baking Matters More in VR</h2>
+        <ul>
+            <li class="fragment">Baked lighting has <strong>zero runtime cost</strong> &mdash; it's just texture lookups</li>
+            <li class="fragment">With stereo rendering eating the frame budget, "free" lighting is essential</li>
+            <li class="fragment">Baked GI produces soft indirect illumination that would be prohibitively expensive in real-time</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Unity 6 Lightmapper</h2>
+        <ul>
+            <li class="fragment"><strong>Progressive GPU Lightmapper</strong> (OpenCL) is now the default in 6.3</li>
+            <li class="fragment">Enlighten baking backend is <strong>removed</strong> in Unity 6</li>
+            <li class="fragment">CPU lightmapper still available as fallback</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>xAtlas:</strong> New lightmap packing algorithm generates tighter UV layouts with up to <strong>27% memory savings</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Lightmap Settings</h2>
+        <table>
+            <tr><th>Setting</th><th>Development</th><th>Final Build</th></tr>
+            <tr><td>Lightmap Resolution</td><td>5&ndash;10</td><td>20&ndash;80</td></tr>
+            <tr><td>Max Lightmap Size</td><td>4096</td><td>4096</td></tr>
+            <tr><td>Compression</td><td>Normal</td><td>None (if artifacts)</td></tr>
+            <tr><td>Direct Samples</td><td>32</td><td>32+</td></tr>
+            <tr><td>Indirect Samples</td><td>512</td><td>512+</td></tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Use low resolution during iteration, raise it for final bakes</p>
+    </section>
+
+    <section>
+        <h2>Baking Tips for VR</h2>
+        <ul>
+            <li class="fragment"><strong>Mark static geometry:</strong> Contribute GI + Batching Static on all non-moving objects</li>
+            <li class="fragment"><strong>Scale In Lightmap:</strong> Reduce texel density on objects players won't inspect closely</li>
+            <li class="fragment"><strong>Small objects:</strong> Disable Contribute GI; light them with probes instead</li>
+            <li class="fragment"><strong>Visualize:</strong> Scene View &rarr; Draw Mode &rarr; Baked Lightmap to check texel distribution</li>
+            <li class="fragment"><strong>Always test on device</strong> &mdash; editor preview can be misleading</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     PART V: ADAPTIVE PROBE VOLUMES
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: Adaptive Probe Volumes</h2>
+        <p>The New Standard for Dynamic Object Lighting</p>
+    </section>
+
+    <section>
+        <h2>The Problem with Legacy Light Probes</h2>
+        <div class="comparison-row">
+            <div class="side old">
+                <h4 style="color: #ef4444;">Light Probe Groups (Legacy)</h4>
+                <ul class="small">
+                    <li>Manually place every probe by hand</li>
+                    <li>Time-consuming, error-prone</li>
+                    <li><strong>Per-object</strong> sampling: one blended value per GameObject</li>
+                    <li>Visible seams between adjacent objects</li>
+                </ul>
+            </div>
+            <div class="side new">
+                <h4 style="color: var(--accent);">Adaptive Probe Volumes (New)</h4>
+                <ul class="small">
+                    <li>Automatic placement based on geometry</li>
+                    <li>Minimal manual setup</li>
+                    <li><strong>Per-pixel</strong> sampling: 8 nearest probes per pixel</li>
+                    <li>Smooth transitions, no seams</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>How APV Works: Bricks</h2>
+        <p>Unity fills the scene with a 3D grid of <strong>bricks</strong></p>
+        <ul>
+            <li class="fragment">Each brick contains <strong>64 light probes</strong> in a 4&times;4&times;4 arrangement</li>
+            <li class="fragment">Brick size <strong>adapts to geometry density</strong>:</li>
+        </ul>
+        <table class="fragment" style="margin-top: var(--space-md); font-size: 0.85em;">
+            <tr><th>Brick Spacing</th><th>Where Used</th></tr>
+            <tr><td style="color: var(--accent); font-weight: 600;">1m</td><td>Dense geometry (furniture, doorways)</td></tr>
+            <tr><td style="color: var(--accent); font-weight: 600;">3m</td><td>Moderate detail areas</td></tr>
+            <tr><td style="color: var(--accent); font-weight: 600;">9m</td><td>Open interior spaces</td></tr>
+            <tr><td style="color: var(--accent); font-weight: 600;">27m</td><td>Large outdoor areas</td></tr>
+        </table>
+        <p class="fragment muted small">Dense where it matters, sparse where it doesn't &mdash; automatic LOD for lighting</p>
+    </section>
+
+    <section>
+        <h2>Per-Pixel vs Per-Object</h2>
+        <div class="box" style="margin-bottom: var(--space-md);">
+            <p><strong>Legacy:</strong> Each GameObject samples a <em>single</em> blended probe value &rarr; flat lighting, visible seams between objects</p>
+        </div>
+        <div class="box success">
+            <p><strong>APV:</strong> Each <em>pixel</em> samples the <strong>8 closest probes</strong> around it &rarr; smooth gradients across surfaces, quality approaching lightmaps</p>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">This is the single biggest quality improvement for dynamic objects in VR</p>
+    </section>
+
+    <section>
+        <h2>APV Key Features</h2>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li class="fragment"><strong>Lighting Scenarios</strong><br><span class="small muted">Store day/night states, blend at runtime</span></li>
+                    <li class="fragment"><strong>Sky Occlusion</strong><br><span class="small muted">Dynamic time-of-day via occlusion data</span></li>
+                    <li class="fragment"><strong>Streaming</strong><br><span class="small muted">Load/unload probe data for large worlds</span></li>
+                </ul>
+            </div>
+            <div>
+                <ul>
+                    <li class="fragment"><strong>Baking Sets</strong><br><span class="small muted">Organize multi-scene baking</span></li>
+                    <li class="fragment"><strong>Probe Adjustment Volumes</strong><br><span class="small muted">Fix artifacts &mdash; dark spots, light leaks</span></li>
+                    <li class="fragment"><strong>Automatic Density</strong><br><span class="small muted">No manual probe placement needed</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Setting Up APV</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span><strong>Enable APV:</strong> Project Settings &rarr; Quality &rarr; URP Asset &rarr; Lighting &rarr; Light Probe System &rarr; <em>Adaptive Probe Volumes</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span><strong>Add Volume:</strong> GameObject &rarr; Light &rarr; Adaptive Probe Volume &rarr; set Mode to <em>Global</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span><strong>Configure Lights:</strong> Set light Mode to <em>Mixed</em> or <em>Baked</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span><strong>Configure Objects:</strong> Enable <em>Contribute GI</em>; set Receive GI to <em>Light Probes</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span><strong>Bake:</strong> Window &rarr; Rendering &rarr; Lighting &rarr; enable Baked GI &rarr; Generate Lighting</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">6</span>
+                <span><strong>Fine-tune:</strong> Add Probe Adjustment Volume components to fix dark spots or light leaks</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>APV Limitations</h2>
+        <ul>
+            <li class="fragment">Cannot manually adjust individual probe positions</li>
+            <li class="fragment">Cannot convert existing Light Probe Groups to APV</li>
+            <li class="fragment">Requires baking &mdash; not purely real-time</li>
+            <li class="fragment">May appear vertex-lit on very low-poly geometry &mdash; test on device</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VI: REFLECTION PROBES & RENDERING LAYERS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VI: Reflection Probes &amp; Rendering Layers</h2>
+        <p>Environment Reflections and Lighting Control</p>
+    </section>
+
+    <section>
+        <h2>Reflection Probes</h2>
+        <ul>
+            <li class="fragment">Capture a <strong>cubemap</strong> of surroundings for reflective/metallic materials</li>
+            <li class="fragment">Each probe has a <strong>box-shaped influence volume</strong></li>
+            <li class="fragment">Maximum <strong>2 probes</strong> affect any pixel (blended by distance)</li>
+            <li class="fragment">Pixels outside all volumes fall back to the <strong>skybox</strong></li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Prefer baked probes</strong> for VR &mdash; real-time probes re-render the scene into a cubemap, which is very expensive</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Rendering Layers (Light Layers)</h2>
+        <p>Control <strong>which lights affect which objects</strong></p>
+        <div class="workflow-steps fragment">
+            <div class="step">
+                <span class="step-num">1</span>
+                <span><strong>Enable:</strong> URP Asset &rarr; Lighting &rarr; <em>Use Rendering Layers</em></span>
+            </div>
+            <div class="step">
+                <span class="step-num">2</span>
+                <span><strong>Name layers:</strong> Project Settings &rarr; Tags and Layers &rarr; Rendering Layers</span>
+            </div>
+            <div class="step">
+                <span class="step-num">3</span>
+                <span><strong>Assign to lights:</strong> Light component &rarr; General &rarr; Light Layer</span>
+            </div>
+            <div class="step">
+                <span class="step-num">4</span>
+                <span><strong>Assign to objects:</strong> Mesh Renderer &rarr; Additional Settings &rarr; Rendering Layer Mask</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Rendering Layers &mdash; VR Use Cases</h2>
+        <ul>
+            <li class="fragment"><strong>Separate character lighting</strong> from environment lighting</li>
+            <li class="fragment"><strong>Dramatic lighting</strong> that doesn't affect UI elements</li>
+            <li class="fragment"><strong>Custom shadow layers</strong> &mdash; objects cast shadows from lights that don't illuminate them</li>
+        </ul>
+        <p class="fragment muted small" style="margin-top: var(--space-md);">Performance tip: keep to a few layers &mdash; cost increases at 9, 17, 25+ layers</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VII: POST-PROCESSING IN VR
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VII: Post-Processing in VR</h2>
+        <p>What to Use, What to Avoid</p>
+    </section>
+
+    <section>
+        <h2>The Volume System</h2>
+        <ul>
+            <li class="fragment">Post-processing uses the <strong>Volume</strong> component (Global or Local)</li>
+            <li class="fragment"><strong>Global Volume:</strong> affects entire scene</li>
+            <li class="fragment"><strong>Local Volume:</strong> affects only within its collider bounds</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Local volumes are great for rooms with different lighting moods</p>
+    </section>
+
+    <section>
+        <h2>Post-Processing for VR</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Effect</th><th>VR?</th><th>Notes</th></tr>
+            <tr>
+                <td>Tonemapping</td>
+                <td><span class="badge success">Use</span></td>
+                <td>Essential for consistent HDR &rarr; LDR mapping</td>
+            </tr>
+            <tr>
+                <td>Color Adjustments</td>
+                <td><span class="badge success">Use</span></td>
+                <td>Exposure, contrast, saturation</td>
+            </tr>
+            <tr>
+                <td>Vignette</td>
+                <td><span class="badge">Careful</span></td>
+                <td>Can help with comfort tunneling</td>
+            </tr>
+            <tr>
+                <td>Bloom</td>
+                <td><span class="badge warning">Sparingly</span></td>
+                <td>Can cause discomfort; expensive on Quest</td>
+            </tr>
+            <tr>
+                <td>SSAO</td>
+                <td><span class="badge danger">Avoid</span></td>
+                <td>Breaks at screen edges; bake AO instead</td>
+            </tr>
+            <tr>
+                <td>SSR</td>
+                <td><span class="badge danger">Avoid</span></td>
+                <td>Reflections vanish when source leaves screen</td>
+            </tr>
+            <tr>
+                <td>Depth of Field</td>
+                <td><span class="badge danger">Avoid</span></td>
+                <td>Conflicts with natural eye focus in VR</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Why Screen-Space Effects Fail in VR</h2>
+        <ul>
+            <li class="fragment"><strong>No data beyond the viewport edge</strong> &mdash; effects flicker as you turn your head</li>
+            <li class="fragment">Effects render <strong>per-eye</strong>, doubling cost</li>
+            <li class="fragment">SSAO/SSR artifacts are amplified because VR fills your peripheral vision</li>
+        </ul>
+        <div class="box success fragment" style="margin-top: var(--space-md);">
+            <p><strong>Alternative:</strong> Bake ambient occlusion into lightmaps and use Reflection Probes instead of SSR</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VIII: QUEST OPTIMIZATION
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VIII: Quest Optimization</h2>
+        <p>Lighting for Standalone VR</p>
+    </section>
+
+    <section>
+        <h2>Quest Lighting Rules</h2>
+        <ul>
+            <li class="fragment"><strong>Baked lighting is mandatory</strong> &mdash; not optional</li>
+            <li class="fragment">Maximum <strong>1 real-time directional light</strong> (if any)</li>
+            <li class="fragment"><strong>Disable soft shadows</strong> &mdash; not worth the cost</li>
+            <li class="fragment">Point lights with real-time shadows are extremely expensive (6 cubemap faces)</li>
+            <li class="fragment">Use <strong>Subtractive</strong> mixed lighting mode for best Quest performance</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>BakedLit vs Lit Materials</h2>
+        <div class="comparison-row">
+            <div class="side new">
+                <h4 style="color: var(--accent);">BakedLit (URP)</h4>
+                <ul class="small">
+                    <li>Only responds to baked lighting</li>
+                    <li>Cheaper shader &mdash; fewer calculations</li>
+                    <li>Best for static environment objects</li>
+                </ul>
+            </div>
+            <div class="side">
+                <h4>Lit (URP)</h4>
+                <ul class="small">
+                    <li>Responds to real-time + baked lighting</li>
+                    <li>More expensive shader</li>
+                    <li>Needed for objects affected by dynamic lights</li>
+                </ul>
+            </div>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Use BakedLit for maximum performance on purely baked objects</p>
+    </section>
+
+    <section>
+        <h2>"Fake It" Techniques</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4 style="color: var(--accent);">Blob Shadows</h4>
+                <p class="small">Textured quad under the player</p>
+                <p class="small muted">Zero runtime cost; looks convincing</p>
+            </div>
+            <div class="card fragment">
+                <h4 style="color: var(--accent);">Emissive Materials</h4>
+                <p class="small">Self-illuminating surfaces for "glowing" objects</p>
+                <p class="small muted">No light component needed</p>
+            </div>
+            <div class="card fragment">
+                <h4 style="color: var(--accent);">Light Cookies</h4>
+                <p class="small">Projected texture patterns on lights</p>
+                <p class="small muted">Window light, gobos, patterns</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART IX: PUTTING IT ALL TOGETHER
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IX: Putting It All Together</h2>
+        <p>A Practical VR Lighting Workflow</p>
+    </section>
+
+    <section>
+        <h2>VR Lighting Workflow</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span><strong>Pipeline:</strong> URP, Forward rendering, Single-Pass Instanced (or Multi-View on Quest)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span><strong>Set all lights to Baked</strong> initially &mdash; optimize first, add dynamics later</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span><strong>Mark static geometry:</strong> Contribute GI + Batching Static on all non-moving objects</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span><strong>Enable APV:</strong> Add a Global Adaptive Probe Volume for dynamic object lighting</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span><strong>Bake at low quality</strong> (resolution 5&ndash;10), test on device, iterate</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>VR Lighting Workflow (cont.)</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">6</span>
+                <span><strong>Add dynamics sparingly:</strong> At most one Mixed directional for player shadows</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">7</span>
+                <span><strong>Use fake techniques</strong> for dynamic effects: blob shadows, emissives, light cookies</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">8</span>
+                <span><strong>Raise lightmap quality</strong> for final build (resolution 20&ndash;80)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">9</span>
+                <span><strong>Profile on device:</strong> Unity Profiler + Render Graph Viewer (new in 6.3)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">10</span>
+                <span><strong>Fix artifacts:</strong> Probe Adjustment Volumes, lightmap visualization, shadow tuning</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common Mistakes &amp; Fixes</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Problem</th><th>Cause</th><th>Fix</th></tr>
+            <tr>
+                <td>Too-dark scenes</td>
+                <td>No indirect lighting</td>
+                <td>Increase Indirect Intensity; use ambient/environment light</td>
+            </tr>
+            <tr>
+                <td>Flickering shadows</td>
+                <td>Low shadow map resolution</td>
+                <td>Reduce Max Shadow Distance; increase resolution</td>
+            </tr>
+            <tr>
+                <td>Z-fighting shimmer</td>
+                <td>Coplanar geometry</td>
+                <td>Offset surfaces slightly; increase depth precision</td>
+            </tr>
+            <tr>
+                <td>Specular aliasing</td>
+                <td>Sharp highlights + head movement</td>
+                <td>Reduce smoothness on detailed meshes; use MSAA</td>
+            </tr>
+            <tr>
+                <td>APV dark spots</td>
+                <td>Probes inside geometry</td>
+                <td>Add Probe Adjustment Volume to invalidate probes</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>VR Lighting Checklist</h2>
+        <ul>
+            <li class="fragment"><span class="badge success">1</span> URP + Forward rendering + MSAA 4x</li>
+            <li class="fragment"><span class="badge success">2</span> Single-Pass Instanced (desktop) / Multi-View (Quest)</li>
+            <li class="fragment"><span class="badge success">3</span> Bake as much lighting as possible</li>
+            <li class="fragment"><span class="badge success">4</span> Use APV instead of manual Light Probe Groups</li>
+            <li class="fragment"><span class="badge success">5</span> Max 1 real-time directional for shadows</li>
+            <li class="fragment"><span class="badge success">6</span> Disable SSAO, SSR, TAA &mdash; prefer baked AO + reflection probes</li>
+            <li class="fragment"><span class="badge success">7</span> Use Rendering Layers to limit light&ndash;object interactions</li>
+            <li class="fragment"><span class="badge success">8</span> Profile on device with Render Graph Viewer</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     CLOSING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
