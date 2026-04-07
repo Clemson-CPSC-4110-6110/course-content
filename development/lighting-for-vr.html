@@ -241,11 +241,72 @@
 
     <section>
         <h2>What Happens When Light Hits a Surface?</h2>
-        <ul>
-            <li class="fragment"><strong>Diffuse reflection</strong> &mdash; light scatters equally in all directions; the surface looks the same from any angle (e.g., matte paint, chalk)</li>
-            <li class="fragment"><strong>Specular reflection</strong> &mdash; light bounces in a preferred direction; creates highlights that shift as you move (e.g., metal, wet surfaces)</li>
-            <li class="fragment"><strong>Ambient</strong> &mdash; a constant term approximating all the indirect light we can't afford to simulate</li>
-        </ul>
+        <div class="columns" style="align-items: start;">
+            <div>
+                <ul>
+                    <li class="fragment"><strong>Diffuse reflection</strong> &mdash; light scatters equally in all directions (e.g., matte paint, chalk)</li>
+                    <li class="fragment"><strong>Specular reflection</strong> &mdash; light bounces in a preferred direction; highlights shift as you move (e.g., metal, wet surfaces)</li>
+                    <li class="fragment"><strong>Ambient</strong> &mdash; a constant term approximating indirect light</li>
+                </ul>
+            </div>
+            <div class="fragment">
+                <svg viewBox="0 0 360 320" style="width: 100%; max-width: 360px;" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Diffuse -->
+                    <text x="90" y="18" fill="#00d4aa" font-size="14" font-weight="600" text-anchor="middle" font-family="Outfit, sans-serif">Diffuse</text>
+                    <!-- Surface -->
+                    <line x1="10" y1="140" x2="170" y2="140" stroke="#6a6a7a" stroke-width="2"/>
+                    <!-- Incoming ray -->
+                    <line x1="40" y1="30" x2="90" y2="100" stroke="#eab308" stroke-width="2"/>
+                    <polygon points="88,95 95,104 84,102" fill="#eab308"/>
+                    <!-- Scatter rays -->
+                    <line x1="90" y1="100" x2="50" y2="40" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="75" y2="35" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="100" y2="30" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="125" y2="38" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="140" y2="55" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="30" y2="60" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="90" y1="100" x2="145" y2="80" stroke="#00d4aa" stroke-width="1.5" opacity="0.6"/>
+                    <!-- Arc hint -->
+                    <text x="90" y="130" fill="#a0a0b0" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">scatters in all directions</text>
+
+                    <!-- Specular -->
+                    <text x="270" y="18" fill="#00d4aa" font-size="14" font-weight="600" text-anchor="middle" font-family="Outfit, sans-serif">Specular</text>
+                    <!-- Surface -->
+                    <line x1="190" y1="140" x2="350" y2="140" stroke="#6a6a7a" stroke-width="2"/>
+                    <!-- Incoming ray -->
+                    <line x1="220" y1="30" x2="270" y2="100" stroke="#eab308" stroke-width="2"/>
+                    <polygon points="268,95 275,104 264,102" fill="#eab308"/>
+                    <!-- Main reflection -->
+                    <line x1="270" y1="100" x2="320" y2="30" stroke="#00d4aa" stroke-width="2.5"/>
+                    <polygon points="318,35 325,25 315,30" fill="#00d4aa"/>
+                    <!-- Weak scatter -->
+                    <line x1="270" y1="100" x2="305" y2="45" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
+                    <line x1="270" y1="100" x2="335" y2="50" stroke="#00d4aa" stroke-width="1" opacity="0.2"/>
+                    <line x1="270" y1="100" x2="290" y2="38" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
+                    <text x="270" y="130" fill="#a0a0b0" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">concentrated reflection</text>
+
+                    <!-- Combined -->
+                    <text x="180" y="180" fill="#a0a0b0" font-size="13" text-anchor="middle" font-family="Outfit, sans-serif">Most real materials have both components</text>
+                    <!-- Combined surface -->
+                    <line x1="70" y1="280" x2="290" y2="280" stroke="#6a6a7a" stroke-width="2"/>
+                    <!-- Incoming -->
+                    <line x1="110" y1="190" x2="180" y2="245" stroke="#eab308" stroke-width="2"/>
+                    <polygon points="178,240 185,249 174,247" fill="#eab308"/>
+                    <!-- Diffuse scatter (dimmer) -->
+                    <line x1="180" y1="245" x2="130" y2="195" stroke="#00d4aa" stroke-width="1" opacity="0.35"/>
+                    <line x1="180" y1="245" x2="155" y2="190" stroke="#00d4aa" stroke-width="1" opacity="0.35"/>
+                    <line x1="180" y1="245" x2="185" y2="185" stroke="#00d4aa" stroke-width="1" opacity="0.35"/>
+                    <line x1="180" y1="245" x2="210" y2="192" stroke="#00d4aa" stroke-width="1" opacity="0.35"/>
+                    <line x1="180" y1="245" x2="235" y2="205" stroke="#00d4aa" stroke-width="1" opacity="0.35"/>
+                    <!-- Specular (brighter) -->
+                    <line x1="180" y1="245" x2="250" y2="190" stroke="#00ffcc" stroke-width="2.5"/>
+                    <polygon points="248,194 255,185 245,191" fill="#00ffcc"/>
+                    <text x="140" y="268" fill="#00d4aa" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif" opacity="0.7">diffuse</text>
+                    <text x="248" y="210" fill="#00ffcc" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">specular</text>
+                    <text x="100" y="248" fill="#eab308" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">incoming</text>
+                </svg>
+            </div>
+        </div>
     </section>
 
     <section>
@@ -275,14 +336,70 @@
 
     <section>
         <h2>Blinn-Phong: The Vectors</h2>
-        <ul>
-            <li class="fragment"><strong>N</strong> &mdash; surface normal (which way the surface faces)</li>
-            <li class="fragment"><strong>L</strong> &mdash; direction from the surface toward the light</li>
-            <li class="fragment"><strong>V</strong> &mdash; direction from the surface toward the viewer (camera/eye)</li>
-            <li class="fragment"><strong>H</strong> &mdash; halfway vector between L and V</li>
-        </ul>
-        <div class="box fragment" style="margin-top: var(--space-md);">
-            <p>The <strong>dot product</strong> N &middot; L measures how directly the surface faces the light. When N &middot; L = 1, the surface is fully lit. When N &middot; L &le; 0, the surface faces away and receives no direct light.</p>
+        <div class="columns" style="align-items: start;">
+            <div>
+                <svg viewBox="0 0 400 340" style="width: 100%; max-width: 400px;" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Surface -->
+                    <line x1="40" y1="260" x2="360" y2="260" stroke="#6a6a7a" stroke-width="2"/>
+                    <text x="200" y="285" fill="#6a6a7a" font-size="12" text-anchor="middle" font-family="Outfit, sans-serif">surface</text>
+                    <!-- Surface point -->
+                    <circle cx="200" cy="260" r="4" fill="#f0f0f5"/>
+
+                    <!-- N - Normal (straight up) -->
+                    <line x1="200" y1="260" x2="200" y2="100" stroke="#00d4aa" stroke-width="2.5"/>
+                    <polygon points="200,100 194,115 206,115" fill="#00d4aa"/>
+                    <text x="212" y="95" fill="#00d4aa" font-size="16" font-weight="700" font-family="Outfit, sans-serif">N</text>
+
+                    <!-- L - Light direction (upper left) -->
+                    <line x1="200" y1="260" x2="100" y2="120" stroke="#eab308" stroke-width="2.5"/>
+                    <polygon points="100,120 115,120 108,134" fill="#eab308"/>
+                    <text x="82" y="115" fill="#eab308" font-size="16" font-weight="700" font-family="Outfit, sans-serif">L</text>
+                    <!-- Light source icon -->
+                    <circle cx="85" cy="100" r="12" fill="none" stroke="#eab308" stroke-width="1.5" opacity="0.5"/>
+                    <circle cx="85" cy="100" r="4" fill="#eab308" opacity="0.5"/>
+
+                    <!-- V - View direction (upper right) -->
+                    <line x1="200" y1="260" x2="320" y2="135" stroke="#3b82f6" stroke-width="2.5"/>
+                    <polygon points="320,135 310,133 313,148" fill="#3b82f6"/>
+                    <text x="330" y="130" fill="#3b82f6" font-size="16" font-weight="700" font-family="Outfit, sans-serif">V</text>
+                    <!-- Eye icon -->
+                    <ellipse cx="338" cy="115" rx="12" ry="7" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+                    <circle cx="338" cy="115" r="3" fill="#3b82f6" opacity="0.5"/>
+
+                    <!-- H - Halfway vector (between L and V) -->
+                    <line x1="200" y1="260" x2="218" y2="108" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+                    <polygon points="218,108 210,120 224,118" fill="#ef4444"/>
+                    <text x="232" y="105" fill="#ef4444" font-size="16" font-weight="700" font-family="Outfit, sans-serif">H</text>
+
+                    <!-- Angle arc between N and L -->
+                    <path d="M 200,220 A 40,40 0 0,0 174,228" fill="none" stroke="#a0a0b0" stroke-width="1.5"/>
+                    <text x="170" y="218" fill="#a0a0b0" font-size="11" font-family="Outfit, sans-serif">&theta;</text>
+
+                    <!-- Legend -->
+                    <text x="40" y="320" fill="#a0a0b0" font-size="11" font-family="Outfit, sans-serif">
+                        <tspan fill="#eab308">L</tspan> = to light &nbsp;
+                        <tspan fill="#3b82f6">V</tspan> = to viewer &nbsp;
+                        <tspan fill="#00d4aa">N</tspan> = normal &nbsp;
+                        <tspan fill="#ef4444">H</tspan> = halfway(L,V)
+                    </text>
+                </svg>
+            </div>
+            <div>
+                <ul>
+                    <li class="fragment"><strong style="color: #00d4aa;">N</strong> &mdash; surface normal</li>
+                    <li class="fragment"><strong style="color: #eab308;">L</strong> &mdash; direction toward the light</li>
+                    <li class="fragment"><strong style="color: #3b82f6;">V</strong> &mdash; direction toward the viewer</li>
+                    <li class="fragment"><strong style="color: #ef4444;">H</strong> &mdash; halfway between L and V</li>
+                </ul>
+                <div class="box fragment" style="margin-top: var(--space-md);">
+                    <p class="small"><strong>N &middot; L</strong> (dot product) measures how directly the surface faces the light</p>
+                    <p class="small muted" style="margin-top: 0.3rem;">= 1 when fully facing the light<br>
+                    &le; 0 when facing away (no light)</p>
+                </div>
+                <div class="box fragment" style="margin-top: var(--space-sm);">
+                    <p class="small"><strong>N &middot; H</strong> measures how close the surface is to the ideal specular reflection angle</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -306,7 +423,53 @@
                 <td>Higher n = tighter, sharper specular highlight</td>
             </tr>
         </table>
-        <p class="fragment muted small" style="margin-top: var(--space-sm);">Low n &asymp; rough plastic. High n &asymp; polished metal.</p>
+        <!-- Shininess exponent visualization -->
+        <div class="fragment" style="margin-top: var(--space-md);">
+            <svg viewBox="0 0 700 120" style="width: 100%; max-width: 700px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <!-- n = 5 -->
+                <text x="88" y="15" fill="#a0a0b0" font-size="12" text-anchor="middle" font-family="Outfit, sans-serif">n = 5</text>
+                <defs>
+                    <radialGradient id="spec5" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#00ffcc" stop-opacity="1"/>
+                        <stop offset="60%" stop-color="#00d4aa" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="spec25" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#00ffcc" stop-opacity="1"/>
+                        <stop offset="35%" stop-color="#00d4aa" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="spec100" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#00ffcc" stop-opacity="1"/>
+                        <stop offset="15%" stop-color="#00d4aa" stop-opacity="0.5"/>
+                        <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="spec500" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                        <stop offset="6%" stop-color="#00ffcc" stop-opacity="0.8"/>
+                        <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="88" cy="65" r="42" fill="url(#spec5)"/>
+                <text x="88" y="108" fill="#6a6a7a" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">rough</text>
+
+                <!-- n = 25 -->
+                <text x="263" y="15" fill="#a0a0b0" font-size="12" text-anchor="middle" font-family="Outfit, sans-serif">n = 25</text>
+                <circle cx="263" cy="65" r="42" fill="url(#spec25)"/>
+
+                <!-- n = 100 -->
+                <text x="438" y="15" fill="#a0a0b0" font-size="12" text-anchor="middle" font-family="Outfit, sans-serif">n = 100</text>
+                <circle cx="438" cy="65" r="42" fill="url(#spec100)"/>
+
+                <!-- n = 500 -->
+                <text x="613" y="15" fill="#a0a0b0" font-size="12" text-anchor="middle" font-family="Outfit, sans-serif">n = 500</text>
+                <circle cx="613" cy="65" r="42" fill="url(#spec500)"/>
+                <text x="613" y="108" fill="#6a6a7a" font-size="11" text-anchor="middle" font-family="Outfit, sans-serif">polished</text>
+
+                <!-- Arrow -->
+                <line x1="140" y1="65" x2="560" y2="65" stroke="#6a6a7a" stroke-width="0" opacity="0"/>
+            </svg>
+        </div>
     </section>
 
     <section>
