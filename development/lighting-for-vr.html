@@ -937,7 +937,7 @@
     </section>
 
     <section>
-        <h2>Post-Processing for VR</h2>
+        <h2>Post-Processing: Safe for VR</h2>
         <table style="font-size: 0.85em;">
             <tr><th>Effect</th><th>VR?</th><th>Notes</th></tr>
             <tr>
@@ -960,15 +960,23 @@
                 <td><span class="badge warning">&sim; Sparingly</span></td>
                 <td>Can cause discomfort; expensive on Quest</td>
             </tr>
+        </table>
+        <p class="muted small" style="margin-top: var(--space-md);">All of these are configured via <strong>Volume</strong> components (Global or Local)</p>
+    </section>
+
+    <section>
+        <h2>Post-Processing: Avoid in VR</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Effect</th><th>VR?</th><th>Why</th></tr>
             <tr>
                 <td>SSAO*</td>
                 <td><span class="badge danger">&times; Avoid</span></td>
-                <td>Breaks at screen edges; bake AO instead</td>
+                <td>Breaks at screen edges; bake AO into lightmaps instead</td>
             </tr>
             <tr>
                 <td>SSR</td>
                 <td><span class="badge danger">&times; Avoid</span></td>
-                <td>Reflections vanish when source leaves screen</td>
+                <td>Reflections vanish when source leaves screen; use Reflection Probes</td>
             </tr>
             <tr>
                 <td>Depth of Field</td>
@@ -976,8 +984,7 @@
                 <td>Conflicts with natural eye focus in VR</td>
             </tr>
         </table>
-        <p class="muted small" style="margin-top: var(--space-sm);">*SSAO is technically a <strong>Renderer Feature</strong> in URP, not a Volume override &mdash; you configure it on the URP Renderer asset, not in a Volume profile</p>
-        </table>
+        <p class="muted small" style="margin-top: var(--space-md);">*SSAO is a <strong>Renderer Feature</strong> in URP, not a Volume override &mdash; configure it on the URP Renderer asset, not in a Volume profile</p>
     </section>
 
     <section>
