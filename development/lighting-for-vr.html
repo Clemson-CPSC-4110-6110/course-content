@@ -211,71 +211,180 @@
         </div>
     </section>
 
+</section>
+
+<!-- ============================================
+     PART II: HOW LIGHTING WORKS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: How Lighting Works</h2>
+        <p>The Math Behind What You See</p>
+    </section>
+
     <section>
-        <h2>Performance Budgets (Quest)</h2>
-        <div class="columns">
-            <div>
-                <h4 style="color: var(--accent);">Draw Calls</h4>
-                <table style="font-size: 0.8em;">
-                    <tr><th></th><th>Quest 2</th><th>Quest 3</th></tr>
-                    <tr><td>Light</td><td>400&ndash;600</td><td>600+</td></tr>
-                    <tr><td>Medium</td><td>200&ndash;300</td><td>300&ndash;400</td></tr>
-                    <tr><td>Busy</td><td>80&ndash;200</td><td>150&ndash;250</td></tr>
-                </table>
+        <h2>Direct vs Indirect Light</h2>
+        <div class="comparison-row">
+            <div class="side new">
+                <h4 style="color: var(--accent);">Direct Light</h4>
+                <p class="small">Light that travels <strong>straight from a source</strong> to a surface</p>
+                <p class="small muted">The sun hitting a table, a lamp illuminating a wall</p>
             </div>
-            <div>
-                <h4 style="color: var(--accent);">Triangles</h4>
-                <table style="font-size: 0.8em;">
-                    <tr><th>Quest 2</th><th>Quest 3</th></tr>
-                    <tr><td>750k&ndash;1M</td><td>1M&ndash;1.5M</td></tr>
-                </table>
-                <p class="muted small" style="margin-top: var(--space-sm);">Every real-time light adds draw calls on top of these budgets</p>
+            <div class="side">
+                <h4>Indirect Light (Global Illumination)</h4>
+                <p class="small">Light that has <strong>bounced off other surfaces</strong> before reaching a point</p>
+                <p class="small muted">Why the underside of a table isn't pitch black, why a red wall tints nearby objects</p>
             </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Direct light is cheap to compute. Indirect light is expensive &mdash; this tension drives most lighting decisions in VR.</p>
+    </section>
+
+    <section>
+        <h2>What Happens When Light Hits a Surface?</h2>
+        <ul>
+            <li class="fragment"><strong>Diffuse reflection</strong> &mdash; light scatters equally in all directions; the surface looks the same from any angle (e.g., matte paint, chalk)</li>
+            <li class="fragment"><strong>Specular reflection</strong> &mdash; light bounces in a preferred direction; creates highlights that shift as you move (e.g., metal, wet surfaces)</li>
+            <li class="fragment"><strong>Ambient</strong> &mdash; a constant term approximating all the indirect light we can't afford to simulate</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Blinn-Phong Model</h2>
+        <p class="muted small">The classic lighting equation &mdash; simple, fast, and still the intuition behind modern shading</p>
+        <div class="box" style="margin-top: var(--space-md); text-align: center; font-size: 1.1em;">
+            <p><strong>Color = Ambient + Diffuse + Specular</strong></p>
+        </div>
+        <div class="columns columns-3 fragment" style="margin-top: var(--space-md);">
+            <div class="card">
+                <h4 style="color: var(--accent);">Ambient</h4>
+                <p class="small">k<sub>a</sub> &middot; I<sub>a</sub></p>
+                <p class="small muted">Constant base light; prevents total darkness</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">Diffuse</h4>
+                <p class="small">k<sub>d</sub> &middot; I &middot; max(N &middot; L, 0)</p>
+                <p class="small muted">Brighter when surface faces the light</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">Specular</h4>
+                <p class="small">k<sub>s</sub> &middot; I &middot; max(N &middot; H, 0)<sup>n</sup></p>
+                <p class="small muted">Sharp highlight near reflection direction</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Blinn-Phong: The Vectors</h2>
+        <ul>
+            <li class="fragment"><strong>N</strong> &mdash; surface normal (which way the surface faces)</li>
+            <li class="fragment"><strong>L</strong> &mdash; direction from the surface toward the light</li>
+            <li class="fragment"><strong>V</strong> &mdash; direction from the surface toward the viewer (camera/eye)</li>
+            <li class="fragment"><strong>H</strong> &mdash; halfway vector between L and V</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>The <strong>dot product</strong> N &middot; L measures how directly the surface faces the light. When N &middot; L = 1, the surface is fully lit. When N &middot; L &le; 0, the surface faces away and receives no direct light.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Blinn-Phong: The Parameters</h2>
+        <table>
+            <tr><th>Parameter</th><th>Controls</th><th>Effect</th></tr>
+            <tr>
+                <td>k<sub>a</sub>, k<sub>d</sub>, k<sub>s</sub></td>
+                <td>Material reflectance</td>
+                <td>How much ambient/diffuse/specular light the surface reflects</td>
+            </tr>
+            <tr>
+                <td>I, I<sub>a</sub></td>
+                <td>Light intensity</td>
+                <td>How bright the light source is</td>
+            </tr>
+            <tr>
+                <td>n</td>
+                <td>Shininess exponent</td>
+                <td>Higher n = tighter, sharper specular highlight</td>
+            </tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Low n &asymp; rough plastic. High n &asymp; polished metal.</p>
+    </section>
+
+    <section>
+        <h2>From Blinn-Phong to PBR</h2>
+        <p>Blinn-Phong is intuitive but not physically accurate &mdash; artists had to manually tune k<sub>d</sub>, k<sub>s</sub>, and n per material</p>
+        <p class="fragment" style="margin-top: var(--space-md);"><strong>Physically Based Rendering (PBR)</strong> replaces those with properties grounded in physics:</p>
+        <div class="columns fragment" style="margin-top: var(--space-md);">
+            <div class="card">
+                <h4 style="color: var(--accent);">Albedo</h4>
+                <p class="small">Base color of the surface (replaces diffuse color)</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">Metallic</h4>
+                <p class="small">Is it a metal (1) or non-metal (0)?</p>
+            </div>
+        </div>
+        <div class="columns fragment" style="margin-top: var(--space-sm);">
+            <div class="card">
+                <h4 style="color: var(--accent);">Smoothness</h4>
+                <p class="small">How rough or polished the surface is (replaces shininess exponent)</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">Normal Map</h4>
+                <p class="small">Per-pixel surface detail without extra geometry</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Why PBR Matters</h2>
+        <ul>
+            <li class="fragment">Materials look correct under <strong>any lighting condition</strong> &mdash; no per-scene tweaking</li>
+            <li class="fragment"><strong>Energy conservation:</strong> a surface never reflects more light than it receives</li>
+            <li class="fragment">Unity's URP Lit shader uses PBR by default &mdash; this is what you'll work with</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>PBR is still computing the same basic idea &mdash; ambient + diffuse + specular &mdash; but with more physically accurate math under the hood</p>
         </div>
     </section>
 </section>
 
 <!-- ============================================
-     PART II: RENDERING PIPELINE
+     PART III: RENDERING PIPELINE
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part II: Rendering Pipeline</h2>
+        <h2>Part III: Rendering Pipeline</h2>
         <p>Choosing the Right Foundation in Unity 6</p>
     </section>
 
     <section>
-        <h2>Unity 6 Pipeline Strategy</h2>
-        <div class="pipeline-timeline fragment">
-            <div class="stage deprecated">
-                <strong>Built-in RP</strong><br>
-                <span class="small muted">Deprecated in 6.5</span>
+        <h2>Forward vs Deferred Rendering</h2>
+        <p class="muted small">Two fundamentally different approaches to calculating lighting</p>
+        <div class="comparison-row fragment">
+            <div class="side new">
+                <h4 style="color: var(--accent);">Forward Rendering</h4>
+                <p class="small">Each object is drawn and <strong>fully lit in one pass</strong></p>
+                <p class="small muted">Simple, predictable cost per object</p>
+                <p class="small muted">Cost grows with: number of lights &times; objects affected</p>
             </div>
-            <span class="arrow">&rarr;</span>
-            <div class="stage">
-                <strong>HDRP</strong><br>
-                <span class="small muted">Maintenance mode</span>
-            </div>
-            <span class="arrow">&rarr;</span>
-            <div class="stage recommended">
-                <strong>URP</strong><br>
-                <span class="small" style="color: var(--accent);">Active development</span>
+            <div class="side">
+                <h4>Deferred Rendering</h4>
+                <p class="small">Objects are drawn to intermediate buffers (G-buffer) first, then <strong>lighting is applied as a separate screen-space pass</strong></p>
+                <p class="small muted">Handles many lights efficiently</p>
+                <p class="small muted">Higher memory cost (stores position, normals, color per pixel)</p>
             </div>
         </div>
-        <p class="fragment muted" style="margin-top: var(--space-lg);">URP is the recommended pipeline for VR/XR, mobile, and most new projects</p>
     </section>
 
     <section>
         <h2>Why Forward Rendering for VR?</h2>
         <ul>
-            <li class="fragment"><strong>MSAA support</strong> &mdash; hardware anti-aliasing critical for VR clarity</li>
-            <li class="fragment"><strong>Lower memory</strong> &mdash; no G-buffer for both eyes</li>
-            <li class="fragment"><strong>Single-Pass Instanced</strong> &mdash; compatible with forward rendering</li>
+            <li class="fragment"><strong>MSAA support</strong> &mdash; hardware anti-aliasing critical for VR clarity; deferred doesn't support it</li>
+            <li class="fragment"><strong>Lower memory</strong> &mdash; no G-buffer to store for both eyes</li>
+            <li class="fragment"><strong>Single-Pass Instanced</strong> &mdash; the fastest stereo method works with forward rendering</li>
             <li class="fragment"><strong>Mobile-friendly</strong> &mdash; lower bandwidth, works well on Quest GPUs</li>
         </ul>
-        <div class="box danger fragment" style="margin-top: var(--space-md);">
-            <p>Deferred rendering does <strong>not</strong> support MSAA and has poor single-pass instanced support &mdash; avoid for VR</p>
-        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Unity's <strong>URP</strong> (Universal Render Pipeline) uses forward rendering by default and is the recommended pipeline for VR in Unity 6</p>
     </section>
 
     <section>
@@ -341,11 +450,11 @@
 </section>
 
 <!-- ============================================
-     PART III: LIGHT TYPES & MODES
+     PART IV: LIGHT TYPES & MODES
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part III: Light Types &amp; Modes</h2>
+        <h2>Part IV: Light Types &amp; Modes</h2>
         <p>Understanding Your Tools</p>
     </section>
 
@@ -455,11 +564,11 @@
 </section>
 
 <!-- ============================================
-     PART IV: LIGHT BAKING
+     PART V: LIGHT BAKING
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part IV: Light Baking</h2>
+        <h2>Part V: Light Baking</h2>
         <p>Pre-Computing Light for Free Runtime Performance</p>
     </section>
 
@@ -510,11 +619,11 @@
 </section>
 
 <!-- ============================================
-     PART V: ADAPTIVE PROBE VOLUMES
+     PART VI: ADAPTIVE PROBE VOLUMES
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part V: Adaptive Probe Volumes</h2>
+        <h2>Part VI: Adaptive Probe Volumes</h2>
         <p>The New Standard for Dynamic Object Lighting</p>
     </section>
 
@@ -632,11 +741,11 @@
 </section>
 
 <!-- ============================================
-     PART VI: REFLECTION PROBES & RENDERING LAYERS
+     PART VII: REFLECTION PROBES & RENDERING LAYERS
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part VI: Reflection Probes &amp; Rendering Layers</h2>
+        <h2>Part VII: Reflection Probes &amp; Rendering Layers</h2>
         <p>Environment Reflections and Lighting Control</p>
     </section>
 
@@ -688,11 +797,11 @@
 </section>
 
 <!-- ============================================
-     PART VII: POST-PROCESSING IN VR
+     PART VIII: POST-PROCESSING IN VR
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part VII: Post-Processing in VR</h2>
+        <h2>Part VIII: Post-Processing in VR</h2>
         <p>What to Use, What to Avoid</p>
     </section>
 
@@ -762,11 +871,11 @@
 </section>
 
 <!-- ============================================
-     PART VIII: QUEST OPTIMIZATION
+     PART IX: QUEST OPTIMIZATION
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part VIII: Quest Optimization</h2>
+        <h2>Part IX: Quest Optimization</h2>
         <p>Lighting for Standalone VR</p>
     </section>
 
@@ -827,11 +936,11 @@
 </section>
 
 <!-- ============================================
-     PART IX: PUTTING IT ALL TOGETHER
+     PART X: PUTTING IT ALL TOGETHER
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part IX: Putting It All Together</h2>
+        <h2>Part X: Putting It All Together</h2>
         <p>A Practical VR Lighting Workflow</p>
     </section>
 
