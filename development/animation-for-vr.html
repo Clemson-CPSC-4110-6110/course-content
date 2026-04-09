@@ -654,21 +654,26 @@ public class SimpleLocomotion : MonoBehaviour
     </section>
 
     <section>
-        <h2>Driving the 2D Blend Tree</h2>
+        <h2>Driving the 2D Blend Tree: Setup</h2>
         <pre><code class="language-csharp">using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator), typeof(CharacterController))]
 public class DirectionalLocomotion : MonoBehaviour
 {
+    [Header("Input")]
     public InputActionReference moveAction;
     public InputActionReference sprintAction;
-    public float walkSpeed = 3f, runSpeed = 6f;
+
+    [Header("Movement")]
+    public float walkSpeed = 3f;
+    public float runSpeed = 6f;
+    public float turnSpeed = 120f; // degrees per second
 
     private Animator animator;
     private CharacterController controller;
-    private static readonly int VxHash = Animator.StringToHash("VelocityX");
-    private static readonly int VzHash = Animator.StringToHash("VelocityZ");
+    private static readonly int VelocityXHash = Animator.StringToHash("VelocityX");
+    private static readonly int VelocityZHash = Animator.StringToHash("VelocityZ");
 
     void Awake()
     {
@@ -682,36 +687,74 @@ public class DirectionalLocomotion : MonoBehaviour
     </section>
 
     <section>
-        <h2>Driving the 2D Blend Tree (cont.)</h2>
+        <h2>Update(): Animation Parameters</h2>
         <pre><code class="language-csharp">void Update()
 {
     Vector2 input = moveAction.action.ReadValue&lt;Vector2&gt;();
     bool sprinting = sprintAction.action.ReadValue&lt;float&gt;() &gt; 0.5f;
 
-    // Scale input: walk = 0–0.5, run = 0.5–1.0
-    float scale = sprinting ? 1.0f : 0.5f;
-    float targetX = input.x * scale;
-    float targetZ = input.y * scale;
+    // --- Animation ---
+    // Scale input: 0–0.5 = walk range, 0.5–1.0 = run range
+    float speedMultiplier = sprinting ? 1.0f : 0.5f;
+    float targetX = input.x * speedMultiplier;
+    float targetZ = input.y * speedMultiplier;
 
-    // Smooth the animator parameters (avoids jerky blending)
-    animator.SetFloat(VxHash, targetX, 0.1f, Time.deltaTime);
-    animator.SetFloat(VzHash, targetZ, 0.1f, Time.deltaTime);
+    animator.SetFloat(VelocityXHash, targetX, 0.1f, Time.deltaTime);
+    animator.SetFloat(VelocityZHash, targetZ, 0.1f, Time.deltaTime);
 
-    // Move the character
+    // ... movement and rotation next
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Update(): Movement &amp; Rotation</h2>
+        <pre><code class="language-csharp">    // --- Movement: relative to character's facing ---
     float currentSpeed = sprinting ? runSpeed : walkSpeed;
-    Vector3 move = new Vector3(input.x, 0, input.y) * currentSpeed;
-    move.y = controller.isGrounded ? -0.5f : Physics.gravity.y;
+    Vector3 move = (transform.forward * input.y +
+                    transform.right   * input.x) * currentSpeed;
+
+    // Gravity
+    if (controller.isGrounded) move.y = -0.5f;
+    else                       move.y += Physics.gravity.y * Time.deltaTime;
+
     controller.Move(move * Time.deltaTime);
+
+    // --- Rotation: Q/E to turn (strafing with A/D) ---
+    float turnInput = 0f;
+    if (Keyboard.current != null)
+    {
+        if (Keyboard.current.qKey.isPressed) turnInput = -1f;
+        if (Keyboard.current.eKey.isPressed) turnInput = 1f;
+    }
+    transform.Rotate(0f, turnInput * turnSpeed * Time.deltaTime, 0f);
 }</code></pre>
         <p class="fragment muted small">Wire <code>Player/Move</code> and <code>Player/Sprint</code> into the Inspector fields</p>
     </section>
 
     <section>
+        <h2>Why Strafing (Not Auto-Facing)?</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Auto-Face Movement</h4>
+                <p class="small">Third-person action game style</p>
+                <p class="small muted">Character always turns to face where it's going &mdash; the 2D blend tree mostly stays near the forward axis</p>
+            </div>
+            <div class="side new">
+                <h4>Independent Facing <span class="badge success">This demo</span></h4>
+                <p class="small">Shooter / tactical style</p>
+                <p class="small muted">Character can <strong>strafe sideways and backwards</strong> while keeping its facing &mdash; the whole 2D blend tree gets exercised</p>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">With independent facing, <strong>all 9 clips</strong> in your blend tree actually get used</p>
+    </section>
+
+    <section>
         <h2>How the Mapping Works</h2>
         <ul>
-            <li class="fragment"><strong>Sprint off:</strong> WASD produces values in the &plusmn;0.5 range &rarr; <em>walk zone</em></li>
-            <li class="fragment"><strong>Sprint on</strong> (Shift held): values reach &plusmn;1.0 &rarr; <em>run zone</em></li>
-            <li class="fragment">Blend Tree interpolates between walk and run clips based on distance from center</li>
+            <li class="fragment"><strong>WASD</strong> &rarr; move relative to facing (W forward, A/D strafe, S back)</li>
+            <li class="fragment"><strong>Q / E</strong> &rarr; turn left / right</li>
+            <li class="fragment"><strong>Sprint off:</strong> input values land in &plusmn;0.5 &rarr; <em>walk zone</em></li>
+            <li class="fragment"><strong>Sprint on</strong> (Shift): values reach &plusmn;1.0 &rarr; <em>run zone</em></li>
             <li class="fragment">Diagonal input (W+D) blends forward and right-strafe motions <strong>automatically</strong></li>
         </ul>
     </section>
