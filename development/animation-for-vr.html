@@ -22,26 +22,44 @@
     <link rel="stylesheet" href="../assets/theme.css">
 
     <style>
-        .reveal .slides pre code {
-            max-height: 600px;
-            font-size: 13px !important;
-            line-height: 1.3 !important;
-            padding: 0.5em 0.75em !important;
-            overflow: hidden !important;
-            white-space: pre !important;
-        }
         .reveal .slides pre {
             width: 100%;
-            margin: 0.3em 0;
+            margin: 0.4em 0;
             padding: 0 !important;
+            box-shadow: none;
+            max-height: 500px;
+            overflow: auto !important;
+            border-radius: 6px;
         }
-        /* Tighter headings and spacing on script-heavy slides */
+        .reveal .slides pre code {
+            font-size: 0.7em !important;
+            line-height: 1.35 !important;
+            padding: 0.6em 0.8em !important;
+            max-height: none !important;
+            overflow: visible !important;
+            white-space: pre !important;
+            display: block;
+        }
+        /* Custom scrollbar for code blocks */
+        .reveal .slides pre::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 170, 0.4);
+            border-radius: 5px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 170, 0.7);
+        }
+        /* Tighter headings on script-heavy slides */
         .reveal .slides section.code-slide h2 {
-            font-size: 1.25em;
-            margin-bottom: 0.25em;
-        }
-        .reveal .slides section.code-slide p {
-            margin: 0.25em 0;
+            font-size: 1.3em;
+            margin-bottom: 0.3em;
         }
         .workflow-steps {
             display: flex;
