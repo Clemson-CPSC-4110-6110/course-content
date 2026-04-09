@@ -463,29 +463,94 @@
     </section>
 
     <section>
+        <h2>Interlude: The Input System</h2>
+        <p>Before we script the Animator, we need to read input. We'll use Unity's <strong>new Input System</strong> (<code>UnityEngine.InputSystem</code>) &mdash; not the legacy <code>UnityEngine.Input</code> class.</p>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li>Default for all new XR projects</li>
+            <li>Supports keyboard, gamepad, XR controllers, touch with a unified API</li>
+            <li>Rebindable at runtime</li>
+            <li>All scripts in this deck assume you're using it</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Creating an Input Actions Asset</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Window &rarr; Package Manager &rarr; install <strong>Input System</strong> (restart if prompted)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Right-click Project &rarr; Create &rarr; <strong>Input Actions</strong> &rarr; name it <code>PlayerInputActions</code></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Double-click to open the editor; add an Action Map named <code>Player</code></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Add actions: <code>Move</code> (Vector2, WASD composite), <code>Sprint</code> (Button, Left Shift), <code>Jump</code> (Button, Space), <code>Wave</code> (Button, G)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span>Click <strong>Save Asset</strong> &mdash; the asset won't update until you do!</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Diagonal Normalization Gotcha</h2>
+        <div class="box warning">
+            <p>WASD composites default to <strong>Digital</strong> mode &mdash; W+D produces <code>(1, 1)</code>, magnitude ~1.41</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-md);">Diagonal movement is ~41% faster than cardinal movement!</p>
+        <div class="box success fragment" style="margin-top: var(--space-md);">
+            <p><strong>Fix:</strong> Select the WASD composite &rarr; change Mode from <code>Digital</code> to <code>DigitalNormalized</code></p>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-md);">All scripts in this deck assume normalized input</p>
+    </section>
+
+    <section>
         <h2>Driving From Script</h2>
         <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator))]
 public class SimpleLocomotion : MonoBehaviour
 {
+    public InputActionReference moveAction;
+
     private Animator animator;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
 
-    void Awake() => animator = GetComponent&lt;Animator&gt;();
+    void Awake() =&gt; animator = GetComponent&lt;Animator&gt;();
+    void OnEnable() =&gt; moveAction.action.Enable();
+    void OnDisable() =&gt; moveAction.action.Disable();
 
     void Update()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-        Vector3 inputDir = new Vector3(h, 0, v);
+        Vector2 input = moveAction.action.ReadValue&lt;Vector2&gt;();
+        Vector3 inputDir = new Vector3(input.x, 0, input.y);
         float speed = inputDir.magnitude * 6f;
 
         // Damped update: smooths over 0.1s
         animator.SetFloat(SpeedHash, speed, 0.1f, Time.deltaTime);
     }
 }</code></pre>
-        <p class="fragment muted small">Use <code>Animator.StringToHash()</code> at init to avoid string comparison overhead every frame</p>
+        <p class="fragment muted small">Wire up: expand <code>PlayerInputActions</code> in Project, drag <code>Player/Move</code> into the Move Action field</p>
+    </section>
+
+    <section>
+        <h2>Key Input System Patterns</h2>
+        <ul>
+            <li class="fragment"><code>InputActionReference</code> field &mdash; assigned in the Inspector</li>
+            <li class="fragment"><code>OnEnable() / OnDisable()</code> &mdash; always <strong>enable and disable actions</strong> with the MonoBehaviour</li>
+            <li class="fragment"><code>.action.ReadValue&lt;Vector2&gt;()</code> &mdash; continuous values (movement axes)</li>
+            <li class="fragment"><code>.action.ReadValue&lt;float&gt;() &gt; 0.5f</code> &mdash; button held state</li>
+            <li class="fragment"><code>.action.WasPressedThisFrame()</code> &mdash; one-shot button presses (jump, wave)</li>
+            <li class="fragment"><code>.action.WasReleasedThisFrame()</code> &mdash; button release events</li>
+        </ul>
     </section>
 </section>
 
@@ -537,16 +602,140 @@ public class SimpleLocomotion : MonoBehaviour
     </section>
 
     <section>
-        <h2>2D Freeform Directional Example</h2>
-        <p class="muted small">Using <code>VelocityX</code> and <code>VelocityZ</code> parameters</p>
-        <table style="font-size: 0.8em; margin-top: var(--space-md);">
-            <tr><th>Motion</th><th>X</th><th>Z</th></tr>
-            <tr><td>Idle</td><td>0</td><td>0</td></tr>
-            <tr><td>Walk Forward</td><td>0</td><td>1.5</td></tr>
-            <tr><td>Walk Back</td><td>0</td><td>-1.5</td></tr>
-            <tr><td>Walk Left / Right</td><td>&plusmn;1.5</td><td>0</td></tr>
-            <tr><td>Run Forward</td><td>0</td><td>5</td></tr>
-            <tr><td>Run Left / Right</td><td>&plusmn;5</td><td>0</td></tr>
+        <h2>Demo: 2D Directional Blend Tree Setup</h2>
+        <p class="muted small">A full 8-directional locomotion system with walk and run speeds</p>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Add two Float parameters: <code>VelocityX</code> (lateral) and <code>VelocityZ</code> (forward/back)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Create Blend Tree state &rarr; set Blend Type to <strong>2D Freeform Directional</strong></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Set Parameter X = <code>VelocityX</code>, Parameter Y = <code>VelocityZ</code></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Add motion fields with X/Y positions (see next slide)</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>2D Blend Tree Motion Positions</h2>
+        <table style="font-size: 0.75em;">
+            <tr><th>Motion</th><th>Pos X</th><th>Pos Y</th><th>Notes</th></tr>
+            <tr><td>Idle</td><td>0</td><td>0</td><td>Center &mdash; required for Freeform Directional</td></tr>
+            <tr><td>Walking</td><td>0</td><td>0.5</td><td>Forward walk</td></tr>
+            <tr><td>Running</td><td>0</td><td>1.0</td><td>Forward run</td></tr>
+            <tr><td>Walking Backwards</td><td>0</td><td>-0.5</td><td>Backward walk</td></tr>
+            <tr><td>Running Backward</td><td>0</td><td>-1.0</td><td>Backward run</td></tr>
+            <tr><td>Left Strafe Walking</td><td>-0.5</td><td>0</td><td>Strafe walk left</td></tr>
+            <tr><td>Left Strafe</td><td>-1.0</td><td>0</td><td>Strafe run left</td></tr>
+            <tr><td>Right Strafe Walking</td><td>0.5</td><td>0</td><td>Strafe walk right</td></tr>
+            <tr><td>Right Strafe</td><td>1.0</td><td>0</td><td>Strafe run right</td></tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Inner ring (&plusmn;0.5) = walk speed, outer ring (&plusmn;1.0) = run speed</p>
+    </section>
+
+    <section>
+        <h2>Inspector Preview</h2>
+        <ul>
+            <li class="fragment">The Inspector shows a <strong>2D preview diagram</strong> with blue dots at each motion's position</li>
+            <li class="fragment">A red diamond represents the <strong>current parameter values</strong></li>
+            <li class="fragment">Dragging it shows which motions are blending and at what weights</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Tip:</strong> Start with just Idle, Walk Forward, and Run Forward. The Blend Tree handles missing directions gracefully &mdash; add strafe and backward motions later.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Driving the 2D Blend Tree</h2>
+        <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.InputSystem;
+
+[RequireComponent(typeof(Animator), typeof(CharacterController))]
+public class DirectionalLocomotion : MonoBehaviour
+{
+    public InputActionReference moveAction;
+    public InputActionReference sprintAction;
+    public float walkSpeed = 3f, runSpeed = 6f;
+
+    private Animator animator;
+    private CharacterController controller;
+    private static readonly int VxHash = Animator.StringToHash("VelocityX");
+    private static readonly int VzHash = Animator.StringToHash("VelocityZ");
+
+    void Awake()
+    {
+        animator = GetComponent&lt;Animator&gt;();
+        controller = GetComponent&lt;CharacterController&gt;();
+    }
+
+    void OnEnable()  { moveAction.action.Enable(); sprintAction.action.Enable(); }
+    void OnDisable() { moveAction.action.Disable(); sprintAction.action.Disable(); }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Driving the 2D Blend Tree (cont.)</h2>
+        <pre><code class="language-csharp">void Update()
+{
+    Vector2 input = moveAction.action.ReadValue&lt;Vector2&gt;();
+    bool sprinting = sprintAction.action.ReadValue&lt;float&gt;() &gt; 0.5f;
+
+    // Scale input: walk = 0–0.5, run = 0.5–1.0
+    float scale = sprinting ? 1.0f : 0.5f;
+    float targetX = input.x * scale;
+    float targetZ = input.y * scale;
+
+    // Smooth the animator parameters (avoids jerky blending)
+    animator.SetFloat(VxHash, targetX, 0.1f, Time.deltaTime);
+    animator.SetFloat(VzHash, targetZ, 0.1f, Time.deltaTime);
+
+    // Move the character
+    float currentSpeed = sprinting ? runSpeed : walkSpeed;
+    Vector3 move = new Vector3(input.x, 0, input.y) * currentSpeed;
+    move.y = controller.isGrounded ? -0.5f : Physics.gravity.y;
+    controller.Move(move * Time.deltaTime);
+}</code></pre>
+        <p class="fragment muted small">Wire <code>Player/Move</code> and <code>Player/Sprint</code> into the Inspector fields</p>
+    </section>
+
+    <section>
+        <h2>How the Mapping Works</h2>
+        <ul>
+            <li class="fragment"><strong>Sprint off:</strong> WASD produces values in the &plusmn;0.5 range &rarr; <em>walk zone</em></li>
+            <li class="fragment"><strong>Sprint on</strong> (Shift held): values reach &plusmn;1.0 &rarr; <em>run zone</em></li>
+            <li class="fragment">Blend Tree interpolates between walk and run clips based on distance from center</li>
+            <li class="fragment">Diagonal input (W+D) blends forward and right-strafe motions <strong>automatically</strong></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>1D vs 2D: When to Use Each</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Scenario</th><th>Use</th></tr>
+            <tr>
+                <td>Character faces movement direction (third-person action)</td>
+                <td><strong>1D</strong> on <code>Speed</code> &mdash; direction handled by rotating the model</td>
+            </tr>
+            <tr>
+                <td>Character can strafe independently of facing (shooter, VR NPC)</td>
+                <td><strong>2D</strong> on <code>VelocityX</code> / <code>VelocityZ</code></td>
+            </tr>
+            <tr>
+                <td>Forward-only movement at varying speeds</td>
+                <td><strong>1D</strong> on <code>Speed</code></td>
+            </tr>
+            <tr>
+                <td>Directional attack stances or aim blending</td>
+                <td><strong>2D</strong> on aim direction parameters</td>
+            </tr>
         </table>
     </section>
 
@@ -663,9 +852,36 @@ public class SimpleLocomotion : MonoBehaviour
             </div>
             <div class="step fragment">
                 <span class="step-num">5</span>
-                <span>Drive with <code>animator.SetBool("IsWaving", true)</code></span>
+                <span>Drive with <code>animator.SetBool("IsWaving", true)</code> on input</span>
             </div>
         </div>
+    </section>
+
+    <section>
+        <h2>Wave Controller Script</h2>
+        <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.InputSystem;
+
+[RequireComponent(typeof(Animator))]
+public class WaveController : MonoBehaviour
+{
+    public InputActionReference waveAction;
+    private Animator animator;
+    private static readonly int IsWavingHash = Animator.StringToHash("IsWaving");
+
+    void Awake()    =&gt; animator = GetComponent&lt;Animator&gt;();
+    void OnEnable() =&gt; waveAction.action.Enable();
+    void OnDisable()=&gt; waveAction.action.Disable();
+
+    void Update()
+    {
+        if (waveAction.action.WasPressedThisFrame())
+            animator.SetBool(IsWavingHash, true);
+        if (waveAction.action.WasReleasedThisFrame())
+            animator.SetBool(IsWavingHash, false);
+    }
+}</code></pre>
+        <p class="fragment muted small">Wire <code>Player/Wave</code> into the Wave Action field. Note: <code>WasPressedThisFrame</code> fires once on the transition from released &rarr; held.</p>
     </section>
 </section>
 
