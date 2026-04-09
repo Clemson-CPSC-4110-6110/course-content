@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation for VR - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides pre code {
+            max-height: 420px;
+            font-size: 0.7em !important;
+            line-height: 1.35 !important;
+            padding: 0.4em 0.6em !important;
+        }
+        .reveal .slides pre {
+            width: 100%;
+            margin: 0.4em 0;
+            padding: 0.6em !important;
+            line-height: 1.35 !important;
+        }
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        .workflow-steps .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.8em;
+        }
+        .workflow-steps .step-num {
+            background: var(--accent);
+            color: var(--bg-deep);
+            border-radius: 50%;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .comparison-row .side {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .comparison-row .side.old {
+            border-color: #ef4444;
+        }
+        .comparison-row .side.new {
+            border-color: var(--accent);
+        }
+        .comparison-row .side h4 {
+            margin-bottom: 0.5rem;
+        }
+        .state-node {
+            display: inline-block;
+            background: var(--bg-elevated);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+        .state-node.entry { border-color: #22c55e; }
+        .state-node.any { border-color: #0ea5e9; }
+        .state-node.default { border-color: #eab308; }
+        .state-node.exit { border-color: #ef4444; }
+        .state-graph {
+            text-align: center;
+            margin: var(--space-md) 0;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Animation for VR</h1>
+    <h3>Unity's Mecanim System &amp; VR Avatars</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     OVERVIEW
+     ============================================ -->
+<section>
+    <section>
+        <h2>What We'll Cover</h2>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li class="fragment">Sourcing assets (Mixamo)</li>
+                    <li class="fragment">Animation Clips</li>
+                    <li class="fragment">Animator Controllers</li>
+                    <li class="fragment">Blend Trees</li>
+                    <li class="fragment">Layers &amp; Avatar Masks</li>
+                </ul>
+            </div>
+            <div>
+                <ul>
+                    <li class="fragment">Root Motion vs Script-Driven</li>
+                    <li class="fragment">Animation Events &amp; scripting</li>
+                    <li class="fragment">Inverse Kinematics (IK)</li>
+                    <li class="fragment">VR-specific considerations</li>
+                    <li class="fragment">Timeline &amp; Playable API</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Core Insight for VR</h2>
+        <div class="box" style="margin-top: var(--space-md);">
+            <p>Animation in VR splits into <strong>two fundamentally different problems</strong>:</p>
+        </div>
+        <div class="comparison-row fragment" style="margin-top: var(--space-md);">
+            <div class="side new">
+                <h4>NPC Animation</h4>
+                <p class="small">Works like any flatscreen game &mdash; Animator Controllers, Blend Trees, state machines, root motion</p>
+            </div>
+            <div class="side new">
+                <h4>Player Avatar Animation</h4>
+                <p class="small">Driven by hardware tracking via IK &mdash; no traditional state machine, no root motion</p>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Keep this split in mind as we learn each tool &mdash; it determines where each technique applies</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART I: SOURCING ASSETS (MIXAMO)
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part I: Sourcing Animation Assets</h2>
+        <p>Getting Characters and Motion Data Fast</p>
+    </section>
+
+    <section>
+        <h2>Adobe Mixamo</h2>
+        <ul>
+            <li class="fragment"><strong>Free</strong> with any Adobe ID &mdash; no Creative Cloud subscription needed</li>
+            <li class="fragment"><strong>100+</strong> pre-rigged humanoid characters</li>
+            <li class="fragment"><strong>2,400+</strong> motion-captured animations</li>
+            <li class="fragment">Royalty-free for personal, commercial, and educational use</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">The fastest path from zero to an animated character in Unity</p>
+    </section>
+
+    <section>
+        <h2>Recommended Starter Assets</h2>
+        <div class="columns">
+            <div>
+                <h4 style="color: var(--accent);">Characters</h4>
+                <ul class="small">
+                    <li><strong>Y Bot</strong> &mdash; blue mannequin (standard test character)</li>
+                    <li><strong>X Bot</strong> &mdash; orange mannequin</li>
+                    <li><strong>AJ</strong>, <strong>Michelle</strong> &mdash; realistic humanoids</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: var(--accent);">Animations</h4>
+                <ul class="small">
+                    <li>Idle / Neutral Idle</li>
+                    <li>Walking, Running</li>
+                    <li>Waving, Jump</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mixamo Download Settings</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Setting</th><th>Value</th><th>Why</th></tr>
+            <tr>
+                <td><strong>Format</strong></td>
+                <td>FBX for Unity</td>
+                <td>Optimized for Unity's importer</td>
+            </tr>
+            <tr>
+                <td><strong>Skin (first download)</strong></td>
+                <td>With Skin</td>
+                <td>Mesh + skeleton + animation</td>
+            </tr>
+            <tr>
+                <td><strong>Skin (later animations)</strong></td>
+                <td>Without Skin</td>
+                <td>Skeleton + animation only (smaller)</td>
+            </tr>
+            <tr>
+                <td><strong>Frames per Second</strong></td>
+                <td>30</td>
+                <td>Unity interpolates at runtime</td>
+            </tr>
+            <tr>
+                <td><strong>Keyframe Reduction</strong></td>
+                <td>None</td>
+                <td>Preserves full quality</td>
+            </tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">For walk/run cycles: enable <strong>In Place</strong> if using script-driven movement; leave off for root motion</p>
+    </section>
+
+    <section>
+        <h2>Importing into Unity</h2>
+        <p class="muted small">Critical rig configuration step for every character:</p>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Drag <code>.fbx</code> files into your Project window</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Select the character FBX &rarr; Inspector &rarr; <strong>Rig</strong> tab</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Change <strong>Animation Type</strong> to <em>Humanoid</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Set <strong>Avatar Definition</strong> to <em>Create From This Model</em>, click Apply</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span>Click <strong>Configure</strong> to verify the bone map is green (all required bones mapped)</span>
+            </div>
+        </div>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Why Humanoid? It enables Mecanim <strong>retargeting</strong> &mdash; any Humanoid animation can play on any Humanoid character</p>
+    </section>
+
+    <section>
+        <h2>Other Free Animation Sources</h2>
+        <ul>
+            <li class="fragment"><strong>Human Basic Motions FREE</strong> by Kevin Iglesias &mdash; walk, run, sprint, jump, idle</li>
+            <li class="fragment"><strong>Starter Assets &mdash; ThirdPerson | URP</strong> by Unity &mdash; complete reference controller</li>
+            <li class="fragment"><strong>Robot Kyle | URP</strong> &mdash; free Unity robot character</li>
+            <li class="fragment"><strong>CMU Motion Capture Database</strong> &mdash; 2,500+ academic mocap recordings</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     PART II: ANIMATION CLIPS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part II: Animation Clips</h2>
+        <p>The Atomic Unit of Motion</p>
+    </section>
+
+    <section>
+        <h2>What Is an Animation Clip?</h2>
+        <div class="box">
+            <p>A single piece of recorded motion &mdash; one jump, one walk cycle, one wave</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-md);">Clips are the <strong>fundamental building blocks</strong> that the Animator Controller orchestrates</p>
+    </section>
+
+    <section>
+        <h2>What's Inside a Clip?</h2>
+        <ul>
+            <li class="fragment"><strong>Animation Curves</strong> &mdash; each records how one property changes over time (position, rotation, blend shape weight, material color, ...)</li>
+            <li class="fragment"><strong>Keyframes</strong> &mdash; data points on each curve, with tangent handles controlling interpolation</li>
+            <li class="fragment"><strong>Animation Events</strong> &mdash; markers that call C# methods at specific times</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Dopesheet vs Curves View</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Dopesheet</h4>
+                <p class="small">Shows keyframes as diamonds on a timeline</p>
+                <p class="small muted">Best for adjusting <strong>timing</strong> &mdash; when things happen</p>
+            </div>
+            <div class="side">
+                <h4 style="color: var(--accent);">Curves</h4>
+                <p class="small">Shows interpolation curves with editable B&eacute;zier handles</p>
+                <p class="small muted">Best for fine-tuning <strong>easing</strong> and motion quality</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Key Import Settings: Loop</h2>
+        <ul>
+            <li class="fragment"><strong>Loop Time:</strong> Enable for anything that repeats (idle, walk, run)</li>
+            <li class="fragment"><strong>Loop Pose:</strong> Smoothly blends the gap between last and first frame</li>
+            <li class="fragment">Unity shows <strong>green/yellow/red</strong> indicators for loop quality</li>
+        </ul>
+        <div class="box success fragment" style="margin-top: var(--space-md);">
+            <p>Green = seamless loop. Aim for green on all looping clips.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Root Transform Settings</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Setting</th><th>Bake Into Pose ON</th><th>Bake Into Pose OFF</th></tr>
+            <tr>
+                <td><strong>Rotation</strong></td>
+                <td>No rotation from clip</td>
+                <td>Clip drives rotation</td>
+            </tr>
+            <tr>
+                <td><strong>Position Y</strong></td>
+                <td>No vertical movement (good for walks)</td>
+                <td>Height changes apply (needed for jumps)</td>
+            </tr>
+            <tr>
+                <td><strong>Position XZ</strong></td>
+                <td>No horizontal drift (good for idles)</td>
+                <td>Animation drives horizontal (root motion)</td>
+            </tr>
+        </table>
+        <p class="fragment muted small" style="margin-top: var(--space-sm);">Typical walk cycle: Rotation ON, Y ON, XZ OFF (if using root motion)</p>
+    </section>
+
+    <section>
+        <h2>Editing Imported Clips</h2>
+        <div class="box warning">
+            <p>Clips inside FBX containers are <strong>read-only</strong></p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-md);">To edit: select the clip &rarr; press <strong>Ctrl+D</strong> to duplicate as a standalone <code>.anim</code> asset</p>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Then open in Window &rarr; Animation &rarr; Animation to modify keyframes, add events, adjust curves</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART III: ANIMATOR CONTROLLER
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part III: The Animator Controller</h2>
+        <p>A Visual State Machine for Animations</p>
+    </section>
+
+    <section>
+        <h2>The Brain of the Animation System</h2>
+        <p>An <strong>Animator Controller</strong> is a visual state machine that determines:</p>
+        <ul>
+            <li class="fragment">Which animation plays</li>
+            <li class="fragment">When transitions occur</li>
+            <li class="fragment">How animations blend together</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Create via: Right-click in Project &rarr; Create &rarr; Animator Controller</p>
+    </section>
+
+    <section>
+        <h2>Core Node Types</h2>
+        <div class="state-graph">
+            <div class="state-node entry">Entry</div>
+            <div class="state-node default">Default State</div>
+            <div class="state-node">Regular State</div>
+            <div class="state-node any">Any State</div>
+            <div class="state-node exit">Exit</div>
+        </div>
+        <ul style="font-size: 0.85em;">
+            <li class="fragment"><strong>States</strong> (grey) &mdash; each plays one Clip or Blend Tree</li>
+            <li class="fragment"><strong>Default State</strong> (orange) &mdash; first state entered on activation</li>
+            <li class="fragment"><strong>Any State</strong> (teal) &mdash; transitions from here apply universally (interrupts)</li>
+            <li class="fragment"><strong>Entry</strong> (green) / <strong>Exit</strong> (red) &mdash; state machine boundaries</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Transitions</h2>
+        <p>Right-click a state &rarr; <em>Make Transition</em> &rarr; click the destination</p>
+        <ul style="margin-top: var(--space-md);">
+            <li class="fragment"><strong>Has Exit Time:</strong> Should the transition wait for the clip to reach a point?</li>
+            <li class="fragment"><strong>Exit Time:</strong> Normalized point in source clip (0&ndash;1) when transition can begin</li>
+            <li class="fragment"><strong>Transition Duration:</strong> How long the crossfade takes</li>
+            <li class="fragment"><strong>Conditions:</strong> Parameter-based rules that must ALL be true</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Rule of thumb:</strong> Disable Has Exit Time for responsive gameplay (idle&rarr;walk on input). Enable it for animations that must complete (attack&rarr;idle).</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Parameters: Four Types</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Type</th><th>When to use</th><th>Example</th></tr>
+            <tr>
+                <td><strong>Float</strong></td>
+                <td>Continuous values; driving Blend Trees</td>
+                <td><code>Speed</code>, <code>Direction</code></td>
+            </tr>
+            <tr>
+                <td><strong>Bool</strong></td>
+                <td>Persistent binary states</td>
+                <td><code>IsGrounded</code>, <code>IsAlive</code></td>
+            </tr>
+            <tr>
+                <td><strong>Int</strong></td>
+                <td>Discrete numbered states</td>
+                <td><code>WeaponType</code>, <code>ComboIndex</code></td>
+            </tr>
+            <tr>
+                <td><strong>Trigger</strong></td>
+                <td>One-shot events; auto-resets</td>
+                <td><code>Jump</code>, <code>Attack</code></td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Trigger vs Bool</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Trigger</h4>
+                <p class="small">Instantaneous action; auto-resets after one transition consumes it</p>
+                <p class="small muted">Use for: Jump, Attack, Die</p>
+            </div>
+            <div class="side">
+                <h4 style="color: var(--accent);">Bool</h4>
+                <p class="small">Persists until explicitly changed</p>
+                <p class="small muted">Use for: IsGrounded, IsCrouched, IsAlive</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Demo: Idle &rarr; Walk &rarr; Run</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Create Animator Controller, add Float parameter <code>Speed</code></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Drag Idle, Walking, Running clips into the Animator window</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Set Idle as default, create transitions between all three states</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Add conditions: Idle&rarr;Walk (<code>Speed &gt; 0.1</code>), Walk&rarr;Run (<code>Speed &gt; 3</code>), etc.</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span>Disable Has Exit Time on all transitions; set Duration to ~0.15s</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Driving From Script</h2>
+        <pre><code class="language-csharp">using UnityEngine;
+
+[RequireComponent(typeof(Animator))]
+public class SimpleLocomotion : MonoBehaviour
+{
+    private Animator animator;
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+
+    void Awake() => animator = GetComponent&lt;Animator&gt;();
+
+    void Update()
+    {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        Vector3 inputDir = new Vector3(h, 0, v);
+        float speed = inputDir.magnitude * 6f;
+
+        // Damped update: smooths over 0.1s
+        animator.SetFloat(SpeedHash, speed, 0.1f, Time.deltaTime);
+    }
+}</code></pre>
+        <p class="fragment muted small">Use <code>Animator.StringToHash()</code> at init to avoid string comparison overhead every frame</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART IV: BLEND TREES
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IV: Blend Trees</h2>
+        <p>Smooth Locomotion Without Transition Spaghetti</p>
+    </section>
+
+    <section>
+        <h2>The Problem With Transitions</h2>
+        <ul>
+            <li class="fragment">Idle &rarr; Walk &rarr; Run needs 4 transitions with conditions</li>
+            <li class="fragment">Add directional movement and the count multiplies <em>exponentially</em></li>
+            <li class="fragment">Tuning transition timings becomes a nightmare</li>
+        </ul>
+        <div class="box success fragment" style="margin-top: var(--space-md);">
+            <p><strong>Blend Trees</strong> continuously interpolate between clips based on parameter values &mdash; all within a single state</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>1D Blend Tree</h2>
+        <p>Blend along a single float parameter (e.g., <code>Speed</code>)</p>
+        <table style="margin-top: var(--space-md);">
+            <tr><th>Motion</th><th>Threshold</th></tr>
+            <tr><td>Idle</td><td>0</td></tr>
+            <tr><td>Walk</td><td>3</td></tr>
+            <tr><td>Run</td><td>6</td></tr>
+        </table>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li><code>Speed = 0</code> &rarr; 100% Idle</li>
+            <li><code>Speed = 1.5</code> &rarr; 50% Idle + 50% Walk</li>
+            <li><code>Speed = 6</code> &rarr; 100% Run</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2D Blend Trees</h2>
+        <p>For directional movement (needs two parameters)</p>
+        <ul>
+            <li class="fragment"><strong>2D Simple Directional</strong> &mdash; one motion per direction; simple 8-way movement</li>
+            <li class="fragment"><strong>2D Freeform Directional</strong> &mdash; multiple motions per direction; <strong>best for locomotion</strong></li>
+            <li class="fragment"><strong>2D Freeform Cartesian</strong> &mdash; parameters unrelated (e.g., speed + turn angle)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2D Freeform Directional Example</h2>
+        <p class="muted small">Using <code>VelocityX</code> and <code>VelocityZ</code> parameters</p>
+        <table style="font-size: 0.8em; margin-top: var(--space-md);">
+            <tr><th>Motion</th><th>X</th><th>Z</th></tr>
+            <tr><td>Idle</td><td>0</td><td>0</td></tr>
+            <tr><td>Walk Forward</td><td>0</td><td>1.5</td></tr>
+            <tr><td>Walk Back</td><td>0</td><td>-1.5</td></tr>
+            <tr><td>Walk Left / Right</td><td>&plusmn;1.5</td><td>0</td></tr>
+            <tr><td>Run Forward</td><td>0</td><td>5</td></tr>
+            <tr><td>Run Left / Right</td><td>&plusmn;5</td><td>0</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Why Blend Trees Win</h2>
+        <div class="comparison-row">
+            <div class="side old">
+                <h4>State Machine <span class="badge danger">Many transitions</span></h4>
+                <ul class="small">
+                    <li>4+ transitions for 3 states</li>
+                    <li>Conditions per transition</li>
+                    <li>Discrete hops between animations</li>
+                    <li>Exit time tuning needed</li>
+                </ul>
+            </div>
+            <div class="side new">
+                <h4>Blend Tree <span class="badge success">Single state</span></h4>
+                <ul class="small">
+                    <li>Zero transitions</li>
+                    <li>One parameter drives everything</li>
+                    <li>Continuous smooth blending</li>
+                    <li>No exit time needed</li>
+                </ul>
+            </div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Blend Trees are almost always preferred over discrete transitions for locomotion</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART V: LAYERS & AVATAR MASKS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part V: Layers &amp; Avatar Masks</h2>
+        <p>Animating Different Body Parts Independently</p>
+    </section>
+
+    <section>
+        <h2>Why Layers?</h2>
+        <p>Layers let you play different animations on different body parts <strong>simultaneously</strong></p>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p><strong>Example:</strong> Character walks (lower body) while waving (upper body) at the same time</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Layer Settings</h2>
+        <ul>
+            <li class="fragment"><strong>Weight</strong> (0&ndash;1): How strongly this layer affects the final pose</li>
+            <li class="fragment"><strong>Mask</strong>: An Avatar Mask restricting which bones this layer controls</li>
+            <li class="fragment"><strong>Blending</strong>: Override (replaces) or Additive (adds delta)</li>
+            <li class="fragment"><strong>IK Pass</strong>: Enables <code>OnAnimatorIK()</code> for this layer</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Avatar Masks</h2>
+        <p>Define which bones a layer can control</p>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Right-click Project &rarr; Create &rarr; <strong>Avatar Mask</strong></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>In the Humanoid body diagram, click body parts to toggle <em>included</em> / <em>excluded</em></span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>For upper-body mask: include head, arms, torso; exclude legs and root</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Assign to your layer via the gear icon &rarr; Mask field</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Override vs Additive Blending</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Override</h4>
+                <p class="small">Layer animation <strong>replaces</strong> the underlying result for masked bones</p>
+                <p class="small muted">Use for: full wave animation on top of walking legs</p>
+            </div>
+            <div class="side">
+                <h4 style="color: var(--accent);">Additive</h4>
+                <p class="small">Layer animation is treated as a <strong>delta from a reference pose</strong> and added on top</p>
+                <p class="small muted">Use for: breathing, head bob, weapon recoil</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Demo: Waving While Walking</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Base Layer: locomotion Blend Tree (from Part IV)</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Add Layer <code>UpperBody</code>; Blending = Override; Mask = UpperBodyMask; Weight = 1.0</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Create Empty default state + Wave state in the new layer</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Add Bool parameter <code>IsWaving</code>; transitions between Empty &harr; Wave</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">5</span>
+                <span>Drive with <code>animator.SetBool("IsWaving", true)</code></span>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VI: ROOT MOTION
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VI: Root Motion</h2>
+        <p>Should Animation Drive Movement?</p>
+    </section>
+
+    <section>
+        <h2>What Is Root Motion?</h2>
+        <ul>
+            <li class="fragment">During a walk animation, the character's hips (the <strong>root bone</strong>) translate forward</li>
+            <li class="fragment">Unity captures this as <strong>Root Transform</strong> data, separate from the body pose</li>
+            <li class="fragment">When <strong>Apply Root Motion</strong> is enabled, this translation drives the GameObject's Transform</li>
+        </ul>
+        <div class="box success fragment" style="margin-top: var(--space-md);">
+            <p><strong>Result:</strong> Character moves at exactly the speed and cadence of the animation &mdash; <em>zero foot sliding</em></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Apply Root Motion Checkbox</h2>
+        <ul>
+            <li class="fragment"><strong>☑ On</strong> &mdash; root motion from clips drives the GameObject</li>
+            <li class="fragment"><strong>☐ Off</strong> &mdash; root motion is discarded; movement is script-controlled</li>
+            <li class="fragment"><strong>"Handled by Script"</strong> &mdash; shown when you implement <code>OnAnimatorMove()</code></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Custom Handling: OnAnimatorMove()</h2>
+        <pre><code class="language-csharp">void OnAnimatorMove()
+{
+    // Apply root motion to a Rigidbody with gravity preserved
+    Rigidbody rb = GetComponent&lt;Rigidbody&gt;();
+    Vector3 velocity = animator.deltaPosition / Time.deltaTime;
+    velocity.y = rb.velocity.y; // Preserve gravity
+    rb.velocity = velocity;
+    rb.MoveRotation(rb.rotation * animator.deltaRotation);
+}</code></pre>
+        <p class="fragment muted small">Lets you scale, redirect, or apply root motion to any movement system</p>
+    </section>
+
+    <section>
+        <h2>Root Motion vs Script-Driven</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Factor</th><th>Root Motion</th><th>Script-Driven</th></tr>
+            <tr>
+                <td>Foot sliding</td>
+                <td><span class="badge success">&check; Eliminated</span></td>
+                <td>Possible if mismatch</td>
+            </tr>
+            <tr>
+                <td>Control</td>
+                <td>Animator drives cadence</td>
+                <td>Programmer drives speed</td>
+            </tr>
+            <tr>
+                <td>Responsiveness</td>
+                <td>Can feel sluggish</td>
+                <td>Immediately responsive</td>
+            </tr>
+            <tr>
+                <td>VR player</td>
+                <td><span class="badge danger">&times; Never</span></td>
+                <td><span class="badge success">&check; Required</span></td>
+            </tr>
+            <tr>
+                <td>NPCs</td>
+                <td><span class="badge success">&check; Excellent</span></td>
+                <td>Works fine</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Why Root Motion Fails for VR Players</h2>
+        <div class="box danger">
+            <p>Root motion must <strong>never</strong> drive the VR player's position</p>
+        </div>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li>The player's position is determined by the <strong>HMD's real-world tracking</strong></li>
+            <li>Any discrepancy between physical and virtual position causes <strong>motion sickness</strong></li>
+            <li>VR player movement uses XRI Locomotion Providers (continuous move, teleportation)</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Root motion is still fine for <strong>NPCs in VR</strong> &mdash; NavMeshAgent + root motion is a standard pattern</p>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VII: EVENTS & SCRIPTING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VII: Animation Events &amp; Scripting</h2>
+        <p>Bridging Animation and Gameplay Logic</p>
+    </section>
+
+    <section>
+        <h2>Animation Events</h2>
+        <p>Markers at specific frames that invoke C# methods during playback</p>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li><strong>Footstep sounds</strong> at foot-contact frames</li>
+            <li><strong>Particle effects</strong> during an attack swing</li>
+            <li><strong>Gameplay logic</strong> at the apex of a jump</li>
+            <li><strong>Hitbox activation</strong> during a combat move</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Adding Events in the Editor</h2>
+        <div class="workflow-steps">
+            <div class="step fragment">
+                <span class="step-num">1</span>
+                <span>Open Window &rarr; Animation &rarr; Animation with the clip selected</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">2</span>
+                <span>Scrub to the desired frame</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">3</span>
+                <span>Click the <strong>Add Event</strong> pin icon above the timeline</span>
+            </div>
+            <div class="step fragment">
+                <span class="step-num">4</span>
+                <span>Specify the Function name + optional parameter (float, int, string, or Object)</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Event Receiver Script</h2>
+        <pre><code class="language-csharp">public class AnimationEventReceiver : MonoBehaviour
+{
+    public AudioClip footstepClip;
+    private AudioSource audioSource;
+
+    void Awake() =&gt; audioSource = GetComponent&lt;AudioSource&gt;();
+
+    // Called by animation event at foot-contact frames
+    public void PlayFootstep()
+    {
+        audioSource.PlayOneShot(footstepClip);
+    }
+
+    // With a string parameter
+    public void OnAttackPhase(string phase)
+    {
+        Debug.Log($"Attack entered phase: {phase}");
+    }
+}</code></pre>
+        <p class="fragment muted small">The function must be public on a MonoBehaviour on the same GameObject as the Animator</p>
+    </section>
+
+    <section>
+        <h2>Animator API: Setting Parameters</h2>
+        <pre><code class="language-csharp">Animator animator = GetComponent&lt;Animator&gt;();
+
+// Instant set
+animator.SetFloat("Speed", 5.0f);
+
+// Damped (smooths value over 0.1s)
+animator.SetFloat("Speed", 5.0f, 0.1f, Time.deltaTime);
+
+animator.SetBool("IsGrounded", true);
+animator.SetInteger("WeaponType", 2);
+
+// Triggers auto-reset after being consumed
+animator.SetTrigger("Jump");
+animator.ResetTrigger("Jump"); // manually reset if needed</code></pre>
+    </section>
+
+    <section>
+        <h2>Animator API: Querying &amp; Direct Control</h2>
+        <pre><code class="language-csharp">// Querying current state
+AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0); // layer 0
+if (info.IsName("Jump"))
+    Debug.Log("Currently in Jump state");
+
+float progress = info.normalizedTime; // 0.0–1.0 per loop
+
+// Direct playback control
+animator.Play("Run");                        // instant switch
+animator.CrossFade("Walk", 0.25f);          // 0.25s crossfade
+
+// Layer weight (e.g., blending upper body in/out)
+animator.SetLayerWeight(1, targetWeight);</code></pre>
+    </section>
+</section>
+
+<!-- ============================================
+     PART VIII: INVERSE KINEMATICS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part VIII: Inverse Kinematics</h2>
+        <p>Procedurally Adjusting Character Poses</p>
+    </section>
+
+    <section>
+        <h2>What Is IK?</h2>
+        <div class="box">
+            <p>IK lets you procedurally adjust a character's pose at runtime so that hands reach targets, feet plant on uneven terrain, and eyes track objects &mdash; <strong>without pre-authored animation for every scenario</strong></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Forward Kinematics vs Inverse Kinematics</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Forward Kinematics</h4>
+                <p class="small"><strong>Input:</strong> joint rotations (shoulder, elbow)</p>
+                <p class="small"><strong>Output:</strong> hand position</p>
+                <p class="small muted">"Rotate the shoulder 30&deg;, then the elbow 45&deg;"</p>
+            </div>
+            <div class="side">
+                <h4 style="color: var(--accent);">Inverse Kinematics</h4>
+                <p class="small"><strong>Input:</strong> desired hand position</p>
+                <p class="small muted">"Put the hand on this doorknob"</p>
+                <p class="small"><strong>Output:</strong> joint rotations that get you there</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Unity's Built-In Animator IK</h2>
+        <p>For Humanoid rigs, Mecanim provides four end-effector goals plus a LookAt target:</p>
+        <div class="columns columns-3" style="margin-top: var(--space-md);">
+            <div class="card">
+                <h4 style="color: var(--accent);">Hands</h4>
+                <p class="small">Left Hand, Right Hand</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">Feet</h4>
+                <p class="small">Left Foot, Right Foot</p>
+            </div>
+            <div class="card">
+                <h4 style="color: var(--accent);">LookAt</h4>
+                <p class="small">Head + eye orientation</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>IK Prerequisites</h2>
+        <ul>
+            <li class="fragment">Character must use a <strong>Humanoid</strong> Avatar</li>
+            <li class="fragment">Animator Controller layer must have <strong>IK Pass</strong> enabled (gear icon)</li>
+            <li class="fragment">A script implementing <code>OnAnimatorIK()</code> must be on the same GameObject</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>IK Script Example</h2>
+        <pre><code class="language-csharp">void OnAnimatorIK(int layerIndex)
+{
+    // Look At IK — head and eyes track the target
+    animator.SetLookAtWeight(1f, 0.3f, 0.6f, 1f, 0.5f);
+    // (weight, bodyWeight, headWeight, eyesWeight, clampWeight)
+    animator.SetLookAtPosition(lookTarget.position);
+
+    // Right Hand IK — hand reaches for target
+    animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
+    animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
+    animator.SetIKPosition(AvatarIKGoal.RightHand, handTarget.position);
+    animator.SetIKRotation(AvatarIKGoal.RightHand, handTarget.rotation);
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>IK Execution Order</h2>
+        <div class="state-graph">
+            <div class="state-node">Animation Evaluation</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">OnAnimatorMove()</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">OnAnimatorIK()</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">Rendering</div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">IK runs <em>after</em> root motion but <em>before</em> the frame is drawn &mdash; so IK adjustments override the animation pose</p>
+    </section>
+
+    <section>
+        <h2>Weight Blending</h2>
+        <ul>
+            <li class="fragment"><code>SetIKPositionWeight(goal, 0)</code> &rarr; pure animation pose</li>
+            <li class="fragment"><code>SetIKPositionWeight(goal, 1)</code> &rarr; fully IK-driven</li>
+            <li class="fragment"><code>SetIKPositionWeight(goal, 0.5)</code> &rarr; halfway blend</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>Blend IK weight in/out smoothly to avoid snapping &mdash; e.g., as the hand approaches a reachable target, ramp the weight from 0 to 1</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     PART IX: VR CONSIDERATIONS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part IX: VR-Specific Considerations</h2>
+        <p>Where Everything We've Learned Splits in Two</p>
+    </section>
+
+    <section>
+        <h2>The Fundamental Split</h2>
+        <div class="comparison-row">
+            <div class="side new">
+                <h4>NPC Animation</h4>
+                <ul class="small">
+                    <li>Animator Controllers</li>
+                    <li>Blend Trees &amp; state machines</li>
+                    <li>Root motion OK</li>
+                    <li>NavMeshAgent pathfinding</li>
+                </ul>
+                <p class="small muted" style="margin-top: 0.5rem;">Works just like flatscreen games</p>
+            </div>
+            <div class="side new">
+                <h4>Player Avatar</h4>
+                <ul class="small">
+                    <li>IK from headset + controllers</li>
+                    <li>No traditional state machine</li>
+                    <li>Never root motion</li>
+                    <li>XRI Locomotion Providers</li>
+                </ul>
+                <p class="small muted" style="margin-top: 0.5rem;">Fundamentally different problem</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>NPC Animation in VR</h2>
+        <p>Exactly like flatscreen, with <strong>one extra consideration</strong>:</p>
+        <div class="box warning fragment" style="margin-top: var(--space-md);">
+            <p>Players in VR can lean inches from an NPC's face. Subtle artifacts (foot sliding, stiff shoulders, empty eyes) are <strong>far more visible</strong> than on a flat screen.</p>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Use <strong>LookAt IK</strong> so NPCs track the player's HMD position for natural eye contact</p>
+    </section>
+
+    <section>
+        <h2>VR Player Avatars: IK From 3 Points</h2>
+        <p>The player has only <strong>3 tracked points</strong> &mdash; headset + two controllers</p>
+        <pre><code class="language-csharp">void OnAnimatorIK(int layerIndex)
+{
+    // Hands follow VR controllers
+    animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
+    animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
+    animator.SetIKPosition(AvatarIKGoal.LeftHand, leftController.position);
+    animator.SetIKRotation(AvatarIKGoal.LeftHand, leftController.rotation);
+
+    // (Repeat for right hand)
+
+    // Head follows HMD
+    animator.SetLookAtWeight(1f);
+    animator.SetLookAtPosition(hmd.position + hmd.forward * 10f);
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>Limits of Built-In IK for VR</h2>
+        <ul>
+            <li class="fragment">Only solves <strong>four end-effectors</strong> (hands + feet)</li>
+            <li class="fragment">No spine estimation, shoulder prediction, or lower-body inference</li>
+            <li class="fragment">Legs have to be faked &mdash; the player's legs aren't tracked at all</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>For production VR avatars, most developers use <strong>Final IK (VRIK)</strong> by RootMotion (~$90) &mdash; the industry standard, originally developed for Oculus's <em>Dead and Buried</em></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>VR Avatar IK Solutions Compared</h2>
+        <table style="font-size: 0.8em;">
+            <tr><th>Solution</th><th>Cost</th><th>Tracking</th><th>Body Coverage</th></tr>
+            <tr>
+                <td>Unity built-in IK</td>
+                <td>Free</td>
+                <td>4 goals + LookAt</td>
+                <td>Arms + LookAt only</td>
+            </tr>
+            <tr>
+                <td>Animation Rigging package</td>
+                <td>Free</td>
+                <td>Flexible constraints</td>
+                <td>Manual setup</td>
+            </tr>
+            <tr>
+                <td><strong>Final IK (VRIK)</strong></td>
+                <td>~$90</td>
+                <td>3&ndash;6 points</td>
+                <td><strong>Full body estimation</strong></td>
+            </tr>
+            <tr>
+                <td>VRArmIK (GitHub)</td>
+                <td>Free</td>
+                <td>3 points</td>
+                <td>Arms + shoulders</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Controller-Driven Hand Animation</h2>
+        <p>Standard pattern: a Blend Tree with two float parameters</p>
+        <pre><code class="language-csharp">public class VRHandAnimator : MonoBehaviour
+{
+    public InputActionReference gripAction;
+    public InputActionReference triggerAction;
+    private Animator animator;
+    private static readonly int GripHash = Animator.StringToHash("Grip");
+    private static readonly int TriggerHash = Animator.StringToHash("Trigger");
+
+    void Awake() =&gt; animator = GetComponent&lt;Animator&gt;();
+
+    void Update()
+    {
+        animator.SetFloat(GripHash, gripAction.action.ReadValue&lt;float&gt;());
+        animator.SetFloat(TriggerHash, triggerAction.action.ReadValue&lt;float&gt;());
+    }
+}</code></pre>
+        <p class="fragment muted small">The Animator uses a Direct Blend Tree with open hand, fist (grip), and pinch (trigger) motions</p>
+    </section>
+
+    <section>
+        <h2>XR Hands: Optical Tracking</h2>
+        <ul>
+            <li class="fragment"><strong>XR Hands package</strong> (<code>com.unity.xr.hands</code>) provides real-time optical hand tracking</li>
+            <li class="fragment">Supported on Meta Quest 2 / 3 / Pro</li>
+            <li class="fragment">Tracked joint data directly drives hand mesh deformation &mdash; <strong>no animation clips needed</strong></li>
+        </ul>
+        <p class="fragment muted" style="margin-top: var(--space-md);">This replaces controller-based hand animation entirely on hand-tracking-capable devices</p>
+    </section>
+
+    <section>
+        <h2>Root Motion in VR: The Cardinal Rule</h2>
+        <div class="box danger">
+            <p>The virtual camera must <strong>always</strong> reflect the player's physical head position. No exceptions.</p>
+        </div>
+        <p class="fragment" style="margin-top: var(--space-md);">Three reasons root motion fails for VR players:</p>
+        <ul class="fragment">
+            <li><strong>Tracking conflict</strong> &mdash; HMD is the authoritative source of position</li>
+            <li><strong>Vestibular mismatch</strong> &mdash; virtual motion without physical motion = sickness</li>
+            <li><strong>Responsiveness</strong> &mdash; you can't afford any lag between intent and movement</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     PART X: TIMELINE & PLAYABLE API
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part X: Timeline &amp; Playable API</h2>
+        <p>When the Animator Controller Isn't Enough</p>
+    </section>
+
+    <section>
+        <h2>Animator vs Timeline</h2>
+        <div class="comparison-row">
+            <div class="side">
+                <h4 style="color: var(--accent);">Animator Controller</h4>
+                <p class="small">Interactive, reactive animation</p>
+                <p class="small muted">State machines that respond to player input every frame</p>
+                <p class="small">Locomotion, combat, reactions</p>
+            </div>
+            <div class="side">
+                <h4 style="color: var(--accent);">Timeline</h4>
+                <p class="small">Choreographed, authored sequences</p>
+                <p class="small muted">A multi-track sequencer that coordinates many GameObjects on a schedule</p>
+                <p class="small">Cutscenes, tutorials, scripted events</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>When to Use What</h2>
+        <table style="font-size: 0.85em;">
+            <tr><th>Use Case</th><th>Tool</th></tr>
+            <tr><td>Player locomotion, combat</td><td>Animator Controller + Blend Trees</td></tr>
+            <tr><td>NPC behavior and reactions</td><td>Animator Controller</td></tr>
+            <tr><td>Cutscenes, cinematics</td><td>Timeline</td></tr>
+            <tr><td>Coordinating many objects on a schedule</td><td>Timeline</td></tr>
+            <tr><td>Procedural / runtime-generated animation</td><td>Playable API</td></tr>
+            <tr><td>VR tutorial sequences (NPC choreography)</td><td>Timeline</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Timeline Tracks</h2>
+        <ul>
+            <li class="fragment"><strong>Animation Track</strong> &mdash; plays clips on a bound Animator</li>
+            <li class="fragment"><strong>Audio Track</strong> &mdash; plays audio clips through an AudioSource</li>
+            <li class="fragment"><strong>Activation Track</strong> &mdash; enables/disables GameObjects at specified times</li>
+            <li class="fragment"><strong>Signal Track</strong> &mdash; fires Signal Emitters triggering UnityEvents</li>
+            <li class="fragment"><strong>Cinemachine Track</strong> &mdash; blends between virtual cameras</li>
+            <li class="fragment"><strong>Control Track</strong> &mdash; controls sub-Timelines, particles, nested Directors</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Playable API</h2>
+        <p>The low-level foundation beneath both Animator Controllers and Timeline</p>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Build custom animation graphs at runtime for scenarios where pre-authored controllers are too rigid</p>
+        <ul class="fragment" style="margin-top: var(--space-md);">
+            <li><code>PlayableGraph</code> &mdash; the container for the entire graph</li>
+            <li><code>AnimationClipPlayable</code> &mdash; wraps a single clip</li>
+            <li><code>AnimationMixerPlayable</code> &mdash; blends multiple inputs by weight</li>
+            <li><code>AnimationPlayableOutput</code> &mdash; connects graph to an Animator</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>When You'd Actually Use This</h2>
+        <ul>
+            <li class="fragment"><strong>Procedural animation systems</strong> &mdash; generating motion from data at runtime</li>
+            <li class="fragment"><strong>Runtime graph modification</strong> &mdash; e.g., swapping clips based on equipment</li>
+            <li class="fragment"><strong>Dynamic blending</strong> too cumbersome for a static Animator Controller</li>
+        </ul>
+        <div class="box fragment" style="margin-top: var(--space-md);">
+            <p>For this course: understanding its existence is enough. Most VR projects use Animator Controllers for standard needs and reserve the Playable API for advanced procedural systems.</p>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     UNITY 6.3 NOTES
+     ============================================ -->
+<section>
+    <section>
+        <h2>Unity 6.3 Specifics</h2>
+        <p class="muted small">Mecanim in Unity 6.3 is functionally identical to Unity 2022 LTS. Minor changes:</p>
+        <ul style="margin-top: var(--space-md); font-size: 0.9em;">
+            <li class="fragment"><strong><code>ResetControllerState</code></strong> (new) &mdash; resets Animator to initial state; useful for object pooling</li>
+            <li class="fragment"><strong>30% faster Legacy Animation</strong> evaluation (only matters if you use the old <code>Animation</code> component)</li>
+            <li class="fragment"><strong><code>CreateStateMachineBehaviour</code> is obsolete</strong> &mdash; use <code>CreateNewStateMachineBehaviour</code></li>
+            <li class="fragment">A <strong>completely new animation system</strong> was previewed at Unite 2024 &mdash; still in development as of April 2026</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     KEY TAKEAWAYS
+     ============================================ -->
+<section>
+    <section>
+        <h2>The Hierarchy</h2>
+        <div class="state-graph">
+            <div class="state-node">Animation Clips</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">Blend Trees</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">Animator Controller</div>
+        </div>
+        <div class="state-graph">
+            <div class="state-node">Layers + Masks</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">IK</div>
+            <span style="color: var(--text-muted);">&rarr;</span>
+            <div class="state-node">Final Pose</div>
+        </div>
+        <p class="fragment muted" style="margin-top: var(--space-md);">Each layer of abstraction builds on the previous one</p>
+    </section>
+
+    <section>
+        <h2>Key Takeaways</h2>
+        <ul>
+            <li class="fragment"><strong>Clips</strong> are atomic motion; <strong>Blend Trees</strong> interpolate; <strong>Controllers</strong> orchestrate</li>
+            <li class="fragment"><strong>Prefer Blend Trees</strong> over discrete transitions for locomotion</li>
+            <li class="fragment"><strong>Layers + masks</strong> let you animate body parts independently</li>
+            <li class="fragment"><strong>Root motion</strong> eliminates foot sliding &mdash; but never for VR players</li>
+            <li class="fragment"><strong>IK</strong> is how VR avatars follow the player's physical movements</li>
+            <li class="fragment"><strong>NPC and player animation</strong> are fundamentally different problems in VR</li>
+        </ul>
+    </section>
+
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
