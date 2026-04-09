@@ -23,16 +23,22 @@
 
     <style>
         .reveal .slides pre code {
-            max-height: 420px;
-            font-size: 0.7em !important;
-            line-height: 1.35 !important;
+            max-height: 560px;
+            font-size: 0.56em !important;
+            line-height: 1.25 !important;
             padding: 0.4em 0.6em !important;
+            overflow: hidden !important;
         }
         .reveal .slides pre {
             width: 100%;
-            margin: 0.4em 0;
-            padding: 0.6em !important;
-            line-height: 1.35 !important;
+            margin: 0.3em 0;
+            padding: 0.5em !important;
+            line-height: 1.25 !important;
+        }
+        /* Tighter headings on script-heavy slides */
+        .reveal .slides section.code-slide h2 {
+            font-size: 1.3em;
+            margin-bottom: 0.3em;
         }
         .workflow-steps {
             display: flex;
@@ -244,15 +250,6 @@
         <p class="fragment muted small" style="margin-top: var(--space-sm);">Why Humanoid? It enables Mecanim <strong>retargeting</strong> &mdash; any Humanoid animation can play on any Humanoid character</p>
     </section>
 
-    <section>
-        <h2>Other Free Animation Sources</h2>
-        <ul>
-            <li class="fragment"><strong>Human Basic Motions FREE</strong> by Kevin Iglesias &mdash; walk, run, sprint, jump, idle</li>
-            <li class="fragment"><strong>Starter Assets &mdash; ThirdPerson | URP</strong> by Unity &mdash; complete reference controller</li>
-            <li class="fragment"><strong>Robot Kyle | URP</strong> &mdash; free Unity robot character</li>
-            <li class="fragment"><strong>CMU Motion Capture Database</strong> &mdash; 2,500+ academic mocap recordings</li>
-        </ul>
-    </section>
 </section>
 
 <!-- ============================================
@@ -511,7 +508,7 @@
         <p class="fragment muted small" style="margin-top: var(--space-md);">All scripts in this deck assume normalized input</p>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Driving From Script</h2>
         <pre><code class="language-csharp">using UnityEngine;
 using UnityEngine.InputSystem;
@@ -653,7 +650,7 @@ public class SimpleLocomotion : MonoBehaviour
         </div>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Driving the 2D Blend Tree: Setup</h2>
         <pre><code class="language-csharp">using UnityEngine;
 using UnityEngine.InputSystem;
@@ -672,8 +669,8 @@ public class DirectionalLocomotion : MonoBehaviour
 
     private Animator animator;
     private CharacterController controller;
-    private static readonly int VelocityXHash = Animator.StringToHash("VelocityX");
-    private static readonly int VelocityZHash = Animator.StringToHash("VelocityZ");
+    private static readonly int VxHash = Animator.StringToHash("VelocityX");
+    private static readonly int VzHash = Animator.StringToHash("VelocityZ");
 
     void Awake()
     {
@@ -681,12 +678,12 @@ public class DirectionalLocomotion : MonoBehaviour
         controller = GetComponent&lt;CharacterController&gt;();
     }
 
-    void OnEnable()  { moveAction.action.Enable(); sprintAction.action.Enable(); }
+    void OnEnable()  { moveAction.action.Enable();  sprintAction.action.Enable();  }
     void OnDisable() { moveAction.action.Disable(); sprintAction.action.Disable(); }
 }</code></pre>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Update(): Animation Parameters</h2>
         <pre><code class="language-csharp">void Update()
 {
@@ -706,7 +703,7 @@ public class DirectionalLocomotion : MonoBehaviour
 }</code></pre>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Update(): Movement &amp; Rotation</h2>
         <pre><code class="language-csharp">    // --- Movement: relative to character's facing ---
     float currentSpeed = sprinting ? runSpeed : walkSpeed;
@@ -900,7 +897,7 @@ public class DirectionalLocomotion : MonoBehaviour
         </div>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Wave Controller Script</h2>
         <pre><code class="language-csharp">using UnityEngine;
 using UnityEngine.InputSystem;
@@ -958,7 +955,7 @@ public class WaveController : MonoBehaviour
         </ul>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Custom Handling: OnAnimatorMove()</h2>
         <pre><code class="language-csharp">void OnAnimatorMove()
 {
@@ -1060,7 +1057,7 @@ public class WaveController : MonoBehaviour
         </div>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Event Receiver Script</h2>
         <pre><code class="language-csharp">public class AnimationEventReceiver : MonoBehaviour
 {
@@ -1084,7 +1081,7 @@ public class WaveController : MonoBehaviour
         <p class="fragment muted small">The function must be public on a MonoBehaviour on the same GameObject as the Animator</p>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Animator API: Setting Parameters</h2>
         <pre><code class="language-csharp">Animator animator = GetComponent&lt;Animator&gt;();
 
@@ -1102,7 +1099,7 @@ animator.SetTrigger("Jump");
 animator.ResetTrigger("Jump"); // manually reset if needed</code></pre>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Animator API: Querying &amp; Direct Control</h2>
         <pre><code class="language-csharp">// Querying current state
 AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0); // layer 0
@@ -1182,7 +1179,7 @@ animator.SetLayerWeight(1, targetWeight);</code></pre>
         </ul>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>IK Script Example</h2>
         <pre><code class="language-csharp">void OnAnimatorIK(int layerIndex)
 {
@@ -1270,7 +1267,7 @@ animator.SetLayerWeight(1, targetWeight);</code></pre>
         <p class="fragment muted" style="margin-top: var(--space-md);">Use <strong>LookAt IK</strong> so NPCs track the player's HMD position for natural eye contact</p>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>VR Player Avatars: IK From 3 Points</h2>
         <p>The player has only <strong>3 tracked points</strong> &mdash; headset + two controllers</p>
         <pre><code class="language-csharp">void OnAnimatorIK(int layerIndex)
@@ -1332,7 +1329,7 @@ animator.SetLayerWeight(1, targetWeight);</code></pre>
         </table>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Controller-Driven Hand Animation</h2>
         <p>Standard pattern: a Blend Tree with two float parameters</p>
         <pre><code class="language-csharp">public class VRHandAnimator : MonoBehaviour
