@@ -139,7 +139,6 @@
                     <li class="fragment">Animation Events &amp; scripting</li>
                     <li class="fragment">Inverse Kinematics (IK)</li>
                     <li class="fragment">VR-specific considerations</li>
-                    <li class="fragment">Timeline &amp; Playable API</li>
                 </ul>
             </div>
         </div>
@@ -182,28 +181,6 @@
             <li class="fragment">Royalty-free for personal, commercial, and educational use</li>
         </ul>
         <p class="fragment muted" style="margin-top: var(--space-md);">The fastest path from zero to an animated character in Unity</p>
-    </section>
-
-    <section>
-        <h2>Recommended Starter Assets</h2>
-        <div class="columns">
-            <div>
-                <h4 style="color: var(--accent);">Characters</h4>
-                <ul class="small">
-                    <li><strong>Y Bot</strong> &mdash; blue mannequin (standard test character)</li>
-                    <li><strong>X Bot</strong> &mdash; orange mannequin</li>
-                    <li><strong>AJ</strong>, <strong>Michelle</strong> &mdash; realistic humanoids</li>
-                </ul>
-            </div>
-            <div>
-                <h4 style="color: var(--accent);">Animations</h4>
-                <ul class="small">
-                    <li>Idle / Neutral Idle</li>
-                    <li>Walking, Running</li>
-                    <li>Waving, Jump</li>
-                </ul>
-            </div>
-        </div>
     </section>
 
     <section>
@@ -1139,83 +1116,6 @@ animator.SetLayerWeight(1, targetWeight);</code></pre>
             <li><strong>Vestibular mismatch</strong> &mdash; virtual motion without physical motion = sickness</li>
             <li><strong>Responsiveness</strong> &mdash; you can't afford any lag between intent and movement</li>
         </ul>
-    </section>
-</section>
-
-<!-- ============================================
-     PART X: TIMELINE & PLAYABLE API
-     ============================================ -->
-<section>
-    <section class="section-slide">
-        <h2>Part X: Timeline &amp; Playable API</h2>
-        <p>When the Animator Controller Isn't Enough</p>
-    </section>
-
-    <section>
-        <h2>Animator vs Timeline</h2>
-        <div class="comparison-row">
-            <div class="side">
-                <h4 style="color: var(--accent);">Animator Controller</h4>
-                <p class="small">Interactive, reactive animation</p>
-                <p class="small muted">State machines that respond to player input every frame</p>
-                <p class="small">Locomotion, combat, reactions</p>
-            </div>
-            <div class="side">
-                <h4 style="color: var(--accent);">Timeline</h4>
-                <p class="small">Choreographed, authored sequences</p>
-                <p class="small muted">A multi-track sequencer that coordinates many GameObjects on a schedule</p>
-                <p class="small">Cutscenes, tutorials, scripted events</p>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <h2>When to Use What</h2>
-        <table style="font-size: 0.85em;">
-            <tr><th>Use Case</th><th>Tool</th></tr>
-            <tr><td>Player locomotion, combat</td><td>Animator Controller + Blend Trees</td></tr>
-            <tr><td>NPC behavior and reactions</td><td>Animator Controller</td></tr>
-            <tr><td>Cutscenes, cinematics</td><td>Timeline</td></tr>
-            <tr><td>Coordinating many objects on a schedule</td><td>Timeline</td></tr>
-            <tr><td>Procedural / runtime-generated animation</td><td>Playable API</td></tr>
-            <tr><td>VR tutorial sequences (NPC choreography)</td><td>Timeline</td></tr>
-        </table>
-    </section>
-
-    <section>
-        <h2>Timeline Tracks</h2>
-        <ul>
-            <li class="fragment"><strong>Animation Track</strong> &mdash; plays clips on a bound Animator</li>
-            <li class="fragment"><strong>Audio Track</strong> &mdash; plays audio clips through an AudioSource</li>
-            <li class="fragment"><strong>Activation Track</strong> &mdash; enables/disables GameObjects at specified times</li>
-            <li class="fragment"><strong>Signal Track</strong> &mdash; fires Signal Emitters triggering UnityEvents</li>
-            <li class="fragment"><strong>Cinemachine Track</strong> &mdash; blends between virtual cameras</li>
-            <li class="fragment"><strong>Control Track</strong> &mdash; controls sub-Timelines, particles, nested Directors</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>The Playable API</h2>
-        <p>The low-level foundation beneath both Animator Controllers and Timeline</p>
-        <p class="fragment muted" style="margin-top: var(--space-md);">Build custom animation graphs at runtime for scenarios where pre-authored controllers are too rigid</p>
-        <ul class="fragment" style="margin-top: var(--space-md);">
-            <li><code>PlayableGraph</code> &mdash; the container for the entire graph</li>
-            <li><code>AnimationClipPlayable</code> &mdash; wraps a single clip</li>
-            <li><code>AnimationMixerPlayable</code> &mdash; blends multiple inputs by weight</li>
-            <li><code>AnimationPlayableOutput</code> &mdash; connects graph to an Animator</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>When You'd Actually Use This</h2>
-        <ul>
-            <li class="fragment"><strong>Procedural animation systems</strong> &mdash; generating motion from data at runtime</li>
-            <li class="fragment"><strong>Runtime graph modification</strong> &mdash; e.g., swapping clips based on equipment</li>
-            <li class="fragment"><strong>Dynamic blending</strong> too cumbersome for a static Animator Controller</li>
-        </ul>
-        <div class="box fragment" style="margin-top: var(--space-md);">
-            <p>For this course: understanding its existence is enough. Most VR projects use Animator Controllers for standard needs and reserve the Playable API for advanced procedural systems.</p>
-        </div>
     </section>
 </section>
 
