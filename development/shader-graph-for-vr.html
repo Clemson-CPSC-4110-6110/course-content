@@ -621,123 +621,11 @@
 </section>
 
 <!-- ============================================
-     SECTION 7: DEBUGGING
+     SECTION 7: DRIVING IT FROM CODE
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part 7 — Debugging Shader Graphs</h2>
-    </section>
-
-    <section>
-        <h2>Rule 1: preview every node</h2>
-        <p>Every node in Shader Graph has a <strong>live preview sphere</strong> at its bottom. When something looks wrong, walk <em>backwards</em> from the Master Stack until the preview stops matching your expectation.</p>
-        <div class="box success">
-            <p><strong>Debugging rule of thumb:</strong> "The bug is in the last node where the preview still looks right → the first node where it looks wrong."</p>
-        </div>
-    </section>
-
-    <section>
-        <h2>Common beginner mistakes</h2>
-        <ul>
-            <li class="fragment"><strong>Forgot to save</strong> — Shader Graph doesn't auto-apply to materials. Ctrl+S or click Save Asset.</li>
-            <li class="fragment"><strong>Wired a Float into an Int/Boolean</strong> — silent type coercion, unexpected results</li>
-            <li class="fragment"><strong>Used world-space UV by mistake</strong> — effect scales with camera position. Use mesh UV (the default UV node).</li>
-            <li class="fragment"><strong>Alpha Clipping not enabled</strong> — dissolve does nothing because Alpha is ignored on opaque shaders</li>
-            <li class="fragment"><strong>Emission stays black</strong> — HDR intensity is 0, or Bloom is not enabled on the URP camera</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Debug by wiring to Base Color</h2>
-        <p>When in doubt, <strong>wire the suspect value directly into Base Color</strong>. You'll see it painted on the object:</p>
-        <ul>
-            <li>Black = 0</li>
-            <li>White = 1</li>
-            <li>Red/green/blue = you wired a vector; the R/G/B channels show component values</li>
-        </ul>
-        <p class="muted small">This is the shader version of <code>Debug.Log</code>. Put it back when you're done.</p>
-    </section>
-</section>
-
-<!-- ============================================
-     SECTION 8: VR GOTCHAS
-     ============================================ -->
-<section>
-    <section class="section-slide">
-        <h2>Part 8 — VR-Specific Gotchas</h2>
-    </section>
-
-    <section>
-        <h2>VR is twice as hard on shaders</h2>
-        <div class="columns">
-            <div class="card">
-                <h4>Desktop game</h4>
-                <p class="small">1920×1080 pixels × 60 fps = ~125M pixel shader invocations/sec</p>
-            </div>
-            <div class="card">
-                <h4>Quest 3 VR</h4>
-                <p class="small">2064×2208 × <strong>2 eyes</strong> × 90 fps = ~820M invocations/sec — <strong>~6.5× more work</strong></p>
-            </div>
-        </div>
-        <p class="fragment muted small">A shader that runs "fine" on your desktop can tank VR framerate. Budget accordingly.</p>
-    </section>
-
-    <section>
-        <h2>Single-Pass Instanced Rendering</h2>
-        <p>Quest/Vive/Index render both eyes in <strong>one</strong> draw call to save CPU overhead. Most shaders just work, but:</p>
-        <ul>
-            <li class="fragment"><strong>Avoid screen-space effects</strong> based on <code>_ScreenPosition</code> unless you handle stereo UVs</li>
-            <li class="fragment"><strong>Avoid sampling the camera opaque texture</strong> in Shader Graph unless you explicitly enable stereo-aware sampling</li>
-            <li class="fragment"><strong>Test on-device early</strong> — what compiles on desktop may break on Android/Quest</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Performance budget for VR shaders</h2>
-        <table>
-            <tr><th>Node / Feature</th><th>Cost</th><th>VR verdict</th></tr>
-            <tr><td>Sample Texture 2D</td><td>Cheap</td><td>✅ Use freely</td></tr>
-            <tr><td>Lerp / Add / Multiply</td><td>Near-free</td><td>✅ Use freely</td></tr>
-            <tr><td>Fresnel</td><td>Low</td><td>✅ Fine</td></tr>
-            <tr><td>Simple / Gradient Noise</td><td>Medium</td><td>⚠️ Prefer baked texture</td></tr>
-            <tr><td>Voronoi</td><td>High</td><td>⚠️ Bake or limit</td></tr>
-            <tr><td>Parallax / POM</td><td>Very high</td><td>❌ Avoid on Quest</td></tr>
-            <tr><td>Custom Function HLSL loops</td><td>Depends</td><td>❌ Profile religiously</td></tr>
-        </table>
-    </section>
-
-    <section>
-        <h2>Overdraw — the silent VR killer</h2>
-        <p><strong>Overdraw</strong> = the same pixel being shaded multiple times because transparent objects stack up.</p>
-        <ul>
-            <li class="fragment">A forest of alpha-blended leaves can shade every pixel 10+ times</li>
-            <li class="fragment">In VR, that's 10× a giant number</li>
-            <li class="fragment">Prefer <strong>alpha clipping</strong> (opaque + discard) over <strong>alpha blending</strong> (true transparency) whenever possible</li>
-            <li class="fragment">Use Unity's <em>Overdraw</em> scene view mode to visualize the damage</li>
-        </ul>
-        <div class="box success fragment">
-            <p>Our dissolve shader is alpha-clipped, not alpha-blended — which is why it's VR-safe. Good choice earlier.</p>
-        </div>
-    </section>
-
-    <section>
-        <h2>Mobile VR checklist</h2>
-        <ul>
-            <li class="fragment">Target shader complexity: <strong>Mobile</strong> variants where available</li>
-            <li class="fragment">Keep texture samples ≤ 4 per shader on Quest</li>
-            <li class="fragment">No dynamic branching in fragment shaders (use Lerp, not If)</li>
-            <li class="fragment">Bake lighting whenever possible — real-time PBR + shadows is expensive</li>
-            <li class="fragment"><strong>Profile on-device</strong>, not in the editor — desktop preview lies</li>
-        </ul>
-    </section>
-</section>
-
-<!-- ============================================
-     SECTION 9: DRIVING IT FROM CODE
-     ============================================ -->
-<section>
-    <section class="section-slide">
-        <h2>Part 9 — Driving the Shader from C#</h2>
+        <h2>Part 7 — Driving the Shader from C#</h2>
     </section>
 
     <section>
@@ -876,6 +764,118 @@ public class DissolveController : MonoBehaviour
             <li class="fragment"><strong><code>GetPropertyBlock</code> before <code>SetFloat</code>.</strong> You need to read current overrides first, modify, then write back — otherwise you wipe other per-renderer overrides.</li>
             <li class="fragment"><strong>Don't use <code>rend.material</code> and MPB on the same renderer.</strong> Pick one approach per object or they fight each other.</li>
             <li class="fragment"><strong>MPB values don't show in the Inspector.</strong> They're invisible overrides — for debugging, temporarily switch to <code>rend.material.SetFloat</code> to confirm values are landing.</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 8: DEBUGGING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 8 — Debugging Shader Graphs</h2>
+    </section>
+
+    <section>
+        <h2>Rule 1: preview every node</h2>
+        <p>Every node in Shader Graph has a <strong>live preview sphere</strong> at its bottom. When something looks wrong, walk <em>backwards</em> from the Master Stack until the preview stops matching your expectation.</p>
+        <div class="box success">
+            <p><strong>Debugging rule of thumb:</strong> "The bug is in the last node where the preview still looks right → the first node where it looks wrong."</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common beginner mistakes</h2>
+        <ul>
+            <li class="fragment"><strong>Forgot to save</strong> — Shader Graph doesn't auto-apply to materials. Ctrl+S or click Save Asset.</li>
+            <li class="fragment"><strong>Wired a Float into an Int/Boolean</strong> — silent type coercion, unexpected results</li>
+            <li class="fragment"><strong>Used world-space UV by mistake</strong> — effect scales with camera position. Use mesh UV (the default UV node).</li>
+            <li class="fragment"><strong>Alpha Clipping not enabled</strong> — dissolve does nothing because Alpha is ignored on opaque shaders</li>
+            <li class="fragment"><strong>Emission stays black</strong> — HDR intensity is 0, or Bloom is not enabled on the URP camera</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Debug by wiring to Base Color</h2>
+        <p>When in doubt, <strong>wire the suspect value directly into Base Color</strong>. You'll see it painted on the object:</p>
+        <ul>
+            <li>Black = 0</li>
+            <li>White = 1</li>
+            <li>Red/green/blue = you wired a vector; the R/G/B channels show component values</li>
+        </ul>
+        <p class="muted small">This is the shader version of <code>Debug.Log</code>. Put it back when you're done.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 9: VR GOTCHAS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 9 — VR-Specific Gotchas</h2>
+    </section>
+
+    <section>
+        <h2>VR is twice as hard on shaders</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Desktop game</h4>
+                <p class="small">1920×1080 pixels × 60 fps = ~125M pixel shader invocations/sec</p>
+            </div>
+            <div class="card">
+                <h4>Quest 3 VR</h4>
+                <p class="small">2064×2208 × <strong>2 eyes</strong> × 90 fps = ~820M invocations/sec — <strong>~6.5× more work</strong></p>
+            </div>
+        </div>
+        <p class="fragment muted small">A shader that runs "fine" on your desktop can tank VR framerate. Budget accordingly.</p>
+    </section>
+
+    <section>
+        <h2>Single-Pass Instanced Rendering</h2>
+        <p>Quest/Vive/Index render both eyes in <strong>one</strong> draw call to save CPU overhead. Most shaders just work, but:</p>
+        <ul>
+            <li class="fragment"><strong>Avoid screen-space effects</strong> based on <code>_ScreenPosition</code> unless you handle stereo UVs</li>
+            <li class="fragment"><strong>Avoid sampling the camera opaque texture</strong> in Shader Graph unless you explicitly enable stereo-aware sampling</li>
+            <li class="fragment"><strong>Test on-device early</strong> — what compiles on desktop may break on Android/Quest</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Performance budget for VR shaders</h2>
+        <table>
+            <tr><th>Node / Feature</th><th>Cost</th><th>VR verdict</th></tr>
+            <tr><td>Sample Texture 2D</td><td>Cheap</td><td>✅ Use freely</td></tr>
+            <tr><td>Lerp / Add / Multiply</td><td>Near-free</td><td>✅ Use freely</td></tr>
+            <tr><td>Fresnel</td><td>Low</td><td>✅ Fine</td></tr>
+            <tr><td>Simple / Gradient Noise</td><td>Medium</td><td>⚠️ Prefer baked texture</td></tr>
+            <tr><td>Voronoi</td><td>High</td><td>⚠️ Bake or limit</td></tr>
+            <tr><td>Parallax / POM</td><td>Very high</td><td>❌ Avoid on Quest</td></tr>
+            <tr><td>Custom Function HLSL loops</td><td>Depends</td><td>❌ Profile religiously</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Overdraw — the silent VR killer</h2>
+        <p><strong>Overdraw</strong> = the same pixel being shaded multiple times because transparent objects stack up.</p>
+        <ul>
+            <li class="fragment">A forest of alpha-blended leaves can shade every pixel 10+ times</li>
+            <li class="fragment">In VR, that's 10× a giant number</li>
+            <li class="fragment">Prefer <strong>alpha clipping</strong> (opaque + discard) over <strong>alpha blending</strong> (true transparency) whenever possible</li>
+            <li class="fragment">Use Unity's <em>Overdraw</em> scene view mode to visualize the damage</li>
+        </ul>
+        <div class="box success fragment">
+            <p>Our dissolve shader is alpha-clipped, not alpha-blended — which is why it's VR-safe. Good choice earlier.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mobile VR checklist</h2>
+        <ul>
+            <li class="fragment">Target shader complexity: <strong>Mobile</strong> variants where available</li>
+            <li class="fragment">Keep texture samples ≤ 4 per shader on Quest</li>
+            <li class="fragment">No dynamic branching in fragment shaders (use Lerp, not If)</li>
+            <li class="fragment">Bake lighting whenever possible — real-time PBR + shadows is expensive</li>
+            <li class="fragment"><strong>Profile on-device</strong>, not in the editor — desktop preview lies</li>
         </ul>
     </section>
 </section>
