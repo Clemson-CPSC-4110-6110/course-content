@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shader Graph for VR - CPSC 4110/6110</title>
+
+    <!-- Reveal.js core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Plugin styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Course theme -->
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .reveal .slides pre code {
+            max-height: 420px;
+            font-size: 0.75em !important;
+            line-height: 1.4 !important;
+            padding: 0.4em 0.6em !important;
+        }
+        .reveal .slides pre {
+            width: 100%;
+            margin: 0.4em 0;
+            padding: 0.6em !important;
+            line-height: 1.4 !important;
+        }
+
+        /* Pipeline diagram */
+        .pipeline {
+            display: flex;
+            align-items: stretch;
+            gap: 0.4rem;
+            margin: 1rem 0;
+            font-size: 0.7em;
+        }
+        .pipeline .stage {
+            flex: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.6rem 0.4rem;
+            text-align: center;
+        }
+        .pipeline .stage.programmable {
+            border-color: var(--accent);
+            background: rgba(82, 45, 128, 0.15);
+        }
+        .pipeline .stage h5 {
+            margin: 0 0 0.3rem 0;
+            font-size: 0.95em;
+            color: var(--accent);
+        }
+        .pipeline .arrow {
+            align-self: center;
+            color: var(--accent);
+            font-size: 1.2em;
+        }
+
+        /* Node-graph mock */
+        .nodegraph {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.6rem;
+            margin: 1rem 0;
+        }
+        .nodegraph .node {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 0.5rem 0.7rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72em;
+        }
+        .nodegraph .node h5 {
+            margin: 0 0 0.2rem 0;
+            color: var(--accent);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95em;
+        }
+        .nodegraph .node .io {
+            display: block;
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        /* Workflow steps */
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+        .workflow-steps .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.78em;
+            text-align: left;
+        }
+        .workflow-steps .step-num {
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            min-width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+        .workflow-steps .step code {
+            font-size: 0.95em;
+        }
+
+        .formula {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            display: inline-block;
+            margin: 0.4rem 0;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================
+     TITLE SLIDE
+     ============================================ -->
+<section class="title-slide">
+    <h1>Shader Graph for VR</h1>
+    <h3>From pixels to production — a visual tutorial</h3>
+    <p class="course-id">CPSC 4110/6110</p>
+</section>
+
+<!-- ============================================
+     SECTION 1: WHAT IS A SHADER
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 1 — What Is a Shader?</h2>
+    </section>
+
+    <section>
+        <h2>The question we're answering</h2>
+        <p>When Unity draws a triangle, <strong>how does it decide the color of every pixel inside that triangle?</strong></p>
+        <p class="fragment muted">Answer: a <em>shader</em> — a tiny program that runs on the GPU, once per vertex and once per pixel.</p>
+    </section>
+
+    <section>
+        <h2>Shaders run on the GPU, not the CPU</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>CPU</h4>
+                <p class="small">A few powerful cores. Runs C# game logic sequentially. Bad at doing the same math on millions of pixels.</p>
+            </div>
+            <div class="card">
+                <h4>GPU</h4>
+                <p class="small">Thousands of tiny cores. Runs the <strong>same</strong> small program in parallel on every vertex and every pixel. Brilliant at graphics.</p>
+            </div>
+        </div>
+        <p class="fragment muted small">A shader is <strong>literally</strong> a program designed for that parallel model.</p>
+    </section>
+
+    <section>
+        <h2>Vertex shader vs. fragment shader</h2>
+        <ul>
+            <li class="fragment"><strong>Vertex shader</strong> — runs once per vertex. Job: decide <em>where</em> each corner of a triangle lands on screen. Can also push vertices around for animation.</li>
+            <li class="fragment"><strong>Fragment (pixel) shader</strong> — runs once per pixel the triangle covers. Job: decide <em>what color</em> that pixel is.</li>
+            <li class="fragment muted">In Shader Graph these correspond to the <strong>Vertex</strong> and <strong>Fragment</strong> blocks of the Master Stack.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The render pipeline (simplified)</h2>
+        <div class="pipeline">
+            <div class="stage">Mesh<br><span class="muted small">vertices</span></div>
+            <div class="arrow">→</div>
+            <div class="stage programmable"><h5>Vertex<br>Shader</h5>position each vertex</div>
+            <div class="arrow">→</div>
+            <div class="stage">Rasterize<br><span class="muted small">fill triangle with pixels</span></div>
+            <div class="arrow">→</div>
+            <div class="stage programmable"><h5>Fragment<br>Shader</h5>color each pixel</div>
+            <div class="arrow">→</div>
+            <div class="stage">Framebuffer<br><span class="muted small">screen</span></div>
+        </div>
+        <p class="muted small">Only the purple boxes are <strong>programmable</strong>. That's what you write when you "write a shader."</p>
+    </section>
+
+    <section>
+        <h2>Why shaders feel like magic</h2>
+        <div class="box">
+            <p>Every visual effect you've ever seen in a game is a shader doing math on pixel coordinates: fire, water, holograms, outlines, dissolves, cartoon shading, X-ray vision.</p>
+        </div>
+        <p class="fragment">There is no fire. There is only <strong>math that outputs orange</strong>.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 2: WHY SHADER GRAPH
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 2 — Why Shader Graph?</h2>
+    </section>
+
+    <section>
+        <h2>The traditional way: HLSL code</h2>
+        <pre><code class="language-hlsl">half4 frag(Varyings IN) : SV_Target
+{
+    half4 col = tex2D(_MainTex, IN.uv);
+    half rim = 1 - saturate(dot(IN.normal, IN.viewDir));
+    col.rgb += rim * _RimColor.rgb;
+    return col;
+}</code></pre>
+        <p class="muted small">Powerful, but: new syntax, platform quirks, no preview, easy to crash your GPU.</p>
+    </section>
+
+    <section>
+        <h2>Shader Graph: the visual alternative</h2>
+        <ul>
+            <li class="fragment"><strong>Drag-and-drop nodes</strong> instead of typing HLSL</li>
+            <li class="fragment"><strong>Live preview</strong> at every single node — you see exactly what each step produces</li>
+            <li class="fragment"><strong>URP/HDRP-aware</strong> — handles lighting, shadows, fog, and XR for you</li>
+            <li class="fragment"><strong>Same underlying code</strong> — Unity compiles your graph to HLSL at build time</li>
+        </ul>
+        <div class="box success fragment">
+            <p><strong>Tradeoff:</strong> easier to learn, slightly less flexible than hand-written HLSL. For 95% of VR effects you will never hit the ceiling.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Requirements for this tutorial</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Unity 2022.3 LTS or newer</div></div>
+            <div class="step"><div class="step-num">2</div><div>A project using the <strong>Universal Render Pipeline (URP)</strong> — the <em>3D (URP)</em> template works</div></div>
+            <div class="step"><div class="step-num">3</div><div>Shader Graph package (installed with URP by default)</div></div>
+            <div class="step"><div class="step-num">4</div><div>A sphere in the scene to test on</div></div>
+        </div>
+        <p class="muted small">Shader Graph does <strong>not</strong> work with Unity's legacy Built-in pipeline.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 3: THE UI TOUR
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 3 — The Shader Graph UI</h2>
+    </section>
+
+    <section>
+        <h2>Creating your first graph</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Right-click in Project → <strong>Create → Shader Graph → URP → Lit Shader Graph</strong></div></div>
+            <div class="step"><div class="step-num">2</div><div>Name it <code>SG_MyFirstShader</code> (naming convention: prefix with <code>SG_</code>)</div></div>
+            <div class="step"><div class="step-num">3</div><div>Double-click to open the Shader Graph editor window</div></div>
+            <div class="step"><div class="step-num">4</div><div>Right-click in Project → <strong>Create → Material</strong>, drag your graph onto the material's Shader slot, then assign material to a sphere</div></div>
+        </div>
+        <div class="box warning">
+            <p><strong>Lit vs. Unlit:</strong> <em>Lit</em> responds to scene lights and shadows (PBR). <em>Unlit</em> ignores lighting and draws raw color — good for holograms, UI, skyboxes.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Anatomy of the editor</h2>
+        <ul>
+            <li class="fragment"><strong>Blackboard</strong> (left) — properties exposed to the material inspector (color, sliders, textures)</li>
+            <li class="fragment"><strong>Graph Inspector</strong> (right) — graph-wide settings (surface type, blend mode, cull mode)</li>
+            <li class="fragment"><strong>Main Preview</strong> (bottom-right) — a sphere showing the final result in real time</li>
+            <li class="fragment"><strong>Master Stack</strong> (center-right) — the final output, split into <em>Vertex</em> and <em>Fragment</em> blocks</li>
+            <li class="fragment"><strong>Node canvas</strong> (everywhere else) — where you drop nodes and wire them together</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Master Stack</h2>
+        <div class="nodegraph">
+            <div class="node">
+                <h5>Vertex</h5>
+                <span class="io">• Position</span>
+                <span class="io">• Normal</span>
+                <span class="io">• Tangent</span>
+            </div>
+            <div class="node">
+                <h5>Fragment</h5>
+                <span class="io">• Base Color</span>
+                <span class="io">• Metallic</span>
+                <span class="io">• Smoothness</span>
+                <span class="io">• Normal (TS)</span>
+                <span class="io">• Emission</span>
+                <span class="io">• Alpha</span>
+            </div>
+        </div>
+        <p class="muted small">Whatever wires into these ports becomes the shader's output. Everything else in the graph exists only to <em>compute</em> these values.</p>
+    </section>
+
+    <section>
+        <h2>Essential keyboard shortcuts</h2>
+        <table>
+            <tr><th>Action</th><th>Shortcut</th></tr>
+            <tr><td>Add a node</td><td>Space (or right-click → Create Node)</td></tr>
+            <tr><td>Frame all / frame selection</td><td>A / F</td></tr>
+            <tr><td>Duplicate</td><td>Ctrl+D</td></tr>
+            <tr><td>Convert selection to subgraph</td><td>Right-click → Convert To Sub-graph</td></tr>
+            <tr><td>Save &amp; apply</td><td>Ctrl+S (<strong>must save to see changes in scene</strong>)</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 4: NODE FUNDAMENTALS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 4 — Nodes, Wires, and Data Types</h2>
+    </section>
+
+    <section>
+        <h2>Every node is a function</h2>
+        <p>A node takes inputs on the left, does math, produces outputs on the right.</p>
+        <div class="nodegraph">
+            <div class="node">
+                <h5>Multiply</h5>
+                <span class="io">in A (float)</span>
+                <span class="io">in B (float)</span>
+                <span class="io">→ out (float)</span>
+            </div>
+            <div class="node">
+                <h5>Add</h5>
+                <span class="io">in A</span>
+                <span class="io">in B</span>
+                <span class="io">→ out</span>
+            </div>
+            <div class="node">
+                <h5>Sample Texture 2D</h5>
+                <span class="io">in Texture</span>
+                <span class="io">in UV</span>
+                <span class="io">→ RGBA, R, G, B, A</span>
+            </div>
+        </div>
+        <p class="fragment muted small">A <strong>wire</strong> passes a value from one node's output to another's input. That's it. That's the whole programming model.</p>
+    </section>
+
+    <section>
+        <h2>Data types (the colors on wire ports)</h2>
+        <table>
+            <tr><th>Type</th><th>What it is</th><th>Example</th></tr>
+            <tr><td>Float (1)</td><td>Single number</td><td>Time, brightness</td></tr>
+            <tr><td>Vector 2</td><td>Pair of floats</td><td>UV coordinate (u, v)</td></tr>
+            <tr><td>Vector 3</td><td>Triple</td><td>Position, normal, RGB</td></tr>
+            <tr><td>Vector 4</td><td>Quadruple</td><td>RGBA color</td></tr>
+            <tr><td>Boolean</td><td>true/false</td><td>Feature toggles</td></tr>
+            <tr><td>Texture 2D</td><td>An image</td><td>Albedo, normal map</td></tr>
+        </table>
+        <p class="muted small">Shader Graph auto-converts where it can: dragging a Float into a Vector3 port gives <code>(x, x, x)</code>.</p>
+    </section>
+
+    <section>
+        <h2>Swizzling: pick components by name</h2>
+        <p>The <strong>Split</strong> node breaks a Vector4 into R, G, B, A. The <strong>Combine</strong> node reassembles them.</p>
+        <p>Common trick — turn a UV into a grayscale gradient:</p>
+        <div class="formula">UV → Split → take R → feed into Base Color</div>
+        <p class="muted small">This shows a horizontal black→white gradient because U goes 0→1 left to right across the surface.</p>
+    </section>
+
+    <section>
+        <h2>Exposed properties (the Blackboard)</h2>
+        <p>Anything you add to the Blackboard becomes a <strong>slider or color picker</strong> on the material inspector in the scene — <em>without</em> reopening the graph.</p>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Click <strong>+</strong> on the Blackboard, choose <em>Color</em>, name it <code>_BaseColor</code></div></div>
+            <div class="step"><div class="step-num">2</div><div>Drag it into the canvas — it appears as a node</div></div>
+            <div class="step"><div class="step-num">3</div><div>Wire it into <strong>Base Color</strong> on the Master Stack</div></div>
+            <div class="step"><div class="step-num">4</div><div>Save. Now every material using this shader has a tintable color in the inspector.</div></div>
+        </div>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 5: THE ESSENTIAL NODES
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 5 — The Nodes You'll Actually Use</h2>
+    </section>
+
+    <section>
+        <h2>UV — the coordinate system of a surface</h2>
+        <p>Every point on a mesh's surface has a 2D coordinate <code>(u, v)</code>, usually in the range <strong>0 to 1</strong>.</p>
+        <ul>
+            <li class="fragment">Bottom-left of the texture = <code>(0, 0)</code></li>
+            <li class="fragment">Top-right of the texture = <code>(1, 1)</code></li>
+            <li class="fragment">The <strong>UV</strong> node gives you this coordinate for the pixel currently being shaded</li>
+        </ul>
+        <div class="box fragment">
+            <p><strong>Why it matters:</strong> UVs are how shaders <em>know where they are</em>. Almost every effect starts with "take UV, do math, make pattern."</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Time — how shaders move</h2>
+        <p>The <strong>Time</strong> node outputs how many seconds the game has been running.</p>
+        <div class="formula">UV.x + Time → feed into Base Color</div>
+        <p class="muted small">Result: a gradient that scrolls sideways forever. Congratulations — you animated a shader without writing a single <code>Update()</code>.</p>
+        <div class="box warning fragment">
+            <p><strong>Shader animation is free.</strong> It happens on the GPU, doesn't allocate memory, doesn't call C#. Prefer it over script-driven animation whenever the effect is purely visual.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Lerp — blend between two things</h2>
+        <div class="formula">Lerp(A, B, t) = A·(1−t) + B·t</div>
+        <ul>
+            <li>t = 0 → output is A</li>
+            <li>t = 1 → output is B</li>
+            <li>t = 0.5 → half-and-half</li>
+        </ul>
+        <p class="muted small">The single most-used node in Shader Graph. Use it to fade between two colors, two textures, two anything.</p>
+    </section>
+
+    <section>
+        <h2>Step and Smoothstep — turn gradients into edges</h2>
+        <ul>
+            <li class="fragment"><strong>Step(edge, x)</strong> → returns 0 if x &lt; edge, 1 otherwise. A hard binary cutoff.</li>
+            <li class="fragment"><strong>Smoothstep(a, b, x)</strong> → like Step but with a smooth S-curve transition between a and b.</li>
+        </ul>
+        <div class="box fragment">
+            <p><strong>Mental model:</strong> Step/Smoothstep are how you turn <em>smooth math</em> into <em>visible shapes</em>. A noise pattern becomes polka dots. A gradient becomes a horizon line.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Sample Texture 2D — read an image</h2>
+        <div class="nodegraph">
+            <div class="node">
+                <h5>Sample Texture 2D</h5>
+                <span class="io">in Texture</span>
+                <span class="io">in UV (default = mesh UV)</span>
+                <span class="io">→ RGBA</span>
+                <span class="io">→ R, G, B, A</span>
+            </div>
+        </div>
+        <p>This is how albedo maps, normal maps, masks, and noise textures enter a shader. You hand it a texture and a UV; it returns the color at that UV.</p>
+    </section>
+
+    <section>
+        <h2>Noise — procedural randomness</h2>
+        <ul>
+            <li><strong>Simple Noise</strong> — value noise, cheap, blobby</li>
+            <li><strong>Gradient Noise</strong> — Perlin-style, smooth, natural-looking</li>
+            <li><strong>Voronoi</strong> — cellular, good for scales, cracks, stylized water</li>
+        </ul>
+        <p class="muted small">All take a UV and a scale, output a grayscale pattern. Feed in <code>UV + Time</code> to make it scroll.</p>
+        <div class="box warning fragment">
+            <p>Procedural noise is <em>expensive</em> in the fragment shader. For production VR, sample a <strong>baked noise texture</strong> instead when you can.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fresnel Effect — the rim-light node</h2>
+        <p>Outputs a bright value on edges of the object (where the surface normal faces away from the camera) and dark in the middle.</p>
+        <div class="formula">fresnel = (1 − dot(Normal, ViewDir))^Power</div>
+        <ul>
+            <li class="fragment">Physically motivated — real materials reflect more light at glancing angles</li>
+            <li class="fragment">Visually: instant rim light, hologram outlines, soap bubbles, force fields</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 6: HANDS-ON BUILD
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 6 — Hands-On: Dissolve + Rim Light</h2>
+    </section>
+
+    <section>
+        <h2>What we're building</h2>
+        <div class="columns">
+            <div>
+                <ul>
+                    <li>An object that <strong>dissolves away</strong> controlled by a slider</li>
+                    <li>A glowing <strong>rim edge</strong> where it's currently disappearing</li>
+                    <li>Fully exposed to the inspector so designers can tweak it</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Why this example?</h4>
+                <p class="small">It touches every concept from Parts 4–5: UV, noise, Step, Lerp, Fresnel, exposed properties, alpha clipping, and emission. Build this and you understand Shader Graph.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 0 — Create the graph</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Create → Shader Graph → URP → <strong>Lit Shader Graph</strong>, name it <code>SG_Dissolve</code></div></div>
+            <div class="step"><div class="step-num">2</div><div>Open it. In the <strong>Graph Inspector</strong>, set <em>Surface Type</em> = Opaque, <em>Alpha Clipping</em> = ✔ enabled</div></div>
+            <div class="step"><div class="step-num">3</div><div>Create a Material using this shader and assign it to a sphere in your scene</div></div>
+        </div>
+        <div class="box">
+            <p><strong>Alpha Clipping</strong> means "if alpha falls below a threshold, throw the pixel away entirely." That's how we make parts of the mesh vanish.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 1 — Expose properties</h2>
+        <p>Add these to the <strong>Blackboard</strong>:</p>
+        <table>
+            <tr><th>Name</th><th>Type</th><th>Default</th></tr>
+            <tr><td><code>_BaseColor</code></td><td>Color</td><td>white</td></tr>
+            <tr><td><code>_DissolveAmount</code></td><td>Float (slider 0–1)</td><td>0</td></tr>
+            <tr><td><code>_NoiseScale</code></td><td>Float</td><td>10</td></tr>
+            <tr><td><code>_EdgeWidth</code></td><td>Float (slider 0–0.2)</td><td>0.05</td></tr>
+            <tr><td><code>_EdgeColor</code></td><td>Color (HDR)</td><td>orange, intensity 3</td></tr>
+        </table>
+        <p class="muted small">HDR colors can go brighter than (1,1,1) — essential for glow/bloom in VR.</p>
+    </section>
+
+    <section>
+        <h2>Step 2 — Generate the dissolve mask</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Drop a <strong>UV</strong> node</div></div>
+            <div class="step"><div class="step-num">2</div><div>Drop a <strong>Simple Noise</strong> node. Wire UV → UV input, wire <code>_NoiseScale</code> → Scale input</div></div>
+            <div class="step"><div class="step-num">3</div><div>The node preview now shows a cloudy black-and-white pattern — that's our <em>dissolve mask</em></div></div>
+        </div>
+        <div class="box success">
+            <p>Every pixel now has a "random" value between 0 and 1. We'll compare that value against <code>_DissolveAmount</code> to decide: still visible, or vanished?</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 3 — Cut out pixels (alpha clip)</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Drop a <strong>Step</strong> node. In = <code>_DissolveAmount</code>, Edge = Simple Noise output</div></div>
+            <div class="step"><div class="step-num">2</div><div>Read that as: "return 1 if noise &gt; dissolve amount, else 0"</div></div>
+            <div class="step"><div class="step-num">3</div><div>Wire Step output → Master Stack → <strong>Alpha</strong></div></div>
+            <div class="step"><div class="step-num">4</div><div>Set <strong>Alpha Clip Threshold</strong> to 0.5</div></div>
+        </div>
+        <p class="muted small">Now push <code>_DissolveAmount</code> up in the inspector — the sphere dissolves in noise-shaped patches. That's already 80% of the effect.</p>
+    </section>
+
+    <section>
+        <h2>Step 4 — Compute the glowing edge</h2>
+        <p>The edge = "pixels that are <em>about</em> to be dissolved" = pixels whose noise value is just barely above <code>_DissolveAmount</code>.</p>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div><strong>Subtract</strong>: noise − <code>_DissolveAmount</code></div></div>
+            <div class="step"><div class="step-num">2</div><div><strong>Step</strong> that result against <code>_EdgeWidth</code> — but <em>inverted</em>: we want 1 when the difference is small</div></div>
+            <div class="step"><div class="step-num">3</div><div>Easiest way: use <strong>Smoothstep(0, _EdgeWidth, noise − _DissolveAmount)</strong>, then <strong>One Minus</strong> the result</div></div>
+            <div class="step"><div class="step-num">4</div><div>You now have a value of 1 on the dissolve edge, 0 everywhere else</div></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 5 — Mix the edge color into Emission</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div><strong>Multiply</strong> the edge mask by <code>_EdgeColor</code> → this gives orange where the edge is, black elsewhere</div></div>
+            <div class="step"><div class="step-num">2</div><div>Wire the result into Master Stack → <strong>Emission</strong></div></div>
+            <div class="step"><div class="step-num">3</div><div>Wire <code>_BaseColor</code> straight into Master Stack → <strong>Base Color</strong></div></div>
+        </div>
+        <div class="box success">
+            <p>Save. Drag the dissolve slider — the sphere eats itself away with a glowing orange wavefront. <em>You just shipped a shader.</em></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Step 6 — Add a rim light (the Fresnel)</h2>
+        <p>Let's make the whole object glow at its silhouette too — a classic "energy object" VR look.</p>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Drop a <strong>Fresnel Effect</strong> node, Power = 3</div></div>
+            <div class="step"><div class="step-num">2</div><div><strong>Multiply</strong> it by <code>_EdgeColor</code></div></div>
+            <div class="step"><div class="step-num">3</div><div><strong>Add</strong> that to the dissolve-edge emission from Step 5</div></div>
+            <div class="step"><div class="step-num">4</div><div>Wire the sum into Emission</div></div>
+        </div>
+        <p class="muted small">Now the object has a permanent orange rim <em>and</em> a brighter dissolve wavefront. Both feed into the same Emission port — no conflict.</p>
+    </section>
+
+    <section>
+        <h2>Final graph structure</h2>
+        <pre><code class="language-text">  UV ─┐
+       ├─► Simple Noise ─┬─► Step(&gt; _DissolveAmount) ─► Alpha
+       │  (_NoiseScale)  │
+       │                 └─► Subtract(_DissolveAmount)
+       │                       └─► Smoothstep(0, _EdgeWidth) ─► OneMinus
+       │                             └─► Multiply(_EdgeColor) ─┐
+       │                                                       │
+  Fresnel(Power=3) ─► Multiply(_EdgeColor) ─────────────── Add ─► Emission
+
+  _BaseColor ──────────────────────────────────────────────────► Base Color</code></pre>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 7: DEBUGGING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 7 — Debugging Shader Graphs</h2>
+    </section>
+
+    <section>
+        <h2>Rule 1: preview every node</h2>
+        <p>Every node in Shader Graph has a <strong>live preview sphere</strong> at its bottom. When something looks wrong, walk <em>backwards</em> from the Master Stack until the preview stops matching your expectation.</p>
+        <div class="box success">
+            <p><strong>Debugging rule of thumb:</strong> "The bug is in the last node where the preview still looks right → the first node where it looks wrong."</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common beginner mistakes</h2>
+        <ul>
+            <li class="fragment"><strong>Forgot to save</strong> — Shader Graph doesn't auto-apply to materials. Ctrl+S or click Save Asset.</li>
+            <li class="fragment"><strong>Wired a Float into an Int/Boolean</strong> — silent type coercion, unexpected results</li>
+            <li class="fragment"><strong>Used world-space UV by mistake</strong> — effect scales with camera position. Use mesh UV (the default UV node).</li>
+            <li class="fragment"><strong>Alpha Clipping not enabled</strong> — dissolve does nothing because Alpha is ignored on opaque shaders</li>
+            <li class="fragment"><strong>Emission stays black</strong> — HDR intensity is 0, or Bloom is not enabled on the URP camera</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Debug by wiring to Base Color</h2>
+        <p>When in doubt, <strong>wire the suspect value directly into Base Color</strong>. You'll see it painted on the object:</p>
+        <ul>
+            <li>Black = 0</li>
+            <li>White = 1</li>
+            <li>Red/green/blue = you wired a vector; the R/G/B channels show component values</li>
+        </ul>
+        <p class="muted small">This is the shader version of <code>Debug.Log</code>. Put it back when you're done.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 8: VR GOTCHAS
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 8 — VR-Specific Gotchas</h2>
+    </section>
+
+    <section>
+        <h2>VR is twice as hard on shaders</h2>
+        <div class="columns">
+            <div class="card">
+                <h4>Desktop game</h4>
+                <p class="small">1920×1080 pixels × 60 fps = ~125M pixel shader invocations/sec</p>
+            </div>
+            <div class="card">
+                <h4>Quest 3 VR</h4>
+                <p class="small">2064×2208 × <strong>2 eyes</strong> × 90 fps = ~820M invocations/sec — <strong>~6.5× more work</strong></p>
+            </div>
+        </div>
+        <p class="fragment muted small">A shader that runs "fine" on your desktop can tank VR framerate. Budget accordingly.</p>
+    </section>
+
+    <section>
+        <h2>Single-Pass Instanced Rendering</h2>
+        <p>Quest/Vive/Index render both eyes in <strong>one</strong> draw call to save CPU overhead. Most shaders just work, but:</p>
+        <ul>
+            <li class="fragment"><strong>Avoid screen-space effects</strong> based on <code>_ScreenPosition</code> unless you handle stereo UVs</li>
+            <li class="fragment"><strong>Avoid sampling the camera opaque texture</strong> in Shader Graph unless you explicitly enable stereo-aware sampling</li>
+            <li class="fragment"><strong>Test on-device early</strong> — what compiles on desktop may break on Android/Quest</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Performance budget for VR shaders</h2>
+        <table>
+            <tr><th>Node / Feature</th><th>Cost</th><th>VR verdict</th></tr>
+            <tr><td>Sample Texture 2D</td><td>Cheap</td><td>✅ Use freely</td></tr>
+            <tr><td>Lerp / Add / Multiply</td><td>Near-free</td><td>✅ Use freely</td></tr>
+            <tr><td>Fresnel</td><td>Low</td><td>✅ Fine</td></tr>
+            <tr><td>Simple / Gradient Noise</td><td>Medium</td><td>⚠️ Prefer baked texture</td></tr>
+            <tr><td>Voronoi</td><td>High</td><td>⚠️ Bake or limit</td></tr>
+            <tr><td>Parallax / POM</td><td>Very high</td><td>❌ Avoid on Quest</td></tr>
+            <tr><td>Custom Function HLSL loops</td><td>Depends</td><td>❌ Profile religiously</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Overdraw — the silent VR killer</h2>
+        <p><strong>Overdraw</strong> = the same pixel being shaded multiple times because transparent objects stack up.</p>
+        <ul>
+            <li class="fragment">A forest of alpha-blended leaves can shade every pixel 10+ times</li>
+            <li class="fragment">In VR, that's 10× a giant number</li>
+            <li class="fragment">Prefer <strong>alpha clipping</strong> (opaque + discard) over <strong>alpha blending</strong> (true transparency) whenever possible</li>
+            <li class="fragment">Use Unity's <em>Overdraw</em> scene view mode to visualize the damage</li>
+        </ul>
+        <div class="box success fragment">
+            <p>Our dissolve shader is alpha-clipped, not alpha-blended — which is why it's VR-safe. Good choice earlier.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mobile VR checklist</h2>
+        <ul>
+            <li class="fragment">Target shader complexity: <strong>Mobile</strong> variants where available</li>
+            <li class="fragment">Keep texture samples ≤ 4 per shader on Quest</li>
+            <li class="fragment">No dynamic branching in fragment shaders (use Lerp, not If)</li>
+            <li class="fragment">Bake lighting whenever possible — real-time PBR + shadows is expensive</li>
+            <li class="fragment"><strong>Profile on-device</strong>, not in the editor — desktop preview lies</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 9: WHERE NEXT
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 9 — Where to Go Next</h2>
+    </section>
+
+    <section>
+        <h2>Extending the dissolve shader</h2>
+        <ul>
+            <li class="fragment">Replace Simple Noise with a <strong>baked noise texture</strong> for performance</li>
+            <li class="fragment">Animate <code>_DissolveAmount</code> from C# for a "Thanos snap" trigger</li>
+            <li class="fragment">Drive dissolve from <strong>world-space Y</strong> for a teleport-out-of-the-floor effect</li>
+            <li class="fragment">Swap Lit for Unlit + add a Depth Fade for ghost/hologram looks</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Common effects as exercises</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>Hologram</h4>
+                <p class="small">Unlit + Fresnel + scrolling scan lines via <code>sin(UV.y · 50 + Time)</code></p>
+            </div>
+            <div class="card fragment">
+                <h4>Stylized water</h4>
+                <p class="small">Two scrolling noise samples added together → normals → Fresnel-tinted surface</p>
+            </div>
+            <div class="card fragment">
+                <h4>Toon shading</h4>
+                <p class="small">Sample main light direction, dot with normal, feed into Step for hard bands</p>
+            </div>
+            <div class="card fragment">
+                <h4>Interactive grab glow</h4>
+                <p class="small">Expose a <code>_Highlight</code> float, Lerp emission up when XR controller hovers</p>
+            </div>
+            <div class="card fragment">
+                <h4>Force field</h4>
+                <p class="small">Fresnel + hex pattern texture + depth intersection bright line</p>
+            </div>
+            <div class="card fragment">
+                <h4>Portal</h4>
+                <p class="small">Sample a render texture from a second camera, mask with a shape</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Resources</h2>
+        <ul>
+            <li><strong>Unity Shader Graph manual</strong> — docs.unity3d.com/Packages/com.unity.shadergraph</li>
+            <li><strong>Ben Cloward's YouTube channel</strong> — the definitive Shader Graph tutorial series</li>
+            <li><strong>Catlike Coding</strong> — deeper HLSL fundamentals when you outgrow the visual editor</li>
+            <li><strong>Book of the Dead / Boat Attack</strong> — Unity's URP sample projects, full of production graphs</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The big mental model</h2>
+        <div class="box">
+            <p>A shader is <strong>a function from pixel coordinate to color</strong>. Everything else — textures, noise, time, fresnel, dissolve — is just a way of building that function out of smaller pieces.</p>
+        </div>
+        <p class="fragment muted">Once you see every effect as "UV goes in, color comes out," Shader Graph stops being intimidating and starts being <em>fun</em>.</p>
+    </section>
+</section>
+
+<!-- ============================================
+     CLOSING
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Questions?</h2>
+    </section>
+</section>
+
+</div>
+</div>
+
+<!-- Reveal.js and plugins -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+
+<!-- Course initialization -->
+<script src="../assets/slides-init.js"></script>
+
+</body>
+</html>
