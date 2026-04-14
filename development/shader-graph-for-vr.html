@@ -554,10 +554,13 @@
     <section>
         <h2>Step 3 — Cut out pixels (alpha clip)</h2>
         <div class="workflow-steps">
-            <div class="step"><div class="step-num">1</div><div>Drop a <strong>Step</strong> node. In = <code>_DissolveAmount</code>, Edge = Simple Noise output</div></div>
-            <div class="step"><div class="step-num">2</div><div>Read that as: "return 1 if noise &gt; dissolve amount, else 0"</div></div>
+            <div class="step"><div class="step-num">1</div><div>Drop a <strong>Step</strong> node. <strong>Edge</strong> = <code>_DissolveAmount</code>, <strong>In</strong> = Simple Noise output</div></div>
+            <div class="step"><div class="step-num">2</div><div>Unity's Step returns <code>1 if In &gt;= Edge else 0</code> — so this reads "keep the pixel (alpha = 1) where <em>noise &gt;= dissolve amount</em>, otherwise discard it"</div></div>
             <div class="step"><div class="step-num">3</div><div>Wire Step output → Master Stack → <strong>Alpha</strong></div></div>
             <div class="step"><div class="step-num">4</div><div>Set <strong>Alpha Clip Threshold</strong> to 0.5</div></div>
+        </div>
+        <div class="box warning">
+            <p><strong>Input order matters.</strong> If you swap Edge and In, the effect inverts — the object will start <em>invisible</em> and fill in as you raise the slider. If you see that, swap the wires.</p>
         </div>
         <p class="muted small">Now push <code>_DissolveAmount</code> up in the inspector — the sphere dissolves in noise-shaped patches. That's already 80% of the effect.</p>
     </section>
@@ -600,7 +603,7 @@
     <section>
         <h2>Final graph structure</h2>
         <pre><code class="language-text">  UV ─┐
-       ├─► Simple Noise ─┬─► Step(&gt; _DissolveAmount) ─► Alpha
+       ├─► Simple Noise ─┬─► Step(Edge=_DissolveAmount, In=noise) ─► Alpha
        │  (_NoiseScale)  │
        │                 └─► Subtract(_DissolveAmount)
        │                       └─► Smoothstep(0, _EdgeWidth) ─► OneMinus
