@@ -590,14 +590,18 @@
 
     <section>
         <h2>Step 6 — Add a rim light (the Fresnel)</h2>
-        <p>Let's make the whole object glow at its silhouette too — a classic "energy object" VR look.</p>
+        <p>Let's make the silhouette glow <em>while dissolving</em> — a classic "energy object" VR look. The rim should be invisible at rest and fade in as the object starts to dissolve.</p>
         <div class="workflow-steps">
             <div class="step"><div class="step-num">1</div><div>Drop a <strong>Fresnel Effect</strong> node, Power = 3</div></div>
             <div class="step"><div class="step-num">2</div><div><strong>Multiply</strong> it by <code>_EdgeColor</code></div></div>
-            <div class="step"><div class="step-num">3</div><div><strong>Add</strong> that to the dissolve-edge emission from Step 5</div></div>
-            <div class="step"><div class="step-num">4</div><div>Wire the sum into Emission</div></div>
+            <div class="step"><div class="step-num">3</div><div><strong>Multiply</strong> that result by <code>_DissolveAmount</code> — this <em>gates</em> the rim so it only appears while dissolving</div></div>
+            <div class="step"><div class="step-num">4</div><div><strong>Add</strong> the gated rim to the dissolve-edge emission from Step 5</div></div>
+            <div class="step"><div class="step-num">5</div><div>Wire the sum into Emission</div></div>
         </div>
-        <p class="muted small">Now the object has a permanent orange rim <em>and</em> a brighter dissolve wavefront. Both feed into the same Emission port — no conflict.</p>
+        <div class="box">
+            <p><strong>Why gate with <code>_DissolveAmount</code>?</strong> Without it, the rim is always on — even when the object is solid and nothing's happening. Multiplying by the dissolve slider makes the rim ramp in exactly when needed.</p>
+        </div>
+        <p class="muted small">Want the rim to snap on faster? Wrap <code>_DissolveAmount</code> in a <strong>Smoothstep(0, 0.1, x)</strong> before multiplying — now even a tiny dissolve (0.05) shows full rim.</p>
     </section>
 
     <section>
@@ -607,11 +611,12 @@
        │  (_NoiseScale)  │
        │                 └─► Subtract(_DissolveAmount)
        │                       └─► Smoothstep(0, _EdgeWidth) ─► OneMinus
-       │                             └─► Multiply(_EdgeColor) ─┐
-       │                                                       │
-  Fresnel(Power=3) ─► Multiply(_EdgeColor) ─────────────── Add ─► Emission
-
-  _BaseColor ──────────────────────────────────────────────────► Base Color</code></pre>
+       │                             └─► Multiply(_EdgeColor) ─────────┐
+       │                                                               │
+  Fresnel(Power=3) ─► Multiply(_EdgeColor) ─► Multiply(_DissolveAmount) ┤
+                                              (gates rim on/off)       │
+                                                                   Add ─► Emission
+  _BaseColor ──────────────────────────────────────────────────────────► Base Color</code></pre>
     </section>
 </section>
 
@@ -728,11 +733,159 @@
 </section>
 
 <!-- ============================================
-     SECTION 9: WHERE NEXT
+     SECTION 9: DRIVING IT FROM CODE
      ============================================ -->
 <section>
     <section class="section-slide">
-        <h2>Part 9 — Where to Go Next</h2>
+        <h2>Part 9 — Driving the Shader from C#</h2>
+    </section>
+
+    <section>
+        <h2>Why a script?</h2>
+        <p>So far we've dragged the <code>_DissolveAmount</code> slider by hand. In a real game you want dissolve to trigger from <strong>events</strong>:</p>
+        <ul>
+            <li class="fragment">Enemy defeated → dissolve out over 1.5 s</li>
+            <li class="fragment">Player teleports in → dissolve <em>in</em> from 1 → 0</li>
+            <li class="fragment">Object grabbed in VR → highlight with partial dissolve</li>
+        </ul>
+        <p class="fragment muted small">Exposed shader properties show up as ordinary material fields — anything C# can reach, code can animate.</p>
+    </section>
+
+    <section>
+        <h2>The minimum viable script</h2>
+        <pre><code class="language-csharp" data-line-numbers="1-18|7|10|14-16">
+using UnityEngine;
+
+public class DissolveSimple : MonoBehaviour
+{
+    [Range(0f, 1f)] public float dissolveAmount = 0f;
+
+    private static readonly int DissolveID = Shader.PropertyToID("_DissolveAmount");
+
+    private Renderer rend;
+
+    void Awake() { rend = GetComponent&lt;Renderer&gt;(); }
+
+    void Update()
+    {
+        // Push the current value into the material every frame
+        rend.material.SetFloat(DissolveID, dissolveAmount);
+    }
+}
+        </code></pre>
+        <p class="muted small">Drop this on the sphere. Now scrubbing <code>dissolveAmount</code> in the Inspector during Play mode drives the shader.</p>
+    </section>
+
+    <section>
+        <h2>Three things to notice</h2>
+        <ul>
+            <li class="fragment"><strong><code>Shader.PropertyToID("_DissolveAmount")</code></strong> — converts the string name to an integer handle <em>once</em>. Faster than passing the string every frame, and the name must match the Reference in the Blackboard exactly.</li>
+            <li class="fragment"><strong><code>rend.material</code></strong> (vs <code>sharedMaterial</code>) — Unity silently <em>clones</em> the material the first time you touch <code>.material</code>, so changes don't leak to other objects. Safe, but creates a new material instance per object.</li>
+            <li class="fragment"><strong><code>SetFloat</code></strong> — there's also <code>SetColor</code>, <code>SetVector</code>, <code>SetTexture</code>. One method per property type.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The VR-friendly version: MaterialPropertyBlock</h2>
+        <p>The simple version clones the material per renderer. In VR, that breaks <strong>GPU instancing</strong> — every dissolving object becomes a unique draw call, tanking performance.</p>
+        <div class="box success">
+            <p><strong>Fix:</strong> use <code>MaterialPropertyBlock</code>. It overrides shader properties <em>per-renderer</em> without touching the material, so instancing still batches everything into one draw call.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>DissolveController.cs</h2>
+        <pre><code class="language-csharp" data-line-numbers="1-40|9|12-16|20-24|28-38">
+using System.Collections;
+using UnityEngine;
+
+[RequireComponent(typeof(Renderer))]
+public class DissolveController : MonoBehaviour
+{
+    [SerializeField] private float duration = 1.5f;
+
+    private static readonly int DissolveID = Shader.PropertyToID("_DissolveAmount");
+
+    private Renderer rend;
+    private MaterialPropertyBlock mpb;
+
+    void Awake()
+    {
+        rend = GetComponent&lt;Renderer&gt;();
+        mpb  = new MaterialPropertyBlock();
+    }
+
+    // Public API — call these from anywhere (UnityEvents, XR interactors, etc.)
+    public void DissolveOut() { StopAllCoroutines(); StartCoroutine(Animate(0f, 1f)); }
+    public void DissolveIn()  { StopAllCoroutines(); StartCoroutine(Animate(1f, 0f)); }
+
+    public void SetDissolve(float v)
+    {
+        rend.GetPropertyBlock(mpb);
+        mpb.SetFloat(DissolveID, Mathf.Clamp01(v));
+        rend.SetPropertyBlock(mpb);
+    }
+
+    private IEnumerator Animate(float from, float to)
+    {
+        float t = 0f;
+        while (t &lt; duration)
+        {
+            t += Time.deltaTime;
+            SetDissolve(Mathf.Lerp(from, to, t / duration));
+            yield return null;
+        }
+        SetDissolve(to);
+    }
+}
+        </code></pre>
+    </section>
+
+    <section>
+        <h2>Using it in the scene</h2>
+        <div class="workflow-steps">
+            <div class="step"><div class="step-num">1</div><div>Save <code>DissolveController.cs</code> in your <code>Scripts/</code> folder</div></div>
+            <div class="step"><div class="step-num">2</div><div>Add the component to your dissolving sphere (the Renderer is required and auto-grabbed)</div></div>
+            <div class="step"><div class="step-num">3</div><div>Hit Play → in the Inspector's tiny <em>3 dots → Invoke</em> menu, call <code>DissolveOut()</code> — watch the sphere vanish with the glowing wavefront</div></div>
+            <div class="step"><div class="step-num">4</div><div>Wire it into a <strong>UnityEvent</strong>: XR Grab Interactable's <em>On Select Entered</em> → DissolveController.DissolveOut</div></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common connection points in VR</h2>
+        <div class="columns columns-3">
+            <div class="card fragment">
+                <h4>XR Interaction</h4>
+                <p class="small"><code>XRGrabInteractable.selectEntered</code> → <code>DissolveOut</code>. Drop an object from the player's hand to make it fade away.</p>
+            </div>
+            <div class="card fragment">
+                <h4>Health / damage</h4>
+                <p class="small">Map enemy HP to dissolve: <code>SetDissolve(1 - hp/maxHp)</code>. Damaged enemies visibly "decay."</p>
+            </div>
+            <div class="card fragment">
+                <h4>Proximity</h4>
+                <p class="small">Distance from player → dissolve. Great for stealth enemies that fade when you look at them.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Gotchas</h2>
+        <ul>
+            <li class="fragment"><strong>Reference name must match.</strong> The Blackboard property has a <em>Display Name</em> (what you see in graph) and a <em>Reference</em> (starts with <code>_</code>, what C# uses). Check the Node Settings panel — it's usually auto-named and sometimes wrong.</li>
+            <li class="fragment"><strong><code>GetPropertyBlock</code> before <code>SetFloat</code>.</strong> You need to read current overrides first, modify, then write back — otherwise you wipe other per-renderer overrides.</li>
+            <li class="fragment"><strong>Don't use <code>rend.material</code> and MPB on the same renderer.</strong> Pick one approach per object or they fight each other.</li>
+            <li class="fragment"><strong>MPB values don't show in the Inspector.</strong> They're invisible overrides — for debugging, temporarily switch to <code>rend.material.SetFloat</code> to confirm values are landing.</li>
+        </ul>
+    </section>
+</section>
+
+<!-- ============================================
+     SECTION 10: WHERE NEXT
+     ============================================ -->
+<section>
+    <section class="section-slide">
+        <h2>Part 10 — Where to Go Next</h2>
     </section>
 
     <section>
