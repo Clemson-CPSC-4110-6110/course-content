@@ -22,17 +22,44 @@
     <link rel="stylesheet" href="../assets/theme.css">
 
     <style>
-        .reveal .slides pre code {
-            max-height: 420px;
-            font-size: 0.75em !important;
-            line-height: 1.4 !important;
-            padding: 0.4em 0.6em !important;
-        }
         .reveal .slides pre {
             width: 100%;
             margin: 0.4em 0;
-            padding: 0.6em !important;
-            line-height: 1.4 !important;
+            padding: 0 !important;
+            box-shadow: none;
+            max-height: 500px;
+            overflow: auto !important;
+            border-radius: 6px;
+        }
+        .reveal .slides pre code {
+            font-size: 0.7em !important;
+            line-height: 1.35 !important;
+            padding: 0.6em 0.8em !important;
+            max-height: none !important;
+            overflow: visible !important;
+            white-space: pre !important;
+            display: block;
+        }
+        /* Custom scrollbar for code blocks */
+        .reveal .slides pre::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 170, 0.4);
+            border-radius: 5px;
+        }
+        .reveal .slides pre::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 170, 0.7);
+        }
+        /* Tighter headings on script-heavy slides */
+        .reveal .slides section.code-slide h2 {
+            font-size: 1.3em;
+            margin-bottom: 0.3em;
         }
 
         /* Pipeline diagram */
@@ -225,7 +252,7 @@
         <h2>Part 2 — Why Shader Graph?</h2>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>The traditional way: HLSL code</h2>
         <pre><code class="language-hlsl">half4 frag(Varyings IN) : SV_Target
 {
@@ -604,7 +631,7 @@
         <p class="muted small">Want the rim to snap on faster? Wrap <code>_DissolveAmount</code> in a <strong>Smoothstep(0, 0.1, x)</strong> before multiplying — now even a tiny dissolve (0.05) shows full rim.</p>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>Final graph structure</h2>
         <pre><code class="language-text">  UV ─┐
        ├─► Simple Noise ─┬─► Step(Edge=_DissolveAmount, In=noise) ─► Alpha
@@ -639,7 +666,7 @@
         <p class="fragment muted small">Exposed shader properties show up as ordinary material fields — anything C# can reach, code can animate.</p>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>The minimum viable script</h2>
         <pre><code class="language-csharp" data-line-numbers="1-18|7|10|14-16">
 using UnityEngine;
@@ -681,7 +708,7 @@ public class DissolveSimple : MonoBehaviour
         </div>
     </section>
 
-    <section>
+    <section class="code-slide">
         <h2>DissolveController.cs</h2>
         <pre><code class="language-csharp" data-line-numbers="1-40|9|12-16|20-24|28-38">
 using System.Collections;
